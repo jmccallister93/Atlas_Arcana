@@ -1,0 +1,7 @@
+{
+  "name": "atlas_arcana",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
