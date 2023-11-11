@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs'); // Make sure to install bcryptjs
 
 const playerSchema = new mongoose.Schema({
   username: {
@@ -10,6 +11,10 @@ const playerSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  password: {
+    type: String,
+    required: true
   },
   gameWins: {
     type: Int32Array,
@@ -27,5 +32,6 @@ const playerSchema = new mongoose.Schema({
     unique: false,
   }
 });
+
 
 module.exports = playerSchema;

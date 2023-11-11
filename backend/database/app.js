@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Player = require('./PlayerModel');
+const authRoutes = require('./authentication/authRoutes');
 
 const app = express();
 app.use(express.json());
@@ -60,6 +61,12 @@ app.delete('/players/:id', async (req, res) => {
         res.status(500).send(error);
     }
 });
+
+
+app.use('/auth', authRoutes);
+
+// Protect game routes
+app.use('/game', authMiddleware, gameRoutes);
 
 
 module.exports = app;
