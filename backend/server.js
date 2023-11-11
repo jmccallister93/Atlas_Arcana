@@ -1,11 +1,14 @@
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const Player = require('./PlayerModel'); // Adjust the path as necessary
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
 
-mongoose.connect('mongodb://localhost/atlasArcana', {
+// MongoDB connection
+mongoose.connect('mongodb://127.0.0.1/atlasArcana', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -22,9 +25,9 @@ app.post('/players', async (req, res) => {
     } catch (error) {
       res.status(400).send(error);
     }
-  });
+});
 
-//   Get all Players
+// Get all Players
 app.get('/players', async (req, res) => {
     try {
       const players = await Player.find();
@@ -32,10 +35,18 @@ app.get('/players', async (req, res) => {
     } catch (error) {
       res.status(500).send(error);
     }
-  });
-  
-
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
 });
 
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+server.listen(3000, () => {
+    console.log('Listening on *:3000');
+});
