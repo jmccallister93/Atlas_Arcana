@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/myDatabaseName', {
+mongoose.connect('mongodb://localhost/atlasArcana', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

@@ -1,0 +1,9 @@
+### Server
+# Express Server running in server.js
+To start cd to backend
+In terminal run node index.js
+
+# MongoDb Service
+Can start service using: net start MongoDB 
+Can stop service using: net stop MongoDB
+
