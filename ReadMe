@@ -1,4 +1,4 @@
-### Server
+### Back End
 # Express Server running in server.js
 To start cd to backend
 In terminal run node server.js
@@ -9,3 +9,8 @@ Can stop service using: net stop MongoDB
 
 # Automated testing
 Run npm test from backend 
+
+### Front End
+# Start UI
+cd to front end
+npm start

@@ -16,6 +16,9 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Create new player
 app.post('/players', async (req, res) => {
+  if (!validatePlayerData(req.body)) {
+    return res.status(400).send({ error: 'Invalid player data' });
+  }
     try {
       const newPlayer = new Player(req.body);
       await newPlayer.save();

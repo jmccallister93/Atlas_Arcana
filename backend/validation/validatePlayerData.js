@@ -1,8 +1,12 @@
 module.exports = {
-    validatePlayerData: (data) => {
-      // Implement validation logic
-      // Example: Check if the player data structure is correct
-      // Return true if valid, false otherwise
+    validatePlayerData: (playerData) => {
+      if (!playerData.id || typeof playerData.id !== 'string') {
+        return false;
+      }
+      if (!playerData.stats || typeof playerData.stats !== 'object') {
+        return false;
+      }
+      // Additional checks...
       return true;
     }
   };
