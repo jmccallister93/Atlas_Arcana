@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { isLoggedIn, login } = useAuth();
+  const { isLoggedIn, login, username } = useAuth();
   const history = useHistory();
 
   useEffect(() => {
@@ -37,7 +37,10 @@ const LoginPage: React.FC = () => {
         password,
       });
       console.log("Login successful:", response.data);
-      login();
+  
+      // Assuming the username is part of the response
+      const username = response.data.username;
+      login(username);
     } catch (error: any) {
       const errMsg = error.response?.data?.error || "Login failed";
       setErrorMessage(errMsg);
@@ -90,7 +93,7 @@ const LoginPage: React.FC = () => {
             </>
           ) : (
             <div>
-              <h2>Welcome {email}, redirecting to Home page...</h2>
+              <h2>Welcome {username}, redirecting to Home page...</h2>
             </div>
           )}
           {errorMessage && (

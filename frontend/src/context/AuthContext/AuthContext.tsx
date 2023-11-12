@@ -2,12 +2,14 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: () => void;
+  username: string | null;
+  login: (username: string) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
+  username: null,
   login: () => {},
   logout: () => {}
 });
@@ -20,17 +22,20 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
 
-  const login = () => {
+  const login = (username: string) => {
     setIsLoggedIn(true);
+    setUsername(username);
   };
 
   const logout = () => {
     setIsLoggedIn(false);
+    setUsername(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, username, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
