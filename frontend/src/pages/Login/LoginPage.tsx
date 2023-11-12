@@ -13,6 +13,7 @@ import {
   IonText,
 } from "@ionic/react";
 import axios from "axios";
+import { IonRouterLink } from "@ionic/react";
 
 const LoginPage: React.FC = () => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -28,7 +29,9 @@ const LoginPage: React.FC = () => {
       console.log("Login successful:", response.data);
       // Handle successful login (e.g., redirect to dashboard, store token)
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.error || "Login failed");
+        console.log(error)
+      const errorMessage = error.response?.data?.message || "Login failed";
+      setErrorMessage(errorMessage);
     }
   };
 
@@ -65,8 +68,13 @@ const LoginPage: React.FC = () => {
         >
           Login
         </IonButton>
-        <IonLabel>Forgot Password?</IonLabel>
-        <IonLabel>Don't have an account? Sign up here!</IonLabel>
+        <IonRouterLink routerLink="/PasswordResetPage">
+          Forgot Password?
+        </IonRouterLink>
+        <br/>
+        <IonRouterLink routerLink="/SignupPage">
+          Don't have an account? Sign up here!
+        </IonRouterLink>
         {errorMessage && (
           <IonText
             color="danger"
@@ -75,8 +83,6 @@ const LoginPage: React.FC = () => {
             {errorMessage}
           </IonText>
         )}
-
-      
       </IonContent>
     </IonPage>
   );

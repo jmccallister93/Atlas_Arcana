@@ -1,7 +1,7 @@
 import { Redirect, Route } from "react-router-dom";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import Home from "./pages/Home";
+
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -23,12 +23,14 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 
 // Pages
+import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import SignupPage from "./pages/SignupPage/SignupPage";
 import SettingsPage from "./pages/SettingsPage/SettingsPage";
 import GamePage from "./pages/GamePage/GamePage";
 import LobbyPage from "./pages/LobbyPage/LobbyPage";
 import Navbar from "./components/NavBar/Navbar";
+import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
 
 setupIonicReact();
 
@@ -38,13 +40,16 @@ const App: React.FC = () => (
       <Navbar />
       <IonRouterOutlet id="mainMenu">
         <Route exact path="/home">
-          <Home />
+          <HomePage />
         </Route>
         <Route exact path="/login">
           <LoginPage />
         </Route>
         <Route exact path="/signup">
           <SignupPage />
+        </Route>
+        <Route exact path="/resetPassword">
+          <ResetPasswordPage />
         </Route>
         <Route exact path="/settings">
           <SettingsPage />
