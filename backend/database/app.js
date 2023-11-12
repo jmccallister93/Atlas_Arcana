@@ -1,10 +1,16 @@
 const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const Player = require('./PlayerModel');
 const authRoutes = require('../authentication/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
+const { validatePlayerData } = require('../validation/validatePlayerData');
+
 
 const app = express();
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
 app.use(express.json());
 
 // MongoDB connection
@@ -17,6 +23,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Create new player
 app.post('/players', async (req, res) => {
+  console.log(req.body)
   if (!validatePlayerData(req.body)) {
     return res.status(400).send({ error: 'Invalid player data' });
   }
@@ -25,7 +32,8 @@ app.post('/players', async (req, res) => {
       await newPlayer.save();
       res.status(201).send(newPlayer);
     } catch (error) {
-      res.status(400).send(error);
+      console.error(error); // Log the error for debugging
+      res.status(400).send({ error: error.message });
     }
 });
 

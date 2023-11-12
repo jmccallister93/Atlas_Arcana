@@ -18,18 +18,18 @@ const playerSchema = new mongoose.Schema({
   },
   token: {
     type: String,
-    required: true
+    required: false
   },
-  // gameWins: {
-  //   type: Int32Array,
-  //   require: false,
-  //   unique: false,
-  // },
-  // gameLosses: {
-  //   type: Int32Array,
-  //   require: false,
-  //   unique: false,
-  // },
+  gameWins: {
+    type: Number,
+    require: false,
+    unique: false,
+  },
+  gameLosses: {
+    type: Number,
+    require: false,
+    unique: false,
+  },
   friendsList:{
     type: String,
     require: false,

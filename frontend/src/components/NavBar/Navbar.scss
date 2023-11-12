@@ -1,12 +1,13 @@
 ion-toolbar {
-    // --background: green;
-    --color: white;
-  
-    // --border-color: none;
-    // --border-width: 4px 0;
-    // --border-style: none;
-  
-    // --min-height: 80px;
-    // --padding-top: 20px;
-    // --padding-bottom: 20px;
+  --color: white; // Sets the color of text and icons in the toolbar
+
+  ion-buttons {
+    ion-menu-button {
+      --color: white; // Specifically targets the menu button
+    }
   }
+}
+  .navbarMenuContainer{
+    background: rgb(0, 0, 0, 0.5);
+  }
+

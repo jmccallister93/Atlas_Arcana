@@ -11,14 +11,11 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Home.css";
 import Navbar from "../components/NavBar/Navbar";
 
-
 const Home: React.FC = () => {
   return (
-    <IonPage >
-      
+    <IonPage>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
-        
           <IonToolbar>
             <IonTitle size="large">Test</IonTitle>
           </IonToolbar>
