@@ -17,19 +17,17 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { emailOrUsername, password } = req.body;
-    const user = await User.findOne({
-      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
-    });
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
 
     if (!user) {
-      console.log(`User not found with email/username: ${emailOrUsername}`);
-      return res.status(401).send({ error: "Login failed. User not found." });
+      console.log(`User not found with email: ${email}`);
+      return res.status(401).send({ error: "Login failed. Email not found." });
     }
 
     const isPasswordMatch = bcrypt.compareSync(password, user.password);
     if (!isPasswordMatch) {
-      console.log("Incorrect password for user:", emailOrUsername);
+      console.log("Incorrect password for user:", email);
       return res
         .status(401)
         .send({ error: "Login failed. Incorrect password." });
@@ -42,3 +40,4 @@ exports.login = async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 };
+
