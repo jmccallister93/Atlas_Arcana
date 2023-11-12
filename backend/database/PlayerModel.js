@@ -2,7 +2,6 @@ const playerSchema = require('./PlayerSchema');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-
 // Static method to find user by email and password
 playerSchema.statics.findByCredentials = async function(email, password) {
     const user = await this.findOne({ email });
