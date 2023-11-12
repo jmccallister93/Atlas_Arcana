@@ -160,7 +160,7 @@ async function endGameSession(sessionId) {
 }
 
 // Assuming you have a setup for socket.io somewhere in your code
-const io = require('../yourSocketSetup'); // Adjust the path as necessary
+const io = require('../database/server'); // Adjust the path as necessary
 
 async function notifyPlayers(playerOne, playerTwo, sessionId) {
   // Emit an event to both players with the session ID

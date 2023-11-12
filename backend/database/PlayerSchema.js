@@ -20,16 +20,16 @@ const playerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  gameWins: {
-    type: Int32Array,
-    require: false,
-    unique: false,
-  },
-  gameLosses: {
-    type: Int32Array,
-    require: false,
-    unique: false,
-  },
+  // gameWins: {
+  //   type: Int32Array,
+  //   require: false,
+  //   unique: false,
+  // },
+  // gameLosses: {
+  //   type: Int32Array,
+  //   require: false,
+  //   unique: false,
+  // },
   friendsList:{
     type: String,
     require: false,

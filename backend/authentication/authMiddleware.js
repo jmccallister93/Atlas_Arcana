@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../database/UserModel'); // Adjust path as needed
+const User = require('../database/PlayerModel'); // Adjust path as needed
 
 const secret = process.env.JWT_SECRET;
 

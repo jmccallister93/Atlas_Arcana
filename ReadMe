@@ -1,11 +1,16 @@
 ### Back End
-# Express Server running in server.js
-To start cd to backend
-In terminal run node server.js
 
 # MongoDb Service
 Can start service using: net start MongoDB 
 Can stop service using: net stop MongoDB
+
+# Redis Service
+Windows search Ubuntu
+open terminal - redis-server to start service
+
+# Express Server running in server.js
+To start cd to backend/database
+In terminal run node server.js
 
 # Automated testing
 Run npm test from backend 
