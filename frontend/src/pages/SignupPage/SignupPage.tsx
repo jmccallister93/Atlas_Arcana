@@ -28,7 +28,7 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/players", {
+      const response = await axios.post("http://localhost:3001/players", {
         username: userName,
         email,
         password,

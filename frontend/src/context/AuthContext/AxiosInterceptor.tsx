@@ -11,7 +11,7 @@ axios.interceptors.response.use(
 
       try {
         // Call your refresh token endpoint
-        const response = await axios.post('http://localhost:3000/auth/refresh-token');
+        const response = await axios.post('http://localhost:3001/auth/refresh-token');
         const { accessToken } = response.data;
 
         // Update the token in localStorage
