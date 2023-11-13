@@ -12,21 +12,31 @@ import {
 } from "@ionic/react";
 import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
-import socket from '../../context/SocketClient/socketClient'
+import socket from "../../context/SocketClient/socketClient";
 
 const LobbyPage = () => {
+  const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-
+  // Issue is this is not running
   useEffect(() => {
-    socket.on('updateOnlineUsers', (users: string[]) => {
-      setOnlineUsers(users);
-    });
+    console.log("LobbyPage: Setting up socket listeners");
+  
+    const handleUpdateOnlineUsers = (usersCount: number) => {
+      console.log("Received users count:", usersCount);
+      setOnlineUsers(usersCount);
+    };
+  
+    socket.on('updateOnlineUsers', handleUpdateOnlineUsers);
   
     return () => {
-      socket.off('updateOnlineUsers');
+      console.log("LobbyPage: Cleaning up socket listeners");
+      socket.off('updateOnlineUsers', handleUpdateOnlineUsers);
     };
   }, []);
+  
+  
+
+  console.log(onlineUsers);
 
   return (
     <IonPage>
@@ -66,7 +76,7 @@ const LobbyPage = () => {
                   <IonCardSubtitle>Current online players</IonCardSubtitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  {onlineUsers.length} players are currently online.
+                  {onlineUsers} players are currently online.
                 </IonCardContent>
               </IonCard>
             </IonCol>

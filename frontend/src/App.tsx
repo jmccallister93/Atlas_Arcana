@@ -42,8 +42,8 @@ setupIonicReact();
 const App: React.FC = () => (
   <AuthProvider>
     <IonApp>
-      <Navbar />
       <IonReactRouter>
+        <Navbar />
         <IonRouterOutlet id="mainMenu">
           <Route exact path="/">
             <Redirect to="/home" />
