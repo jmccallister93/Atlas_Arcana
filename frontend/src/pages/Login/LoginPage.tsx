@@ -37,10 +37,8 @@ const LoginPage: React.FC = () => {
         password,
       });
       console.log("Login successful:", response.data);
-  
-      // Assuming the username is part of the response
-      const username = response.data.username;
-      login(username);
+      const username = response.data.user.username;
+      login(username, response.data.accessToken);
     } catch (error: any) {
       const errMsg = error.response?.data?.error || "Login failed";
       setErrorMessage(errMsg);
@@ -92,9 +90,9 @@ const LoginPage: React.FC = () => {
               </IonRouterLink>
             </>
           ) : (
-            <div>
-              <h2>Welcome {username}, redirecting to Home page...</h2>
-            </div>
+            <IonContent>
+              <h2>Success! Welcome back {username}, redirecting...</h2>
+            </IonContent>
           )}
           {errorMessage && (
             <IonText

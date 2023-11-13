@@ -7,7 +7,12 @@ ion-toolbar {
     }
   }
 }
-  .navbarMenuContainer{
-    background: rgb(0, 0, 0, 0.5);
-  }
+.navbarMenuContainer {
+  background: rgb(0, 0, 0, 0.5);
+}
 
+.usernameDisplay {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+}

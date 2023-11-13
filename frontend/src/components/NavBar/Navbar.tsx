@@ -18,13 +18,13 @@ import { useAuth } from "../../context/AuthContext/AuthContext";
 import { useHistory } from "react-router";
 
 const Navbar: React.FC = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, username } = useAuth();
   const history = useHistory(); // If you're using react-router
 
   const handleLogout = () => {
     logout();
     // Redirect user to login page
-    history.push('/login');
+    history.push("/login");
   };
 
   return (
@@ -44,7 +44,8 @@ const Navbar: React.FC = () => {
             <IonTitle>Menu</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonContent>
+        <IonContent className="usernameDisplay">
+          <h2>{username}</h2>
           <IonList>
             <IonMenuToggle autoHide={false}>
               <IonItem button routerLink="/home">
