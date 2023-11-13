@@ -7,8 +7,18 @@ const socketController = require('../matchmaking/socketController'); // Adjust t
 const server = http.createServer(app);
 const io = socketIo(server);
 
+let onlineUsers = 0;
+
 // Single connection handler
 io.on('connection', (socket) => {
+  onlineUsers++;
+  console.log(`A user connected. Users online: ${onlineUsers}`);
+
+  socket.on('disconnect', () => {
+    onlineUsers--;
+    console.log(`User disconnected. Users online: ${onlineUsers}`);
+  });
+  
   console.log('A user connected');
 
   // Handle game-related events with your socket controller

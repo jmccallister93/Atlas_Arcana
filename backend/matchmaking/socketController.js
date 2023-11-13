@@ -2,13 +2,14 @@ const gameSessionManager = require("./gameSessionManager");
 const StateManager = require("../networking/sync/stateManager");
 const reconcileClientState = require("../networking/sync/reconciliation");
 const compensateForLag = require("../networking/latency/lagCompensation");
-const validateGameActions = require('../validation/validateGameActions');
+const validateGameActions = require("../validation/validateGameActions");
 
 // Initialize the state manager
 const stateManager = new StateManager();
 
+let onlineUsers = 0;
+
 module.exports = function (socket) {
-  
   // Handle a player move or action
   socket.on("playerAction", async (data) => {
     if (!validateGameActions(data.action)) {
@@ -45,9 +46,19 @@ module.exports = function (socket) {
       // Handle errors
     }
   });
+  // User connected
+  socket.on("connect", () => {
+    onlineUsers++;
+    socket.broadcast.emit("updateOnlineUsers", onlineUsers);
+    console.log(`User connected. Users online: ${onlineUsers}`);
+  });
+
+  //User disconnected
   socket.on("disconnect", () => {
-    console.log("User disconnected");
-    // Handle disconnection (e.g., pause game, save state, etc.)
+    onlineUsers--;
+    socket.broadcast.emit("updateOnlineUsers", onlineUsers);
+    console.log(`User disconnected. Users online: ${onlineUsers}`);
+    // ... existing disconnect code ...
   });
 
   socket.on("reconnect", () => {

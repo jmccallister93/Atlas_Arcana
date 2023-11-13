@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
+import socket from '../SocketClient/socketClient';
 
 
 interface AuthContextType {
@@ -35,6 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('username', username);
     localStorage.setItem('accessToken', accessToken);
+    socket.emit('userStatusChange', { username, status: 'online' });
   };
 
   const logout = () => {
@@ -43,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
     localStorage.removeItem('accessToken');
+    socket.emit('userStatusChange', { username, status: 'offline' });
   };
 
 

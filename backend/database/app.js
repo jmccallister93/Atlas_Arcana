@@ -1,6 +1,4 @@
 require('dotenv').config();
-console.log('JWT Secret from app.js:', process.env.JWT_SECRET);
-
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -77,6 +75,10 @@ app.delete('/players/:id', async (req, res) => {
     }
 });
 
+// Get online users
+app.get('/online-users', (req, res) => {
+  res.json({ onlineUsers });
+});
 
 app.use('/auth', authRoutes);
 

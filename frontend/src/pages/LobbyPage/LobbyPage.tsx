@@ -11,10 +11,21 @@ import {
   IonCol,
 } from "@ionic/react";
 import gps from "../GlobalPageStyles.module.scss";
+import { useEffect, useState } from "react";
+import socket from '../../context/SocketClient/socketClient'
 
 const LobbyPage = () => {
-  // Dummy data for players online, you can replace it with real data from your backend
-  const playersOnline = 123;
+  const [onlineUsers, setOnlineUsers] = useState(0);
+
+  useEffect(() => {
+    socket.on('updateOnlineUsers', (count: number) => {
+      setOnlineUsers(count);
+    });
+
+    return () => {
+      socket.off('updateOnlineUsers');
+    };
+  }, []);
 
   return (
     <IonPage>
@@ -54,7 +65,7 @@ const LobbyPage = () => {
                   <IonCardSubtitle>Current online players</IonCardSubtitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  {playersOnline} players are currently online.
+                  {onlineUsers} players are currently online.
                 </IonCardContent>
               </IonCard>
             </IonCol>
