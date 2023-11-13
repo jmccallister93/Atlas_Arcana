@@ -13,19 +13,8 @@ const io = socketIo(server, {
   }
 });
 
-let onlineUsers = 0;
-
-// Single connection handler
 io.on('connection', (socket) => {
-  onlineUsers++;
-  io.emit("updateOnlineUsers", onlineUsers);
-
-  socket.on('disconnect', () => {
-    onlineUsers--;
-    io.emit("updateOnlineUsers", onlineUsers);
-  });
-
-  socketController(socket);
+  socketController(socket, io); // Pass 'io' to manage broadcasts/emits
 
   socket.on('error', (error) => {
     console.error('Socket.io error:', error);

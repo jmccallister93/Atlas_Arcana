@@ -35,7 +35,7 @@ import AccountPage from "./pages/AccountPage/AccountPage";
 
 import { AuthProvider } from "./context/AuthContext/AuthContext";
 
-import "./global.scss"
+import "./global.scss";
 
 setupIonicReact();
 
@@ -45,6 +45,9 @@ const App: React.FC = () => (
       <Navbar />
       <IonReactRouter>
         <IonRouterOutlet id="mainMenu">
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
           <Route exact path="/home" component={HomePage} />
           <Route exact path="/login" component={LoginPage} />
           <Route exact path="/signup" component={SignupPage} />

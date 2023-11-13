@@ -9,7 +9,42 @@ const stateManager = new StateManager();
 
 let onlineUsers = 0;
 
-module.exports = function (socket) {
+// This will store unique socket IDs of connected users
+const connectedUsers = new Set();
+
+module.exports = function (socket, io) {
+  // Add the connected socket ID to the set
+  connectedUsers.add(socket.id);
+  console.log(`User connected. Users online: ${connectedUsers.size}`);
+
+  // Emit the updated user count
+  socket.broadcast.emit("updateOnlineUsers", connectedUsers.size);
+
+  // User connected
+  socket.on("connect", () => {
+    onlineUsers++;
+    socket.broadcast.emit("updateOnlineUsers", onlineUsers);
+    console.log(`User connected. Users online: ${onlineUsers}`);
+  });
+
+  socket.on("disconnect", () => {
+    connectedUsers.delete(socket.id);
+    console.log(`User disconnected. Users online: ${connectedUsers.size}`);
+    io.emit("updateOnlineUsers", connectedUsers.size); // emit to all clients
+  });
+
+  socket.on("reconnect", () => {
+    console.log("User reconnected");
+    // Handle reconnection (e.g., restore state, resume game, etc.)
+  });
+
+  // Status change
+  socket.on("userStatusChange", ({ username, status }) => {
+    // Handle the status change, update Redis or any other storage mechanism
+    // And emit the updated user list to clients
+  });
+
+  // Game Play
   // Handle a player move or action
   socket.on("playerAction", async (data) => {
     if (!validateGameActions(data.action)) {
@@ -46,30 +81,4 @@ module.exports = function (socket) {
       // Handle errors
     }
   });
-  // User connected
-  socket.on("connect", () => {
-    onlineUsers++;
-    socket.broadcast.emit("updateOnlineUsers", onlineUsers);
-    console.log(`User connected. Users online: ${onlineUsers}`);
-  });
-
-  //User disconnected
-  socket.on("disconnect", () => {
-    onlineUsers--;
-    socket.broadcast.emit("updateOnlineUsers", onlineUsers);
-    console.log(`User disconnected. Users online: ${onlineUsers}`);
-    // ... existing disconnect code ...
-  });
-
-  socket.on("reconnect", () => {
-    console.log("User reconnected");
-    // Handle reconnection (e.g., restore state, resume game, etc.)
-  });
-
-  // Status change
-  socket.on("userStatusChange", ({ username, status }) => {
-    // Handle the status change, update Redis or any other storage mechanism
-    // And emit the updated user list to clients
-  });
-
 };
