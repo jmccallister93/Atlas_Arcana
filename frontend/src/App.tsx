@@ -33,44 +33,27 @@ import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
 import DashBoardPage from "./pages/DashboardPage/DashboardPage";
 import AccountPage from "./pages/AccountPage/AccountPage";
 
-import { AuthProvider } from './context/AuthContext/AuthContext'
+import { AuthProvider } from "./context/AuthContext/AuthContext";
 
+import "./global.scss"
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <AuthProvider>
     <IonApp>
+      <Navbar />
       <IonReactRouter>
-        <Navbar />
         <IonRouterOutlet id="mainMenu">
-          <Route exact path="/home">
-            <HomePage />
-          </Route>
-          <Route exact path="/login">
-            <LoginPage />
-          </Route>
-          <Route exact path="/signup">
-            <SignupPage />
-          </Route>
-          <Route exact path="/resetPassword">
-            <ResetPasswordPage />
-          </Route>
-          <Route exact path="/settings">
-            <SettingsPage />
-          </Route>
-          <Route exact path="/game">
-            <GamePage />
-          </Route>
-          <Route exact path="/lobby">
-            <LobbyPage />
-          </Route>
-          <Route exact path="/dashboard">
-            <DashBoardPage />
-          </Route>
-          <Route exact path="/account">
-            <AccountPage />
-          </Route>
+          <Route exact path="/home" component={HomePage} />
+          <Route exact path="/login" component={LoginPage} />
+          <Route exact path="/signup" component={SignupPage} />
+          <Route exact path="/resetPassword" component={ResetPasswordPage} />
+          <Route exact path="/settings" component={SettingsPage} />
+          <Route exact path="/game" component={GamePage} />
+          <Route exact path="/lobby" component={LobbyPage} />
+          <Route exact path="/dashboard" component={DashBoardPage} />
+          <Route exact path="/account" component={AccountPage} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

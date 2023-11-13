@@ -1,0 +1,42 @@
+.logo-img{
+  height: 20vh;
+}
+
+.homepage-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  padding: 20px;
+  padding-top: var(--ion-safe-area-top, 20px); // Adjust for safe area
+
+  .splash-screen {
+    max-width: 600px; // Adjust based on your preference
+    margin: auto;
+
+    h1 {
+      font-size: 2.5em; // Adjust font size as needed
+      color: #ffffff; // Replace with your primary color
+      margin-bottom: 15px;
+    }
+
+    .game-description, .game-modes {
+      font-size: 1em;
+      color: #d1d1d1; // Replace with a color that matches your theme
+      margin-bottom: 20px;
+      line-height: 1.5; // Improves readability
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      IonButton {
+        font-size: 1.2em;
+        padding: 10px 20px;
+      }
+    }
+  }
+}

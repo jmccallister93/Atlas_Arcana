@@ -51,17 +51,18 @@ const Navbar: React.FC = () => {
               <IonItem button routerLink="/home">
                 <IonLabel>Home</IonLabel>
               </IonItem>
+              {isLoggedIn ? (
+                <IonItem button routerLink="/dashboard">
+                  <IonLabel>Dashboard</IonLabel>
+                </IonItem>
+              ) : null}
               <IonItem button routerLink="/lobby">
                 <IonLabel>Lobby</IonLabel>
               </IonItem>
               <IonItem button routerLink="/settings">
                 <IonLabel>Settings</IonLabel>
               </IonItem>
-              {!isLoggedIn ? (
-                <IonItem button routerLink="/login">
-                  <IonLabel>Login | Sign up</IonLabel>
-                </IonItem>
-              ) : (
+              {isLoggedIn ? (
                 <>
                   <IonItem button routerLink="/account">
                     <IonLabel>Account</IonLabel>
@@ -70,6 +71,10 @@ const Navbar: React.FC = () => {
                     <IonLabel>Logout</IonLabel>
                   </IonItem>
                 </>
+              ) : (
+                <IonItem button routerLink="/login">
+                  <IonLabel>Login | Sign up</IonLabel>
+                </IonItem>
               )}
             </IonMenuToggle>
           </IonList>

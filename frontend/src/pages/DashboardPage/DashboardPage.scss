@@ -1,0 +1,41 @@
+.dashboard-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+  }
+  
+  .dashboard-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+
+    .dashboard-icon{
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+  
+    IonCard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+  
+      IonIcon {
+    
+      }
+  
+      IonCardHeader {
+        IonCardTitle {
+          font-size: 1.5rem;
+        }
+  
+        IonCardSubtitle {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+  

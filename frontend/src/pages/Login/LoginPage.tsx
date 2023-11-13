@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn) {
       // Redirect to home after a short delay
-      setTimeout(() => history.push("/home"), 3000);
+      setTimeout(() => history.push("/dashboard"), 3000);
     }
   }, [isLoggedIn, history]);
 
