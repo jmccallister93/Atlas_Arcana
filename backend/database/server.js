@@ -12,21 +12,14 @@ let onlineUsers = 0;
 // Single connection handler
 io.on('connection', (socket) => {
   onlineUsers++;
-  console.log(`A user connected. Users online: ${onlineUsers}`);
+  io.emit("updateOnlineUsers", onlineUsers);
 
   socket.on('disconnect', () => {
     onlineUsers--;
-    console.log(`User disconnected. Users online: ${onlineUsers}`);
+    io.emit("updateOnlineUsers", onlineUsers);
   });
-  
-  console.log('A user connected');
 
-  // Handle game-related events with your socket controller
   socketController(socket);
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
 });
 
 // Start the server

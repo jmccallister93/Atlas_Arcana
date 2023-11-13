@@ -76,10 +76,15 @@ app.delete('/players/:id', async (req, res) => {
 });
 
 // Get online users
-app.get('/online-users', (req, res) => {
-  res.json({ onlineUsers });
+app.get('/online-users', async (req, res) => {
+  try {
+    const onlineUsers = await redisClient.smembers('onlineUsers');
+    res.json({ onlineUsers });
+  } catch (error) {
+    console.error('Error fetching online users:', error);
+    res.status(500).send({ error: 'Internal server error' });
+  }
 });
-
 app.use('/auth', authRoutes);
 
 // Protect game routes

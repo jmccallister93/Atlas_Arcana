@@ -15,13 +15,14 @@ import { useEffect, useState } from "react";
 import socket from '../../context/SocketClient/socketClient'
 
 const LobbyPage = () => {
-  const [onlineUsers, setOnlineUsers] = useState(0);
+
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    socket.on('updateOnlineUsers', (count: number) => {
-      setOnlineUsers(count);
+    socket.on('updateOnlineUsers', (users: string[]) => {
+      setOnlineUsers(users);
     });
-
+  
     return () => {
       socket.off('updateOnlineUsers');
     };
@@ -65,7 +66,7 @@ const LobbyPage = () => {
                   <IonCardSubtitle>Current online players</IonCardSubtitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  {onlineUsers} players are currently online.
+                  {onlineUsers.length} players are currently online.
                 </IonCardContent>
               </IonCard>
             </IonCol>

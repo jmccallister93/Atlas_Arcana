@@ -66,5 +66,10 @@ module.exports = function (socket) {
     // Handle reconnection (e.g., restore state, resume game, etc.)
   });
 
-  // Other event handlers...
+  // Status change
+  socket.on("userStatusChange", ({ username, status }) => {
+    // Handle the status change, update Redis or any other storage mechanism
+    // And emit the updated user list to clients
+  });
+
 };
