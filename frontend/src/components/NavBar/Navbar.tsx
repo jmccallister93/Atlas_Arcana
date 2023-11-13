@@ -12,6 +12,7 @@ import {
   IonItem,
   IonLabel,
   IonFooter,
+  IonBackButton,
 } from "@ionic/react";
 import "./Navbar.scss";
 import { useAuth } from "../../context/AuthContext/AuthContext";
@@ -31,6 +32,9 @@ const Navbar: React.FC = () => {
     <>
       <IonHeader>
         <IonToolbar>
+        <IonButtons slot="start">
+            <IonBackButton defaultHref='/home' color="white"/> 
+          </IonButtons>
           <IonTitle>Atlas Arcana</IonTitle>
           <IonButtons slot="end">
             <IonMenuButton autoHide={false} />
