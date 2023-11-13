@@ -5,7 +5,13 @@ const app = require('./app'); // Import the Express app
 const socketController = require('../matchmaking/socketController'); // Adjust the path as necessary
 
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Allow your frontend origin
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 let onlineUsers = 0;
 
@@ -20,6 +26,10 @@ io.on('connection', (socket) => {
   });
 
   socketController(socket);
+
+  socket.on('error', (error) => {
+    console.error('Socket.io error:', error);
+  });
 });
 
 // Start the server
