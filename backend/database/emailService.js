@@ -1,19 +1,18 @@
-// Using NodeMailer for sending emails
 const nodemailer = require('nodemailer');
 
 async function sendPasswordResetEmail(userEmail, token) {
   const transporter = nodemailer.createTransport({
-    service: 'gmail', // or your email service
+    service: 'gmail', // Use your email service
     auth: {
-      user: 'your-email@gmail.com',
-      pass: 'your-password',
+      user: process.env.EMAIL_USERNAME, // Use environment variable
+      pass: process.env.EMAIL_PASSWORD, // Use environment variable
     },
   });
 
-  const resetUrl = `http://frontend/reset-password?token=${token}`;
+  const resetUrl = `http://frontend-domain/reset-password?token=${token}`;
 
   const mailOptions = {
-    from: 'your-email@gmail.com',
+    from: process.env.EMAIL_USERNAME, // Use environment variable
     to: userEmail,
     subject: 'Password Reset',
     text: `Reset your password by clicking the link: ${resetUrl}`,
@@ -21,3 +20,5 @@ async function sendPasswordResetEmail(userEmail, token) {
 
   await transporter.sendMail(mailOptions);
 }
+
+module.exports = { sendPasswordResetEmail };

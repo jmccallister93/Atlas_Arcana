@@ -3,8 +3,6 @@ const User = require("../database/PlayerModel"); // Adjust path as needed
 const bcrypt = require("bcryptjs");
 const secret = process.env.JWT_SECRET;
 
-console.log("JWT Secret:", secret);
-
 exports.register = async (req, res) => {
   try {
     const user = new User(req.body);

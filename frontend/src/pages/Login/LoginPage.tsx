@@ -12,7 +12,7 @@ import {
   IonText,
   IonRouterLink,
 } from "@ionic/react";
-import axios from "axios";
+import axios from "../../context/AuthContext/AxiosInterceptor";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import { useHistory } from "react-router-dom";
 
