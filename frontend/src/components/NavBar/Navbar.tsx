@@ -16,11 +16,13 @@ import {
 } from "@ionic/react";
 import "./Navbar.scss";
 import { useAuth } from "../../context/AuthContext/AuthContext";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
+import { useEffect } from "react";
+
 
 const Navbar: React.FC = () => {
   const { isLoggedIn, logout, username } = useAuth();
-  const history = useHistory(); // If you're using react-router
+  const history = useHistory();
 
   const handleLogout = () => {
     logout();
@@ -32,9 +34,6 @@ const Navbar: React.FC = () => {
     <>
       <IonHeader>
         <IonToolbar>
-        <IonButtons slot="start">
-            <IonBackButton defaultHref='/home' color="white"/> 
-          </IonButtons>
           <IonTitle>Atlas Arcana</IonTitle>
           <IonButtons slot="end">
             <IonMenuButton autoHide={false} />
@@ -61,7 +60,7 @@ const Navbar: React.FC = () => {
                 </IonItem>
               ) : null}
               <IonItem button routerLink="/lobby">
-                <IonLabel>Lobby</IonLabel>
+                <IonLabel>Play Game</IonLabel>
               </IonItem>
               <IonItem button routerLink="/settings">
                 <IonLabel>Settings</IonLabel>
