@@ -36,6 +36,7 @@ import AccountPage from "./pages/AccountPage/AccountPage";
 import { AuthProvider } from "./context/AuthContext/AuthContext";
 
 import "./global.scss";
+import FriendsPage from "./pages/FriendsPage/FriendsPage";
 
 setupIonicReact();
 
@@ -57,6 +58,7 @@ const App: React.FC = () => (
           <Route exact path="/lobby" component={LobbyPage} />
           <Route exact path="/dashboard" component={DashBoardPage} />
           <Route exact path="/account" component={AccountPage} />
+          <Route exact path="/friends" component={FriendsPage} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

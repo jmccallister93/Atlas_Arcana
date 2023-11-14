@@ -17,7 +17,12 @@ import axios from "axios";
 
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
-  console.log("lobby rendered")
+  
+
+
+  // ~~~LOOK AT ME~~~
+  // Potential solution create a seperate componet and have that re-render instead of the page
+  
   useEffect(() => {
     
     // Existing socket setup

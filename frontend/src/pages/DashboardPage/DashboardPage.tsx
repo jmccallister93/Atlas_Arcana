@@ -39,7 +39,7 @@ const DashBoardPage: React.FC = () => {
             </IonCardHeader>
           </IonCard>
 
-          <IonCard button>
+          <IonCard button routerLink="/friends">
             <IonCardHeader>
               <IonCardTitle>
                 <IonIcon icon={peopleOutline} size="large" color="secondary" />
