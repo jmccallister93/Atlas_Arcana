@@ -20,81 +20,132 @@ import {
   closeCircleOutline,
 } from "ionicons/icons";
 
+import { useAuth } from "../../context/AuthContext/AuthContext";
+
+interface User {
+    _id: string;
+    username: string;
+  }
+
 const FriendsPage: React.FC = () => {
-  const [friends, setFriends] = useState<Array<{username: string; online: boolean}>>([]);
+  const [friends, setFriends] = useState<
+    Array<{ username: string; online: boolean }>
+  >([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [pendingRequests, setPendingRequests] = useState<Array<{username: string;}>>([]);
+  const [pendingRequests, setPendingRequests] = useState<
+    Array<{ username: string }>
+  >([]);
+  const token = localStorage.getItem("accessToken");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
 
   // Fetch friends and pending requests from the backend
   useEffect(() => {
     // Fetch friends list
     async function fetchFriends() {
-      const response = await fetch('http://localhost:3000/friends/list', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          // Include authorization token if needed
-        },
+      const headers: { [key: string]: string } = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch("http://localhost:3000/friends/list", {
+        method: "GET",
+        headers: headers,
       });
       const data = await response.json();
       setFriends(data.friends);
     }
-  
+
     // Fetch pending requests
     async function fetchPendingRequests() {
-      const response = await fetch('http://localhost:3000/friends/requests', {
-        method: 'GET',
+      const response = await fetch("http://localhost:3000/friends/requests", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           // Include authorization token if needed
         },
       });
       const data = await response.json();
       setPendingRequests(data.requests);
     }
-  
+
     fetchFriends();
     fetchPendingRequests();
   }, []);
-  
 
   const handleSearch = async () => {
-    const response = await fetch(`http://localhost:3000/friends/search?username=${searchTerm}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // Include authorization token if needed
-      },
-    });
-    const data = await response.json();
-    // Process the search results here
+    try {
+      const response = await fetch(
+        `http://localhost:3001/friends/search?username=${searchTerm}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // assuming you have the token variable set up as before
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setSearchResults(data); // store the search results
+      // Process the search results here
+    } catch (error) {
+      console.error("Fetch error:", error);
+      // Handle errors here, such as showing an error message to the user
+    }
+  };
+
+  const handleSendRequest = async (receiverId: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/friends/sendRequest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ receiverId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error sending friend request');
+      }
+  
+      // Handle successful request, like updating UI or state
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error, such as showing an error message
+    }
   };
   
+
 
   const handleAcceptRequest = async (username: string) => {
     await fetch(`http://localhost:3000/friends/accept`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Include authorization token if needed
       },
       body: JSON.stringify({ username }),
     });
     // Update UI accordingly
   };
-  
+
   const handleRejectRequest = async (username: string) => {
     await fetch(`http://localhost:3000/friends/reject`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Include authorization token if needed
       },
       body: JSON.stringify({ username }),
     });
     // Update UI accordingly
   };
-  
 
   return (
     <IonPage>
@@ -110,9 +161,17 @@ const FriendsPage: React.FC = () => {
             <IonInput
               value={searchTerm}
               placeholder="Enter username"
-              onIonChange={(e) => setSearchTerm(e.detail.value ?? '')}
+              onIonChange={(e) => setSearchTerm(e.detail.value ?? "")}
             />
             <IonButton onClick={handleSearch}>Search</IonButton>
+            {searchResults.map((user) => (
+              <IonItem key={user._id}>
+                <IonLabel>{user.username}</IonLabel>
+                <IonButton onClick={() => handleSendRequest(user._id)}>
+                  Add Friend
+                </IonButton>
+              </IonItem>
+            ))}
           </IonItem>
           {friends.map((friend) => (
             <IonItem key={friend.username}>
