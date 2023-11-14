@@ -7,6 +7,10 @@ const authRoutes = require('../authentication/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
 const { validatePlayerData } = require('../validation/validatePlayerData');
 const path = require('path');
+const redis = require("redis");
+const redisClient = redis.createClient(); // adjust settings as needed
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
+redisClient.connect();
 
 
 const app = express();
@@ -16,10 +20,7 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1/atlasArcana', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect('mongodb://127.0.0.1/atlasArcana')
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -76,16 +77,34 @@ app.delete('/players/:id', async (req, res) => {
     }
 });
 
-// Get online users
-app.get('/online-users', async (req, res) => {
-  try {
-    const onlineUsers = await redisClient.smembers('onlineUsers');
-    res.json({ onlineUsers });
-  } catch (error) {
-    console.error('Error fetching online users:', error);
-    res.status(500).send({ error: 'Internal server error' });
-  }
-});
+// // Get online users
+// function getOnlineUsers() {
+//   return new Promise((resolve, reject) => {
+//     redisClient.smembers('onlineUsers', (error, value) => {
+//       if (error) {
+//         reject(error);
+//         console.log(`[Redis smembers error] ${error}`);
+//       } else {
+//         resolve(value);
+//       }
+//     });
+//   });
+// }
+
+// // Usage
+// app.get('/online-users', async (req, res) => {
+//   try {
+//     const onlineUsers = await getOnlineUsers();
+//     res.json({ onlineUsers });
+//   } catch (error) {
+//     console.error('Error fetching online users:', error);
+//     res.status(500).send({ error: 'Internal server error' });
+//   }
+// });
+
+
+
+// Auth routes
 app.use('/auth', authRoutes);
 
 // Protect game routes

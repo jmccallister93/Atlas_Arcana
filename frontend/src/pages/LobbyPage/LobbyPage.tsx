@@ -20,16 +20,16 @@ const LobbyPage = () => {
 
   useEffect(() => {
     // Fetch initial online users count
-    const fetchOnlineUsers = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/online-users');
-        setOnlineUsers(response.data.onlineUsers);
-      } catch (error) {
-        console.error('Error fetching online users:', error);
-      }
-    };
+    // const fetchOnlineUsers = async () => {
+    //   try {
+    //     const response = await axios.get('http://localhost:3001/online-users');
+    //     setOnlineUsers(response.data.onlineUsers);
+    //   } catch (error: any) {
+    //     console.error('Error fetching online users:', error.response || error);
+    //   }
+    // };
   
-    fetchOnlineUsers();
+    // fetchOnlineUsers();
   
     // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
