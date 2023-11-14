@@ -23,9 +23,9 @@ import {
 import { useAuth } from "../../context/AuthContext/AuthContext";
 
 interface User {
-    _id: string;
-    username: string;
-  }
+  _id: string;
+  username: string;
+}
 
 const FriendsPage: React.FC = () => {
   const [friends, setFriends] = useState<
@@ -101,27 +101,28 @@ const FriendsPage: React.FC = () => {
 
   const handleSendRequest = async (receiverId: string) => {
     try {
-      const response = await fetch('http://localhost:3000/friends/sendRequest', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ receiverId }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/friends/sendRequest",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ receiverId }),
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Error sending friend request');
+        throw new Error("Error sending friend request");
       }
-  
+
       // Handle successful request, like updating UI or state
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       // Handle error, such as showing an error message
     }
   };
-  
-
 
   const handleAcceptRequest = async (username: string) => {
     await fetch(`http://localhost:3000/friends/accept`, {
@@ -156,6 +157,7 @@ const FriendsPage: React.FC = () => {
       </IonHeader>
       <IonContent>
         <IonList>
+          {/* Search Input Item */}
           <IonItem>
             <IonLabel>Search Friends</IonLabel>
             <IonInput
@@ -164,6 +166,10 @@ const FriendsPage: React.FC = () => {
               onIonChange={(e) => setSearchTerm(e.detail.value ?? "")}
             />
             <IonButton onClick={handleSearch}>Search</IonButton>
+          </IonItem>
+
+          {/* Search Results */}
+          <div style={{ maxHeight: "300px", overflowY: "auto" }}>
             {searchResults.map((user) => (
               <IonItem key={user._id}>
                 <IonLabel>{user.username}</IonLabel>
@@ -172,7 +178,8 @@ const FriendsPage: React.FC = () => {
                 </IonButton>
               </IonItem>
             ))}
-          </IonItem>
+          </div>
+          {/* Existing Friends */}
           {friends.map((friend) => (
             <IonItem key={friend.username}>
               <IonAvatar slot="start">
@@ -191,6 +198,7 @@ const FriendsPage: React.FC = () => {
           ))}
         </IonList>
 
+        {/* Pending Friend Requests */}
         <IonTitle>Pending Friend Requests</IonTitle>
         <IonList>
           {pendingRequests.map((request) => (
@@ -211,11 +219,6 @@ const FriendsPage: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
-
-        <IonButton expand="full" color="primary">
-          <IonIcon slot="start" icon={personAdd} />
-          Add New Friend
-        </IonButton>
       </IonContent>
     </IonPage>
   );
