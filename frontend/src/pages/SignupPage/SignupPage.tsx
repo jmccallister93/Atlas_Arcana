@@ -45,9 +45,8 @@ const SignupPage: React.FC = () => {
         email,
         password,
       });
-      console.log(response)
-      if (response.data && response.data.token) {
-        
+      
+      if (response.data && response.data.token) {  
         login(userName, response.data.token);
         setSuccessfulSignup(true);
         setTimeout(() => history.push("/dashboard"), 3000);

@@ -13,12 +13,25 @@ import {
 import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
+import axios from "axios";
 
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
-  // Issue is this is not running
   useEffect(() => {
+    // Fetch initial online users count
+    const fetchOnlineUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/online-users');
+        setOnlineUsers(response.data.onlineUsers);
+      } catch (error) {
+        console.error('Error fetching online users:', error);
+      }
+    };
+  
+    fetchOnlineUsers();
+  
+    // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
       console.log("Received users count from server:", usersCount);
       setOnlineUsers(usersCount);
@@ -32,6 +45,7 @@ const LobbyPage = () => {
       socket.off('updateOnlineUsers', handleUpdateOnlineUsers);
     };
   }, []);
+  
 
   console.log(onlineUsers);
 
