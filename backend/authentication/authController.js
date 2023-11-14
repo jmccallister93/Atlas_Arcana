@@ -7,11 +7,17 @@ exports.register = async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
-    res.status(201).send({ user });
+
+    // Generate a token
+    const token = jwt.sign({ id: user._id }, secret, { expiresIn: "1h" });
+
+    // Send back user data and token
+    res.status(201).send({ user, token });
   } catch (error) {
     res.status(400).send(error);
   }
 };
+
 
 exports.login = async (req, res) => {
   try {

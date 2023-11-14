@@ -19,22 +19,19 @@ const LobbyPage = () => {
 
   // Issue is this is not running
   useEffect(() => {
-    console.log("LobbyPage: Setting up socket listeners");
-  
     const handleUpdateOnlineUsers = (usersCount: number) => {
-      console.log("Received users count:", usersCount);
+      console.log("Received users count from server:", usersCount);
       setOnlineUsers(usersCount);
     };
   
+    console.log("Setting up event listener for updateOnlineUsers");
     socket.on('updateOnlineUsers', handleUpdateOnlineUsers);
   
     return () => {
-      console.log("LobbyPage: Cleaning up socket listeners");
+      console.log("Cleaning up event listener for updateOnlineUsers");
       socket.off('updateOnlineUsers', handleUpdateOnlineUsers);
     };
   }, []);
-  
-  
 
   console.log(onlineUsers);
 

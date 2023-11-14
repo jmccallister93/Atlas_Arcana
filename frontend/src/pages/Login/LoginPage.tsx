@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
                 Forgot Password?
               </IonRouterLink>
               <br />
-              <IonRouterLink routerLink="/SignupPage">
+              <IonRouterLink routerLink="/signup">
                 Don't have an account? Sign up here!
               </IonRouterLink>
             </>

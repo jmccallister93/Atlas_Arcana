@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonPage,
   IonContent,
@@ -12,6 +12,8 @@ import {
   IonText,
 } from "@ionic/react";
 import axios from "axios";
+import { useHistory } from "react-router";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const SignupPage: React.FC = () => {
   const [userName, setUserName] = useState("");
@@ -19,6 +21,16 @@ const SignupPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successfulSignup, setSuccessfulSignup] = useState(false);
+  const { isLoggedIn, login, username } = useAuth();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Redirect to home after a short delay
+      setTimeout(() => history.push("/dashboard"), 3000);
+    }
+  }, [isLoggedIn, history]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -28,13 +40,20 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3001/players", {
+      const response = await axios.post("http://localhost:3001/auth/register", {
         username: userName,
         email,
         password,
       });
-      console.log("User created:", response.data);
-      // Redirect user or show success message
+      console.log(response)
+      if (response.data && response.data.token) {
+        
+        login(userName, response.data.token);
+        setSuccessfulSignup(true);
+        setTimeout(() => history.push("/dashboard"), 3000);
+      } else {
+        throw new Error("Signup successful, but missing login data.");
+      }
     } catch (error: any) {
       setErrorMessage(error.response?.data?.error || error.message);
     }
@@ -47,58 +66,67 @@ const SignupPage: React.FC = () => {
           <IonTitle>Signup</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <form onSubmit={handleSubmit}>
-          <IonItem>
-            <IonLabel position="floating">Username</IonLabel>
-            <IonInput
-              value={userName}
-              onIonInput={(e) => setUserName(e.detail.value!)}
-              required
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Email</IonLabel>
-            <IonInput
-              type="email"
-              value={email}
-              onIonInput={(e) => setEmail(e.detail.value!)}
-              required
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Password</IonLabel>
-            <IonInput
-              type="password"
-              value={password}
-              onIonInput={(e) => setPassword(e.detail.value!)}
-              required
-            ></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Confirm Password</IonLabel>
-            <IonInput
-              type="password"
-              value={confirmPassword}
-              onIonInput={(e) => {
-                setConfirmPassword(e.detail.value!);
-              }}
-              required
-            ></IonInput>
-          </IonItem>
-          <IonButton type="submit" expand="block" style={{ marginTop: 20 }}>
-            Signup
-          </IonButton>
-          {errorMessage && (
-            <IonText
-              color="danger"
-              style={{ display: "block", textAlign: "center" }}
-            >
-              {errorMessage}
-            </IonText>
-          )}
-        </form>
-      </IonContent>
+      {successfulSignup ? (
+        <IonContent>
+          <h2>Success! Welcome {username}, redirecting...</h2>
+        </IonContent>
+      ) : (
+        <>
+          {" "}
+          <IonContent className="ion-padding">
+            <form onSubmit={handleSubmit}>
+              <IonItem>
+                <IonLabel position="floating">Username</IonLabel>
+                <IonInput
+                  value={userName}
+                  onIonInput={(e) => setUserName(e.detail.value!)}
+                  required
+                ></IonInput>
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Email</IonLabel>
+                <IonInput
+                  type="email"
+                  value={email}
+                  onIonInput={(e) => setEmail(e.detail.value!)}
+                  required
+                ></IonInput>
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Password</IonLabel>
+                <IonInput
+                  type="password"
+                  value={password}
+                  onIonInput={(e) => setPassword(e.detail.value!)}
+                  required
+                ></IonInput>
+              </IonItem>
+              <IonItem>
+                <IonLabel position="floating">Confirm Password</IonLabel>
+                <IonInput
+                  type="password"
+                  value={confirmPassword}
+                  onIonInput={(e) => {
+                    setConfirmPassword(e.detail.value!);
+                  }}
+                  required
+                ></IonInput>
+              </IonItem>
+              <IonButton type="submit" expand="block" style={{ marginTop: 20 }}>
+                Signup
+              </IonButton>
+              {errorMessage && (
+                <IonText
+                  color="danger"
+                  style={{ display: "block", textAlign: "center" }}
+                >
+                  {errorMessage}
+                </IonText>
+              )}
+            </form>
+          </IonContent>{" "}
+        </>
+      )}
     </IonPage>
   );
 };
