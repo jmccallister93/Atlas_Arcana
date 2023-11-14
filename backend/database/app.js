@@ -6,6 +6,7 @@ const Player = require('./PlayerModel');
 const authRoutes = require('../authentication/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
 const { validatePlayerData } = require('../validation/validatePlayerData');
+const path = require('path');
 
 
 const app = express();
@@ -90,5 +91,9 @@ app.use('/auth', authRoutes);
 // Protect game routes
 app.use('/game', authMiddleware);
 
+app.use(express.static('frontend/public'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'public', 'index.html'));
+});
 
 module.exports = app;

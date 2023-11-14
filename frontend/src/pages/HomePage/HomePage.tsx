@@ -24,7 +24,7 @@ const HomePage: React.FC = () => {
           <img src={logo} alt="Atlas Arcana Logo" className="logo-img" />
           <p className="game-description">
             Embark on a journey of strategy and adventure in Atlas Arcana, a
-            captivating base builder, deck builder, and turn-based strategy
+            captivating PvP/PvE base builder, deck builder, and turn-based strategy
             game. Whether you're a tactician or a warlord, this game offers a
             unique blend of strategic planning and competitive fun.
           </p>

@@ -33,21 +33,21 @@ const LobbyPage = () => {
   
     // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
-      console.log("Received users count from server:", usersCount);
+      // console.log("Received users count from server:", usersCount);
       setOnlineUsers(usersCount);
     };
   
-    console.log("Setting up event listener for updateOnlineUsers");
+    // console.log("Setting up event listener for updateOnlineUsers");
     socket.on('updateOnlineUsers', handleUpdateOnlineUsers);
   
     return () => {
-      console.log("Cleaning up event listener for updateOnlineUsers");
+      // console.log("Cleaning up event listener for updateOnlineUsers");
       socket.off('updateOnlineUsers', handleUpdateOnlineUsers);
     };
   }, []);
   
 
-  console.log(onlineUsers);
+  // console.log(onlineUsers);
 
   return (
     <IonPage>
