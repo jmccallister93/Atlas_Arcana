@@ -5,6 +5,9 @@ const app = require('./app'); // Import the Express app
 const socketController = require('../matchmaking/socketController'); // Adjust the path as necessary
 
 const server = http.createServer(app);
+
+let onlineUsersCount = 0;
+
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:3000", // Allow your frontend origin
@@ -14,10 +17,20 @@ const io = socketIo(server, {
 });
 
 io.on('connection', (socket) => {
+  onlineUsersCount++;
+  io.emit('updateOnlineUsers', onlineUsersCount);
+
+  socket.on('disconnect', () => {
+    onlineUsersCount--;
+    io.emit('updateOnlineUsers', onlineUsersCount);
+  });
   socketController(socket, io); // Pass 'io' to manage broadcasts/emits
 
   socket.on('error', (error) => {
     console.error('Socket.io error:', error);
+  });
+  socket.on('requestOnlineUsersCount', () => {
+    socket.emit('updateOnlineUsers', onlineUsersCount);
   });
 });
 

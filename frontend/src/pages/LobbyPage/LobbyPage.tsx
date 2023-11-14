@@ -17,20 +17,9 @@ import axios from "axios";
 
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
-
+  console.log("lobby rendered")
   useEffect(() => {
-    // Fetch initial online users count
-    // const fetchOnlineUsers = async () => {
-    //   try {
-    //     const response = await axios.get('http://localhost:3001/online-users');
-    //     setOnlineUsers(response.data.onlineUsers);
-    //   } catch (error: any) {
-    //     console.error('Error fetching online users:', error.response || error);
-    //   }
-    // };
-  
-    // fetchOnlineUsers();
-  
+    
     // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
       // console.log("Received users count from server:", usersCount);
