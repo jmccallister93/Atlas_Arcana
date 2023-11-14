@@ -63,15 +63,6 @@ const DashBoardPage: React.FC = () => {
             </IonCardHeader>
           </IonCard>
 
-          <IonCard button>
-            <IonCardHeader>
-              <IonCardTitle>
-                <IonIcon icon={listOutline} size="large" color="tertiary" />{" "}
-                Player Statistics
-              </IonCardTitle>
-            </IonCardHeader>
-          </IonCard>
-
           {/* Add more tiles as needed */}
         </div>
       </IonContent>
