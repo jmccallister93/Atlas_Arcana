@@ -1,27 +1,28 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import socket from '../SocketClient/socketClient';
 
 
 interface AuthContextType {
   isLoggedIn: boolean;
   username: string | null;
-  login: (username: string, accessToken: string) => void;  // Updated signature
+  token: string | null;
+  login: (username: string, accessToken: string) => void;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextType>({ 
   isLoggedIn: false,
   username: null,
+  token: null,
   login: () => {},
   logout: () => {}
 });
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   const token = localStorage.getItem("accessToken");
   console.log("From auth context: " + context)
   console.log("From auth token: " + token)
-  return { ...context, token };
+  return context;
 };
 
 interface AuthProviderProps {
@@ -35,10 +36,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [username, setUsername] = useState<string | null>(
     localStorage.getItem('username')
   );
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem('accessToken')
+  );
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      setToken(accessToken);
+    }
+  }, []);
 
   const login = (username: string, accessToken: string) => {
     setIsLoggedIn(true);
     setUsername(username);
+    setToken(accessToken);
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('username', username);
     localStorage.setItem('accessToken', accessToken);
@@ -48,6 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setIsLoggedIn(false);
     setUsername(null);
+    setToken(null);
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
     localStorage.removeItem('accessToken');
@@ -56,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, username, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, username, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
