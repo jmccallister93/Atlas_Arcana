@@ -17,6 +17,7 @@ axios.interceptors.response.use(
         // Update the token in localStorage
         localStorage.setItem('accessToken', accessToken);
 
+
         // Update the header and resend the original request
         originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
         return axios(originalRequest);

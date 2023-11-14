@@ -9,7 +9,8 @@ import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const HomePage: React.FC = () => {
   const { isLoggedIn, username } = useAuth();
-  console.log("home rendered")
+  const { token } = useAuth();
+
   return (
     <IonPage>
       <IonContent fullscreen={true} className="homepage-content">

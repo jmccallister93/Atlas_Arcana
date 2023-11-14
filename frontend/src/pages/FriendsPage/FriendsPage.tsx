@@ -21,6 +21,7 @@ import {
 } from "ionicons/icons";
 
 import { useAuth } from "../../context/AuthContext/AuthContext";
+import jwtDecode from 'jwt-decode';
 
 interface User {
   _id: string;
@@ -35,11 +36,17 @@ const FriendsPage: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<
     Array<{ username: string }>
   >([]);
-  const token = localStorage.getItem("accessToken");
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const { token } = useAuth();
+
+  if (!token) {
+    return <div>Loading...</div>; // Or any other loading indicator
+  }
+
 
   // Fetch friends and pending requests from the backend
   useEffect(() => {
+    console.log("Token available:", !!token); 
     // Fetch friends list
     async function fetchFriends() {
       const headers: { [key: string]: string } = {
@@ -73,9 +80,10 @@ const FriendsPage: React.FC = () => {
 
     fetchFriends();
     fetchPendingRequests();
-  }, []);
+  }, [token]);
 
   const handleSearch = async () => {
+
     try {
       const response = await fetch(
         `http://localhost:3001/friends/search?username=${searchTerm}`,
@@ -99,20 +107,43 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  const getUserId = async () => {
+    console.log("Token before getUserId fetch:", token);
+    try {
+      const response = await fetch("http://localhost:3001/getUserId", {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Response from getUserId:", response);
+      const data = await response.json();
+      return data.userId;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  
+  };
+
   const handleSendRequest = async (receiverId: string) => {
+    const senderId = await getUserId();
+    if (!senderId) {
+      console.error("Sender ID not found");
+      return;
+    }
     try {
       const response = await fetch(
-        "http://localhost:3000/friends/sendRequest",
+        "http://localhost:3001/friends/sendRequest",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ receiverId }),
+          body: JSON.stringify({ senderId, receiverId }),
         }
       );
-
+      
       if (!response.ok) {
         throw new Error("Error sending friend request");
       }
@@ -125,7 +156,7 @@ const FriendsPage: React.FC = () => {
   };
 
   const handleAcceptRequest = async (username: string) => {
-    await fetch(`http://localhost:3000/friends/accept`, {
+    await fetch(`http://localhost:3001/friends/accept`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
