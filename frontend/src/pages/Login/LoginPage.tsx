@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
       });
       console.log("Login successful:", response.data);
       const username = response.data.user.username;
-      login(username, response.data.accessToken);
+      login(username, response.data.token);
     } catch (error: any) {
       const errMsg = error.response?.data?.error || "Login failed";
       setErrorMessage(errMsg);

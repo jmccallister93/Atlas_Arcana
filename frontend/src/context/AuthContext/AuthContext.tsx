@@ -20,8 +20,6 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => {
   const context = useContext(AuthContext);
   const token = localStorage.getItem("accessToken");
-  console.log("From auth context: " + context)
-  console.log("From auth token: " + token)
   return context;
 };
 
