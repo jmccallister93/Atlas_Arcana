@@ -47,7 +47,7 @@ const SignupPage: React.FC = () => {
       });
       
       if (response.data && response.data.token) {  
-        login(userName, response.data.token);
+        login(userName, response.data.token, response.data._id);
         setSuccessfulSignup(true);
         setTimeout(() => history.push("/dashboard"), 3000);
       } else {

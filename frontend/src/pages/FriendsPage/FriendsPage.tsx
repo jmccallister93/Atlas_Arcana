@@ -20,8 +20,8 @@ import {
   closeCircleOutline,
 } from "ionicons/icons";
 
-import { useAuth } from "../../context/AuthContext/AuthContext";
-import jwtDecode from 'jwt-decode';
+import { useAuth, } from "../../context/AuthContext/AuthContext";
+import jwtDecode from "jwt-decode";
 
 interface User {
   _id: string;
@@ -37,51 +37,52 @@ const FriendsPage: React.FC = () => {
     Array<{ username: string }>
   >([]);
   const [searchResults, setSearchResults] = useState<User[]>([]);
-  const { token } = useAuth();
+  const { token, username } = useAuth();
 
-  // // Fetch friends and pending requests from the backend
-  // useEffect(() => {
-  //   // Fetch friends list
-  //   async function fetchFriends() {
-  //     const headers: { [key: string]: string } = {
-  //       "Content-Type": "application/json",
+  // Fetch friends and pending requests from the backend
+  useEffect(() => {
+    // // Fetch friends list
+    // async function fetchFriends() {
+    //   const headers: { [key: string]: string } = {
+    //     "Content-Type": "application/json",
+    //   };
 
-  //     };
+    //   if (token) {
+    //     headers["Authorization"] = `Bearer ${token}`;
+    //   }
 
-  //     if (token) {
-  //       headers["Authorization"] = `Bearer ${token}`;
-  //     }
+    //   const response = await fetch("http://localhost:3000/friends/list", {
+    //     method: "GET",
+    //     headers: headers,
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error(`HTTP error! Status: ${response.status}`);
+    //   }
+    //   const data = await response.json();
+    //   setFriends(data.friends);
+    // }
 
-  //     const response = await fetch("http://localhost:3000/friends/list", {
-  //       method: "GET",
-  //       headers: headers,
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! Status: ${response.status}`);
-  //     }
-  //     const data = await response.json();
-  //     setFriends(data.friends);
-  //   }
+    // fetchFriends();
+    handleSearch();
+  }, [token]);
 
-  //   // Fetch pending requests
-  //   async function fetchPendingRequests() {
-  //     const response = await fetch("http://localhost:3000/friends/requests", {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-          
-  //       },
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! Status: ${response.status}`);
-  //     }
-  //     const data = await response.json();
-  //     setPendingRequests(data.requests);
-  //   }
+  useEffect(() => {
+    async function fetchFriendRequests() {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/friends/friendRequests/${username}`
+        ); 
+        const friendRequests = await response.json();
+        setPendingRequests(friendRequests)
+        
+      } catch (error) {
+        console.error("Error fetching friend requests:", error);
+      }
+      
+    }
 
-  //   fetchFriends();
-  //   fetchPendingRequests();
-  // }, [token]);
+    fetchFriendRequests();
+  }, [username]);
 
   // Search usernames
   const handleSearch = async () => {
@@ -100,7 +101,7 @@ const FriendsPage: React.FC = () => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      setSearchResults(data); 
+      setSearchResults(data);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -111,18 +112,17 @@ const FriendsPage: React.FC = () => {
     try {
       const response = await fetch("http://localhost:3001/getUserId", {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       const data = await response.json();
-      console.log(data)
+      console.log(data);
       return data.userId;
     } catch (error) {
       console.error("Error:", error);
     }
-  
   };
 
   const handleSendRequest = async (receiverId: string) => {
@@ -143,7 +143,7 @@ const FriendsPage: React.FC = () => {
           body: JSON.stringify({ senderId, receiverId }),
         }
       );
-      
+
       if (!response.ok) {
         throw new Error("Error sending friend request");
       }
@@ -178,10 +178,6 @@ const FriendsPage: React.FC = () => {
     });
     // Update UI accordingly
   };
-
-  useEffect(() => {
-    handleSearch()
-  }, [])
 
   return (
     <IonPage>
