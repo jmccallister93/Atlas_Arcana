@@ -1,3 +1,5 @@
+// app.js backend
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -7,10 +9,7 @@ const authRoutes = require('../authentication/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
 const { validatePlayerData } = require('../validation/validatePlayerData');
 const path = require('path');
-const redis = require("redis");
-const redisClient = redis.createClient(); // adjust settings as needed
-redisClient.on("error", (err) => console.log("Redis Client Error", err));
-redisClient.connect();
+const friendsRoutes = require('./friendsRoute');
 
 
 const app = express();
@@ -26,7 +25,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Create new player
 app.post('/players', async (req, res) => {
-  console.log(req.body)
+  
   if (!validatePlayerData(req.body)) {
     return res.status(400).send({ error: 'Invalid player data' });
   }
@@ -77,32 +76,6 @@ app.delete('/players/:id', async (req, res) => {
     }
 });
 
-// // Get online users
-// function getOnlineUsers() {
-//   return new Promise((resolve, reject) => {
-//     redisClient.smembers('onlineUsers', (error, value) => {
-//       if (error) {
-//         reject(error);
-//         console.log(`[Redis smembers error] ${error}`);
-//       } else {
-//         resolve(value);
-//       }
-//     });
-//   });
-// }
-
-// // Usage
-// app.get('/online-users', async (req, res) => {
-//   try {
-//     const onlineUsers = await getOnlineUsers();
-//     res.json({ onlineUsers });
-//   } catch (error) {
-//     console.error('Error fetching online users:', error);
-//     res.status(500).send({ error: 'Internal server error' });
-//   }
-// });
-
-
 
 // Auth routes
 app.use('/auth', authRoutes);
@@ -110,9 +83,11 @@ app.use('/auth', authRoutes);
 // Protect game routes
 app.use('/game', authMiddleware);
 
-app.use(express.static('frontend/public'));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'public', 'index.html'));
+// Friends route
+app.use('/friends', friendsRoutes);
+
+app.get('/getUserId', authMiddleware, async (req, res) => {
+  res.json({ userId: req.user._id });
 });
 
 module.exports = app;

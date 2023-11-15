@@ -26,6 +26,12 @@ playerSchema.statics.findByCredentials = async function(email, password) {
     next();
   });
 
+// Add friend requests and friends arrays to the schema
+playerSchema.add({
+  friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }]
+});
+
 // Use the schema to create a model.
 const Player = mongoose.model('Player', playerSchema);
 

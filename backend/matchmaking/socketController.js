@@ -62,4 +62,16 @@ module.exports = function (socket, io) {
             // Handle errors
         }
     });
+
+    socket.on("sendFriendRequest", async (data) => {
+        try {
+            const { senderId, receiverId } = data;
+            // Logic to handle sending friend request
+            // This is a placeholder for the actual implementation
+            const requestResult = await sendFriendRequest(senderId, receiverId);
+            io.to(receiverId).emit('friendRequestReceived', requestResult);
+        } catch (error) {
+            socket.emit('friendRequestError', error.message);
+        }
+    });
 };

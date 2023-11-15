@@ -30,10 +30,17 @@ const playerSchema = new mongoose.Schema({
     require: false,
     unique: false,
   },
-  friendsList:{
-    type: String,
-    require: false,
-    unique: false,
+  friendsList: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Player'
+  }],
+  friendRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Player'
+  }],
+  online: {
+    type: Boolean,
+    default: false
   }
 });
 

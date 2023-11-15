@@ -20,7 +20,7 @@ import {
   closeCircleOutline,
 } from "ionicons/icons";
 
-import { useAuth, } from "../../context/AuthContext/AuthContext";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 import jwtDecode from "jwt-decode";
 
 interface User {
@@ -71,14 +71,12 @@ const FriendsPage: React.FC = () => {
       try {
         const response = await fetch(
           `http://localhost:3001/friends/friendRequests/${username}`
-        ); 
+        );
         const friendRequests = await response.json();
-        setPendingRequests(friendRequests)
-        
+        setPendingRequests(friendRequests);
       } catch (error) {
         console.error("Error fetching friend requests:", error);
       }
-      
     }
 
     fetchFriendRequests();
@@ -156,27 +154,59 @@ const FriendsPage: React.FC = () => {
   };
 
   const handleAcceptRequest = async (username: string) => {
-    await fetch(`http://localhost:3001/friends/accept`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ username }),
-    });
-    // Update UI accordingly
+    try {
+      const response = await fetch(
+        `http://localhost:3001/friends/acceptRequest`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ username }),
+        }
+      );
+
+      if (response.ok) {
+        // Remove the accepted request from the pending requests
+        setPendingRequests((prevRequests) =>
+          prevRequests.filter((req) => req.username !== username)
+        );
+      } else {
+        // Handle error response
+        console.error("Error accepting request");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const handleRejectRequest = async (username: string) => {
-    await fetch(`http://localhost:3000/friends/reject`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ username }),
-    });
-    // Update UI accordingly
+    try {
+      const response = await fetch(
+        `http://localhost:3000/friends/rejectRequest`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ username }),
+        }
+      );
+
+      if (response.ok) {
+        // Remove the rejected request from the pending requests
+        setPendingRequests((prevRequests) =>
+          prevRequests.filter((req) => req.username !== username)
+        );
+      } else {
+        // Handle error response
+        console.error("Error rejecting request");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -187,6 +217,26 @@ const FriendsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <IonLabel>Friends List</IonLabel>
+        <IonList>
+          {/* Existing Friends */}
+          {friends.map((friend) => (
+            <IonItem key={friend.username}>
+              <IonAvatar slot="start">
+                {/* Replace with avatar image if available */}
+                <img
+                  src={`https://via.placeholder.com/150/0000FF/808080?text=${friend.username}`}
+                />
+              </IonAvatar>
+              <IonLabel>
+                {friend.username}
+                <IonBadge color={friend.online ? "success" : "medium"}>
+                  {friend.online ? "Online" : "Offline"}
+                </IonBadge>
+              </IonLabel>
+            </IonItem>
+          ))}
+        </IonList>
         <IonList>
           {/* Search Input Item */}
           <IonItem>
@@ -210,27 +260,11 @@ const FriendsPage: React.FC = () => {
               </IonItem>
             ))}
           </div>
-          {/* Existing Friends */}
-          {friends.map((friend) => (
-            <IonItem key={friend.username}>
-              <IonAvatar slot="start">
-                {/* Replace with avatar image if available */}
-                <img
-                  src={`https://via.placeholder.com/150/0000FF/808080?text=${friend.username}`}
-                />
-              </IonAvatar>
-              <IonLabel>
-                {friend.username}
-                <IonBadge color={friend.online ? "success" : "medium"}>
-                  {friend.online ? "Online" : "Offline"}
-                </IonBadge>
-              </IonLabel>
-            </IonItem>
-          ))}
         </IonList>
 
         {/* Pending Friend Requests */}
-        <IonTitle>Pending Friend Requests</IonTitle>
+        <IonLabel>Pending Friend Requests</IonLabel>
+
         <IonList>
           {pendingRequests.map((request) => (
             <IonItem key={request.username}>
