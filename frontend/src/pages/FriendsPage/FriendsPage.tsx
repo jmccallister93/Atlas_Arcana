@@ -34,7 +34,7 @@ const FriendsPage: React.FC = () => {
   >([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<
-    Array<{ username: string }>
+    Array<{ _id: string; username: string }>
   >([]);
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const { token, username } = useAuth();
@@ -123,6 +123,7 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  // Send a freind request
   const handleSendRequest = async (receiverId: string) => {
     const senderId = await getUserId();
     if (!senderId) {
@@ -153,7 +154,14 @@ const FriendsPage: React.FC = () => {
     }
   };
 
-  const handleAcceptRequest = async (username: string) => {
+  // Accept a freind request
+  const handleAcceptRequest = async (friendId: string) => {
+    const userId = await getUserId();
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+
     try {
       const response = await fetch(
         `http://localhost:3001/friends/acceptRequest`,
@@ -163,17 +171,16 @@ const FriendsPage: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ username }),
+          body: JSON.stringify({ userId, friendId }),
         }
       );
 
       if (response.ok) {
         // Remove the accepted request from the pending requests
         setPendingRequests((prevRequests) =>
-          prevRequests.filter((req) => req.username !== username)
+          prevRequests.filter((req) => req.username !== friendId)
         );
       } else {
-        // Handle error response
         console.error("Error accepting request");
       }
     } catch (error) {
@@ -181,7 +188,7 @@ const FriendsPage: React.FC = () => {
     }
   };
 
-  const handleRejectRequest = async (username: string) => {
+  const handleRejectRequest = async (requesterId: string) => {
     try {
       const response = await fetch(
         `http://localhost:3001/friends/rejectRequest`,
@@ -191,7 +198,7 @@ const FriendsPage: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ username }),
+          body: JSON.stringify({ requesterId }),
         }
       );
 
@@ -259,7 +266,7 @@ const FriendsPage: React.FC = () => {
           ))}
         </IonList>
 
-{/* Search Input Item */}
+        {/* Search Input Item */}
         <IonList>
           <IonItem>
             <IonLabel>Search Users:</IonLabel>

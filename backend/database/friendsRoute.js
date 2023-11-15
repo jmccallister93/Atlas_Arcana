@@ -33,47 +33,46 @@ router.post("/sendRequest", async (req, res) => {
 
 // Accept a friend request
 router.post("/acceptRequest", authMiddleware, async (req, res) => {
-    const { username, friendUsername } = req.body;
-    try {
-      const user = await Player.findOne({ username: username });
-      const friend = await Player.findOne({ username: friendUsername });
-  
-      if (!user || !friend) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
+  const { userId, friendId } = req.body;
+  console.log("RequestID: " + friendId)
+  console.log("UserID: " + userId)
+  try {
+    // Add friendId to the userId's friendsList
+    await Player.updateOne(
+      { _id: userId },
+      { $addToSet: { friendsList: friendId } }
+    );
+
+    // Add userId to the friendId's friendsList
+    await Player.updateOne(
+      { _id: friendId },
+      { $addToSet: { friendsList: userId } }
+    );
+
+    res.status(200).json({ message: "Friend request accepted." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Decline a friend request
+router.post("/rejectRequest", authMiddleware, async (req, res) => {
+  const { requesterId } = req.body; // requesterId is the ObjectId of the friend who sent the request
+  const userId = req.user._id; // Extracted from the token by authMiddleware
+  console.log("RequestID: " + requesterId)
+  console.log("UserID: " + userId)
+  try {
+      // Remove requesterId from userId's pendingRequests
       await Player.updateOne(
-        { _id: user._id },
-        { $pull: { pendingRequests: friend._id }, $addToSet: { friendsList: friend._id } }
+          { _id: userId },
+          { $pull: { pendingRequests: requesterId } }
       );
-  
-      res.status(200).json({ message: "Friend request accepted." });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-  
-  // Decline a friend request
-  router.post("/rejectRequest", authMiddleware, async (req, res) => {
-    const { username, requesterUsername } = req.body;
-    try {
-      const user = await Player.findOne({ username: username });
-      const requester = await Player.findOne({ username: requesterUsername });
-  
-      if (!user || !requester) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      await Player.updateOne(
-        { _id: user._id },
-        { $pull: { pendingRequests: requester._id } }
-      );
-  
+
       res.status(200).json({ message: "Friend request declined." });
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ error: error.message });
-    }
-  });
+  }
+});
 
 // Reject/Remove a friend
 router.post("/removeFriend", async (req, res) => {
