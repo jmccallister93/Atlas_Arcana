@@ -12,6 +12,9 @@ const stateManager = new StateManager();
 // This will store unique socket IDs of connected users
 const connectedUsers = new Set();
 
+// Initialize a matchmaking queue
+let matchmakingQueue = [];
+
 module.exports = function (socket, io) {
     // Add the connected socket ID to the set
     connectedUsers.add(socket.id);
@@ -76,4 +79,26 @@ module.exports = function (socket, io) {
             socket.emit('friendRequestError', error.message);
         }
     });
+
+    socket.on('joinMatchmaking', (data) => {
+
+        console.log('User joining matchmaking:', data.userId);
+        // Add the user to the matchmaking queue
+        if (!matchmakingQueue.includes(data.userId)) {
+            matchmakingQueue.push(data.userId);
+            console.log('Current matchmaking queue:', matchmakingQueue);
+          }
+        
+      // Check if there are enough players for a match
+        if (matchmakingQueue.length >= 2) {
+            // Here you would typically create a new game session for these players
+            console.log('Match ready! Players:', matchmakingQueue.slice(0, 2));
+
+            // For now, let's just remove these players from the queue
+            matchmakingQueue = matchmakingQueue.slice(2);
+            console.log('Updated matchmaking queue:', matchmakingQueue);
+        }
+      });
+
+
 };

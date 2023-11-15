@@ -9,39 +9,54 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonSpinner,
+  IonButton,
 } from "@ionic/react";
 import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
-  
-
-
-  // ~~~LOOK AT ME~~~
-  // Potential solution create a seperate componet and have that re-render instead of the page
-  
+  const [searchingForGame, setSearchingForGame] = useState<boolean>(false);
+  const { token } = useAuth();
   useEffect(() => {
-    
+    console.log("User accessToken from AuthContext:", token);
+    // ...
+  }, []);
+  useEffect(() => {
     // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
       // console.log("Received users count from server:", usersCount);
       setOnlineUsers(usersCount);
     };
-  
+
     // console.log("Setting up event listener for updateOnlineUsers");
-    socket.on('updateOnlineUsers', handleUpdateOnlineUsers);
-  
+    socket.on("updateOnlineUsers", handleUpdateOnlineUsers);
+
     return () => {
       // console.log("Cleaning up event listener for updateOnlineUsers");
-      socket.off('updateOnlineUsers', handleUpdateOnlineUsers);
+      socket.off("updateOnlineUsers", handleUpdateOnlineUsers);
     };
   }, []);
-  
 
-  // console.log(onlineUsers);
+  // Join matchmaking
+  const joinMatchmaking = async () => {
+    setSearchingForGame(true);
+    try {
+      console.log("Attempting to join matchmaking queue", { userId: token });
+      socket.emit("joinMatchmaking", { userId: token });
+    } catch (error) {
+      console.error("Error joining matchmaking:", error);
+    }
+  };
+
+  const handleEndSearch = () =>{
+    setSearchingForGame(false)
+    console.log(searchingForGame)
+  }
 
   return (
     <IonPage>
@@ -51,6 +66,7 @@ const LobbyPage = () => {
         <IonGrid>
           <IonRow>
             <IonCol size="12" size-md="6">
+              {/* CALL ON SINGLEPLAYER FROM HERE SEPERATE COMPONENET, START GAME */}
               <IonCard button={true} routerLink="/singleplayer">
                 <IonCardHeader>
                   <IonCardTitle>Single Player Game</IonCardTitle>
@@ -62,8 +78,9 @@ const LobbyPage = () => {
               </IonCard>
             </IonCol>
 
+            {/* CALL ON MULTIPLAYER QUE FROM HERE SEPERATE COMPONENET */}
             <IonCol size="12" size-md="6">
-              <IonCard button={true} routerLink="/multiplayer">
+              <IonCard button={true} onClick={joinMatchmaking}>
                 <IonCardHeader>
                   <IonCardTitle>Multiplayer Game</IonCardTitle>
                   <IonCardSubtitle>Join a multiplayer battle</IonCardSubtitle>
@@ -71,6 +88,14 @@ const LobbyPage = () => {
                 <IonCardContent>
                   Dive into intense multiplayer action.
                 </IonCardContent>
+                {searchingForGame ? (
+                  <div style={{ textAlign: "center" }}>
+                    <IonSpinner name="crescent" />
+                    <p>Searching for game...</p>
+                    <IonButton onClick={handleEndSearch} color="danger">End Search</IonButton>
+                  </div>
+
+                ) : null}
               </IonCard>
             </IonCol>
 

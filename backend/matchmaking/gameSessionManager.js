@@ -4,10 +4,13 @@ const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
 const { v4: uuidv4 } = require('uuid'); // For generating unique session IDs
 
+// Connect to Redis client
 sessionClient.on("error", (err) => console.log("Redis Session Client Error", err));
 sessionClient.connect();
 
+// Create a game session
 async function createGameSession(playerOne, playerTwo) {
+  console.log("Creating game session for players:", playerOne, playerTwo);
   const sessionId = uuidv4(); // Generate a unique session ID
   const newSession = {
     players: [playerOne, playerTwo],
@@ -20,6 +23,8 @@ async function createGameSession(playerOne, playerTwo) {
   return sessionId; // Return the session ID
 }
 
+
+// Update game state
 async function updateGameState(sessionId, newState) {
   // Retrieve the current session
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -28,20 +33,6 @@ async function updateGameState(sessionId, newState) {
   // Save the updated session
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
-
-async function createGameSession(playerIds) {
-    const sessionId = uuidv4();
-    const newSession = {
-      sessionId: sessionId,
-      players: initializePlayers(playerIds),
-      map: createMap(),
-      turnOrder: determineTurnOrder(playerIds),
-      // Other initial game state settings
-    };
-  
-    await sessionClient.set(sessionId, JSON.stringify(newSession));
-    return sessionId;
-  }
   
   function initializePlayers(playerIds) {
     // Create player objects with initial stats, inventory, etc.
@@ -169,8 +160,6 @@ async function notifyPlayers(playerOne, playerTwo, sessionId) {
   io.to(playerOne.socketId).emit('gameSessionCreated', { sessionId });
   io.to(playerTwo.socketId).emit('gameSessionCreated', { sessionId });
 }
-
-// You can add more functions to send game state updates, end session notifications, etc.
 
 
 module.exports = { createGameSession, updateGameState, endGameSession };

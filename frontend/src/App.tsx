@@ -38,6 +38,8 @@ import { AuthProvider } from "./context/AuthContext/AuthContext";
 import "./global.scss";
 import FriendsPage from "./pages/FriendsPage/FriendsPage";
 
+import MatchFoundListener from "./context/MatchFoundListener/MatchFoundListener";
+
 setupIonicReact();
 
 const App: React.FC = () => (
@@ -45,6 +47,7 @@ const App: React.FC = () => (
     <IonApp>
       <IonReactRouter>
         <Navbar />
+        <MatchFoundListener /> {/* Include the listener */}
         <IonRouterOutlet id="mainMenu">
           <Route exact path="/">
             <Redirect to="/home" />
@@ -59,6 +62,7 @@ const App: React.FC = () => (
           <Route exact path="/dashboard" component={DashBoardPage} />
           <Route exact path="/account" component={AccountPage} />
           <Route exact path="/friends" component={FriendsPage} />
+         
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
