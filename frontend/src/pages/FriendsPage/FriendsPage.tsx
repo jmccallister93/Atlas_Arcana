@@ -184,7 +184,7 @@ const FriendsPage: React.FC = () => {
   const handleRejectRequest = async (username: string) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/friends/rejectRequest`,
+        `http://localhost:3001/friends/rejectRequest`,
         {
           method: "POST",
           headers: {
@@ -201,7 +201,6 @@ const FriendsPage: React.FC = () => {
           prevRequests.filter((req) => req.username !== username)
         );
       } else {
-        // Handle error response
         console.error("Error rejecting request");
       }
     } catch (error) {
@@ -237,8 +236,31 @@ const FriendsPage: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
+
+        {/* Pending Friend Requests */}
+        <IonLabel>Pending Friend Requests</IonLabel>
         <IonList>
-          {/* Search Input Item */}
+          {pendingRequests.map((request) => (
+            <IonItem key={request.username}>
+              <IonLabel>{request.username}</IonLabel>
+              <IonButton
+                fill="clear"
+                onClick={() => handleAcceptRequest(request.username)}
+              >
+                <IonIcon slot="icon-only" icon={checkmarkCircleOutline} />
+              </IonButton>
+              <IonButton
+                fill="clear"
+                onClick={() => handleRejectRequest(request.username)}
+              >
+                <IonIcon slot="icon-only" icon={closeCircleOutline} />
+              </IonButton>
+            </IonItem>
+          ))}
+        </IonList>
+
+{/* Search Input Item */}
+        <IonList>
           <IonItem>
             <IonLabel>Search Users:</IonLabel>
             <IonInput
@@ -260,29 +282,6 @@ const FriendsPage: React.FC = () => {
               </IonItem>
             ))}
           </div>
-        </IonList>
-
-        {/* Pending Friend Requests */}
-        <IonLabel>Pending Friend Requests</IonLabel>
-
-        <IonList>
-          {pendingRequests.map((request) => (
-            <IonItem key={request.username}>
-              <IonLabel>{request.username}</IonLabel>
-              <IonButton
-                fill="clear"
-                onClick={() => handleAcceptRequest(request.username)}
-              >
-                <IonIcon slot="icon-only" icon={checkmarkCircleOutline} />
-              </IonButton>
-              <IonButton
-                fill="clear"
-                onClick={() => handleRejectRequest(request.username)}
-              >
-                <IonIcon slot="icon-only" icon={closeCircleOutline} />
-              </IonButton>
-            </IonItem>
-          ))}
         </IonList>
       </IonContent>
     </IonPage>
