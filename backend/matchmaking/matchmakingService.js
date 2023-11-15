@@ -1,3 +1,5 @@
+//MATCH MAKING SERVICE
+
 const redis = require("redis");
 const client = redis.createClient(); // Default: localhost and port 6379
 const gameSessionManager = require("./gameSessionManager");
@@ -14,13 +16,10 @@ async function findMatch() {
     const playerOne = await client.lPop("matchmakingQueue");
     const playerTwo = await client.lPop("matchmakingQueue");
 
-    // Create a game session with these two players
     const gameSession = await gameSessionManager.createGameSession(
       playerOne,
       playerTwo
     );
-
-    // Notify players about the game session (this is just a placeholder, implementation depends on your setup)
     notifyPlayers(playerOne, playerTwo, gameSession);
   }
 }

@@ -1,3 +1,5 @@
+//GAME SESSION MANAGER
+
 const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
 const { v4: uuidv4 } = require('uuid'); // For generating unique session IDs

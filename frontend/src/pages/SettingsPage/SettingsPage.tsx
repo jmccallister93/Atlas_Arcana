@@ -35,6 +35,7 @@ const SettingsPage = () => {
     <IonPage>
       <IonContent fullscreen={true} className="ion-padding">
         <div className={gps.topMargin}></div>
+        <IonHeader>Settings</IonHeader>
         <IonList>
           <IonItem onClick={toggleAccountSettings}>
             Account Settings
@@ -45,7 +46,7 @@ const SettingsPage = () => {
           {accountSettingsOpen && (
             <IonList>
               <IonItem>Reset Password</IonItem>
-              <IonItem>Change Username</IonItem> 
+              <IonItem>Change Username</IonItem>
               <IonItem>Logout</IonItem>
             </IonList>
           )}

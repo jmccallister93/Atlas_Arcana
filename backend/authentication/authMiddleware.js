@@ -1,3 +1,5 @@
+//AUTH MIDDLEWARE
+
 const jwt = require('jsonwebtoken');
 const User = require('../database/PlayerModel'); // Adjust path as needed
 

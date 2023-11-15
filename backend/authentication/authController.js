@@ -1,3 +1,5 @@
+//ATUH CONTROLLER
+
 const jwt = require("jsonwebtoken");
 const User = require("../database/PlayerModel"); // Adjust path as needed
 const bcrypt = require("bcryptjs");

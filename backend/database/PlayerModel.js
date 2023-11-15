@@ -1,3 +1,5 @@
+//PLAYER MODEL
+
 const playerSchema = require('./PlayerSchema');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');

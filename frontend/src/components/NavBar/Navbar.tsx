@@ -67,9 +67,9 @@ const Navbar: React.FC = () => {
               </IonItem>
               {isLoggedIn ? (
                 <>
-                  <IonItem button routerLink="/account">
+                  {/* <IonItem button routerLink="/account">
                     <IonLabel>Account</IonLabel>
-                  </IonItem>
+                  </IonItem> */}
                   <IonItem button onClick={handleLogout}>
                     <IonLabel>Logout</IonLabel>
                   </IonItem>

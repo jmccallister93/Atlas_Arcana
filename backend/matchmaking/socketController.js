@@ -1,3 +1,5 @@
+//SOCKET CONTROLLER
+
 const gameSessionManager = require("./gameSessionManager");
 const StateManager = require("../networking/sync/stateManager");
 const reconcileClientState = require("../networking/sync/reconciliation");
