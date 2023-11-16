@@ -23,9 +23,9 @@ const LoginPage: React.FC = () => {
   const { isLoggedIn, login, username } = useAuth();
   const history = useHistory();
 
+   // Redirect to home after a short delay
   useEffect(() => {
     if (isLoggedIn) {
-      // Redirect to home after a short delay
       setErrorMessage("");
       setTimeout(() => history.push("/dashboard"), 3000);
     }
@@ -38,11 +38,9 @@ const LoginPage: React.FC = () => {
         email,
         password,
       });
-      console.log("Login successful:", response.data);
       const username = response.data.user.username;
       login(username, response.data.token, response.data._id);
     } catch (error: any) {
-      console.log(error.response.data);
       const errorMessage = error.response?.data?.error || "Login failed";
       setErrorMessage(errorMessage);
     }

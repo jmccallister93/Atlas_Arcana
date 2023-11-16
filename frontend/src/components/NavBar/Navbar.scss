@@ -11,8 +11,7 @@ ion-toolbar {
   background: rgb(0, 0, 0, 0.5);
 }
 
-.usernameDisplay {
+.ion-menu-button-container {
   display: flex;
-  align-self: center;
-  justify-self: center;
+  justify-content: flex-start; // Aligns the button to the right
 }

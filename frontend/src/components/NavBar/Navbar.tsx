@@ -13,12 +13,14 @@ import {
   IonLabel,
   IonFooter,
   IonBackButton,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/react";
 import "./Navbar.scss";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
-
 
 const Navbar: React.FC = () => {
   const { isLoggedIn, logout, username } = useAuth();
@@ -32,12 +34,31 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <IonHeader>
+    <IonHeader>
         <IonToolbar>
-          <IonTitle>Atlas Arcana</IonTitle>
-          <IonButtons slot="end">
-            <IonMenuButton autoHide={false} />
-          </IonButtons>
+          <IonGrid>
+            <IonRow className="ion-justify-content-center ion-align-items-center">
+              {/* Menu Button */}
+              <IonCol className="ion-text-left">
+                <IonButtons>
+                  <IonMenuButton autoHide={false} />
+                </IonButtons>
+              </IonCol>
+
+              {/* Title - Always centered */}
+              <IonCol className="ion-text-center">
+                <IonLabel>Atlas Arcana</IonLabel>
+              </IonCol>
+
+              {/* Logged in Username */}
+              {isLoggedIn && (
+                <IonCol className="ion-text-right">
+                  <IonLabel>Logged in as {username}</IonLabel>
+                </IonCol>
+              )}
+              {!isLoggedIn && <IonCol ></IonCol>} {/* Placeholder */}
+            </IonRow>
+          </IonGrid>
         </IonToolbar>
       </IonHeader>
 
@@ -48,7 +69,6 @@ const Navbar: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent className="usernameDisplay">
-          <h2>{username}</h2>
           <IonList>
             <IonMenuToggle autoHide={false}>
               <IonItem button routerLink="/home">

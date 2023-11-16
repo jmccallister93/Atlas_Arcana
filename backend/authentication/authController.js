@@ -82,6 +82,7 @@ exports.login = async (req, res) => {
   }
 };
 
+// Export friend request route from one user to another
 exports.sendFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
