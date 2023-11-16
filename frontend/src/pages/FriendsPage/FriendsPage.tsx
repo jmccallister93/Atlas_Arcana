@@ -102,8 +102,18 @@ const FriendsPage: React.FC = () => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      const data = await response.json();
-      setSearchResults(data);
+      // let data = await response.json();
+      // const friendIds = friendsList.map(friend => friend.username); // Assuming friend object has _id field
+      // data = data.filter(user: string => !friendIds.includes(user.username));
+      // setSearchResults(data);
+      const data: User[] = await response.json();
+       // Filter out friends from the search results
+    const friendUsernames = friendsList.map(friend => friend.username); // Assuming each friend object has a username field
+    const filteredData = data.filter(user => !friendUsernames.includes(user.username));
+
+    setSearchResults(filteredData);
+  
+   
     } catch (error) {
       console.error("Fetch error:", error);
     }
