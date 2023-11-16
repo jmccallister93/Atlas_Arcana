@@ -55,8 +55,9 @@ const SignupPage: React.FC = () => {
         throw new Error("Signup successful, but missing login data.");
       }
     } catch (error: any) {
-      console.log(error)
-      setErrorMessage(error.response?.data?.error || error.message);
+      console.log(error.response)
+      const errorMessage = error.response?.data?.error || "An unexpected error occurred";
+      setErrorMessage(errorMessage);
     }
   };
 

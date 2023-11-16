@@ -7,8 +7,6 @@ const mongoose = require('mongoose');
 const Player = require('./PlayerModel');
 const authRoutes = require('../authentication/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
-const { validatePlayerData } = require('../validation/validatePlayerData');
-const path = require('path');
 const friendsRoutes = require('./friendsRoute');
 
 
@@ -23,22 +21,6 @@ mongoose.connect('mongodb://127.0.0.1/atlasArcana')
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// // Create new player
-// app.post('/players', async (req, res) => {
-//   console.log("New Player called from app to route /players req: " , req, " res: " + res)
-//   // if (!validatePlayerData(req.body)) {
-//   //   return res.status(400).send({ error: 'Invalid player data' });
-//   // }
-//     try {
-//       const newPlayer = new Player(req.body);
-//       console.log("New Player called from app to route try /players newPlayer: " , newPlayer)
-//       await newPlayer.save();
-//       res.status(201).send(newPlayer);
-//     } catch (error) {
-//       console.error(error); // Log the error for debugging
-//       res.status(400).send({ error: error.message });
-//     }
-// });
 
 // GET all Players
 app.get('/players', async (req, res) => {

@@ -1,26 +1,37 @@
+const Player = require('../database/PlayerModel')
+
 module.exports = {
-  validatePlayerData: (playerData) => {
+  validatePlayerData: async (playerData) => {
     // Check for email
     if (!playerData.email || typeof playerData.email !== 'string') {
-      return false;
+      return { valid: false, message: 'Invalid email format' };
     }
 
     // Simple regex for basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(playerData.email)) {
-      return false;
+      return { valid: false, message: 'Invalid email format' };
     }
 
-    // Check for password
-    if (!playerData.password || typeof playerData.password !== 'string') {
-      return false;
+    // Check if email already exists in the database
+    const emailExists = await Player.findOne({ email: playerData.email });
+    if (emailExists) {
+      return { valid: false, message: 'Email already exists' };
     }
 
-    // Example: Check if the password is at least 6 characters
-    // if (playerData.password.length < 6) {
-    //   return false;
-    // }
+    // Check for username
+    if (!playerData.username || typeof playerData.username !== 'string') {
+      return { valid: false, message: 'Invalid username format' };
+    }
 
-    return true;
+    // Check if username already exists in the database
+    const usernameExists = await Player.findOne({ username: playerData.username });
+    if (usernameExists) {
+      return { valid: false, message: 'Username already exists' };
+    }
+
+    // Additional validations can be added here
+
+    return { valid: true };
   }
 };
