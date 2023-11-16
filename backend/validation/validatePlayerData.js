@@ -1,7 +1,7 @@
 const Player = require('../database/PlayerModel')
 
 module.exports = {
-  validatePlayerData: async (playerData) => {
+validatePlayerRegistration: async (playerData) => {
     // Check for email
     if (!playerData.email || typeof playerData.email !== 'string') {
       return { valid: false, message: 'Invalid email format' };

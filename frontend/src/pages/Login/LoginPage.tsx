@@ -26,10 +26,12 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn) {
       // Redirect to home after a short delay
+      setErrorMessage("");
       setTimeout(() => history.push("/dashboard"), 3000);
     }
   }, [isLoggedIn, history]);
 
+  // Login function
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:3001/auth/login", {
@@ -38,10 +40,11 @@ const LoginPage: React.FC = () => {
       });
       console.log("Login successful:", response.data);
       const username = response.data.user.username;
-      login( username, response.data.token, response.data._id);
+      login(username, response.data.token, response.data._id);
     } catch (error: any) {
-      const errMsg = error.response?.data?.error || "Login failed";
-      setErrorMessage(errMsg);
+      console.log(error.response.data);
+      const errorMessage = error.response?.data?.error || "Login failed";
+      setErrorMessage(errorMessage);
     }
   };
 

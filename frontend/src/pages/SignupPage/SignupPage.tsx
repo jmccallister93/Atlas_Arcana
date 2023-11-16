@@ -28,6 +28,7 @@ const SignupPage: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn) {
       // Redirect to home after a short delay
+      setErrorMessage("")
       setTimeout(() => history.push("/dashboard"), 3000);
     }
   }, [isLoggedIn, history]);
