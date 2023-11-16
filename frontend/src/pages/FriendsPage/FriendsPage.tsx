@@ -29,7 +29,7 @@ interface User {
 }
 
 const FriendsPage: React.FC = () => {
-  const [friends, setFriends] = useState<
+  const [friendsList, setFriendsList] = useState<
     Array<{ username: string; online: boolean }>
   >([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -41,28 +41,28 @@ const FriendsPage: React.FC = () => {
 
   // Fetch friends and pending requests from the backend
   useEffect(() => {
-    // // Fetch friends list
-    // async function fetchFriends() {
-    //   const headers: { [key: string]: string } = {
-    //     "Content-Type": "application/json",
-    //   };
+    // Fetch friends list
+    async function fetchFriends() {
+      const headers: { [key: string]: string } = {
+        "Content-Type": "application/json",
+      };
 
-    //   if (token) {
-    //     headers["Authorization"] = `Bearer ${token}`;
-    //   }
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
 
-    //   const response = await fetch("http://localhost:3000/friends/list", {
-    //     method: "GET",
-    //     headers: headers,
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error(`HTTP error! Status: ${response.status}`);
-    //   }
-    //   const data = await response.json();
-    //   setFriends(data.friends);
-    // }
+      const response = await fetch("http://localhost:3001/friends/friendsList", {
+        method: "GET",
+        headers: headers,
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setFriendsList(data.friendsList);
+    }
 
-    // fetchFriends();
+    fetchFriends();
     handleSearch();
   }, [token]);
 
@@ -187,6 +187,7 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  // reject freind request
   const handleRejectRequest = async (requesterId: string) => {
     try {
       const response = await fetch(
@@ -225,7 +226,7 @@ const FriendsPage: React.FC = () => {
         <IonLabel>Friends List</IonLabel>
         <IonList>
           {/* Existing Friends */}
-          {friends.map((friend) => (
+          {friendsList.map((friend) => (
             <IonItem key={friend.username}>
               <IonAvatar slot="start">
                 {/* Replace with avatar image if available */}

@@ -112,13 +112,12 @@ router.get("/search", authMiddleware, async (req, res) => {
 });
 
 // Get friends list
-router.get("/list", async (req, res) => {
+router.get("/friendsList", authMiddleware, async (req, res) => {
   // Assuming you have middleware to extract user ID from the token
   const userId = req.user._id;
   try {
-    const user = await Player.findById(userId);
-    // Assuming the friends are stored in a 'friends' field in your user model
-    res.status(200).json({ friends: user.friends });
+    const user = await Player.findById(userId).populate('friendsList', 'username');
+    res.status(200).json({ friendsList: user.friendsList  });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
