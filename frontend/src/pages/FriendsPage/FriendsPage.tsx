@@ -257,7 +257,7 @@ const FriendsPage: React.FC = () => {
               </IonButton>
               <IonButton
                 fill="clear"
-                onClick={() => handleRejectRequest(request.username)}
+                onClick={() => handleRejectRequest(request._id)}
               >
                 <IonIcon slot="icon-only" icon={closeCircleOutline} />
               </IonButton>

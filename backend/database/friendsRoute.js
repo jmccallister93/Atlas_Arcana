@@ -1,5 +1,5 @@
 // freindsRoute.js backend
-const authMiddleware = require('../authentication/authMiddleware');
+const authMiddleware = require("../authentication/authMiddleware");
 const express = require("express");
 const router = express.Router();
 const Player = require("./PlayerModel"); // Adjust the path as necessary
@@ -33,10 +33,9 @@ router.post("/sendRequest", async (req, res) => {
 
 // Accept a friend request
 router.post("/acceptRequest", authMiddleware, async (req, res) => {
-  console.log(req.body)
   const { userId, friendId } = req.body;
-  console.log("RequestID: " + friendId)
-  console.log("UserID: " + userId)
+  console.log("RequestID: " + friendId);
+  console.log("UserID: " + userId);
   try {
     // Add friendId to the userId's friendsList
     await Player.updateOne(
@@ -50,11 +49,11 @@ router.post("/acceptRequest", authMiddleware, async (req, res) => {
       { $addToSet: { friendsList: userId } }
     );
 
-      // Remove friendId from the userId's friendRequests
-      await Player.updateOne(
-        { _id: userId },
-        { $pull: { friendRequests: friendId } }
-      );
+    // Remove friendId from the userId's friendRequests
+    await Player.updateOne(
+      { _id: userId },
+      { $pull: { friendRequests: friendId } }
+    );
 
     res.status(200).json({ message: "Friend request accepted." });
   } catch (error) {
@@ -66,18 +65,18 @@ router.post("/acceptRequest", authMiddleware, async (req, res) => {
 router.post("/rejectRequest", authMiddleware, async (req, res) => {
   const { requesterId } = req.body; // requesterId is the ObjectId of the friend who sent the request
   const userId = req.user._id; // Extracted from the token by authMiddleware
-  console.log("RequestID: " + requesterId)
-  console.log("UserID: " + userId)
+  console.log("RequestID: " + requesterId);
+  console.log("UserID: " + userId);
   try {
-      // Remove requesterId from userId's pendingRequests
-      await Player.updateOne(
-          { _id: userId },
-          { $pull: { pendingRequests: requesterId } }
-      );
+    // Remove requesterId from userId's pendingRequests
+    await Player.updateOne(
+      { _id: userId },
+      { $pull: { friendRequests: requesterId } }
+    );
 
-      res.status(200).json({ message: "Friend request declined." });
+    res.status(200).json({ message: "Friend request declined." });
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -98,19 +97,19 @@ router.post("/removeFriend", async (req, res) => {
 
 // search for friends
 router.get("/search", authMiddleware, async (req, res) => {
-    const { username } = req.query;
-    const currentUser = req.user.username; // Extracted from the token by authMiddleware
-  
-    try {
-      const users = await Player.find({
-        username: { $regex: username, $options: 'i' },
-        username: { $ne: currentUser } // Exclude current user
-      });
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
+  const { username } = req.query;
+  const currentUser = req.user.username; // Extracted from the token by authMiddleware
+
+  try {
+    const users = await Player.find({
+      username: { $regex: username, $options: "i" },
+      username: { $ne: currentUser }, // Exclude current user
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Get friends list
 router.get("/list", async (req, res) => {
