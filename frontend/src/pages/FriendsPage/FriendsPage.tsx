@@ -31,7 +31,7 @@ interface User {
 
 const FriendsPage: React.FC = () => {
   const [friendsList, setFriendsList] = useState<
-    Array<{ username: string; online: boolean }>
+    Array<{ _id: string, username: string; online: boolean }>
   >([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<
@@ -64,10 +64,13 @@ const FriendsPage: React.FC = () => {
       const data = await response.json();
       setFriendsList(data.friendsList);
     }
-
     fetchFriends();
-    handleSearch();
   }, [token]);
+
+  // Initial search after freinds list loads
+  useEffect(() => {
+    handleSearch();
+  }, [friendsList]);
 
   // Get friend requests
   useEffect(() => {
@@ -107,13 +110,13 @@ const FriendsPage: React.FC = () => {
       // data = data.filter(user: string => !friendIds.includes(user.username));
       // setSearchResults(data);
       const data: User[] = await response.json();
-       // Filter out friends from the search results
-    const friendUsernames = friendsList.map(friend => friend.username); // Assuming each friend object has a username field
-    const filteredData = data.filter(user => !friendUsernames.includes(user.username));
+      // Filter out friends from the search results
+      const friendUsernames = friendsList.map((friend) => friend.username); // Assuming each friend object has a username field
+      const filteredData = data.filter(
+        (user) => !friendUsernames.includes(user.username)
+      );
 
-    setSearchResults(filteredData);
-  
-   
+      setSearchResults(filteredData);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -229,6 +232,33 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  // Remove friend
+  const handleRemoveFriend = async (friendId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/friends/removeFriend`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ friendId }),
+        }
+      );
+  
+      if (response.ok) {
+        // Remove the friend from the local state to update UI
+        setFriendsList((prevList) => prevList.filter(friend => friend._id !== friendId));
+      } else {
+        console.error("Error removing friend");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+
   return (
     <IonPage>
       <IonHeader>
@@ -255,6 +285,13 @@ const FriendsPage: React.FC = () => {
                   {friend.online ? "Online" : "Offline"}
                 </IonBadge>
               </IonLabel>
+              <IonButton
+                    fill="clear"
+                    onClick={() => handleRemoveFriend(friend._id)}
+                  >
+                    Remove
+                    <IonIcon slot="icon-only" icon={closeCircleOutline} />
+                  </IonButton>
             </IonItem>
           ))}
         </IonList>

@@ -80,20 +80,24 @@ router.post("/rejectRequest", authMiddleware, async (req, res) => {
   }
 });
 
-// Reject/Remove a friend
-router.post("/removeFriend", async (req, res) => {
-  const { userId, friendId } = req.body;
+// Remove a friend
+router.post("/removeFriend", authMiddleware, async (req, res) => {
+  const { friendId } = req.body;
+  const userId = req.user._id; // Extracting the user's ID from the token
+
   try {
-    // Remove friendId from friendsList
-    await Player.updateOne(
-      { _id: userId },
-      { $pull: { friendsList: friendId } }
-    );
+    // Remove friendId from userId's friendsList
+    await Player.updateOne({ _id: userId }, { $pull: { friendsList: friendId } });
+
+    // Also remove userId from friendId's friendsList
+    await Player.updateOne({ _id: friendId }, { $pull: { friendsList: userId } });
+
     res.status(200).json({ message: "Friend removed." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // search for friends
 router.get("/search", authMiddleware, async (req, res) => {
