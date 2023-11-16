@@ -52,11 +52,12 @@ const LobbyPage = () => {
       console.error("Error joining matchmaking:", error);
     }
   };
-
-  const handleEndSearch = () =>{
-    setSearchingForGame(false)
-    console.log(searchingForGame)
-  }
+  // Function to handle leaving the matchmaking queue
+  const leaveMatchmaking = () => {
+    setSearchingForGame(false);
+    console.log("Leaving matchmaking queue", { userId: token });
+    socket.emit("leaveMatchmaking", { userId: token }); // Emit an event to leave the queue
+  };
 
   return (
     <IonPage>
@@ -92,7 +93,7 @@ const LobbyPage = () => {
                   <div style={{ textAlign: "center" }}>
                     <IonSpinner name="crescent" />
                     <p>Searching for game...</p>
-                    <IonButton onClick={handleEndSearch} color="danger">End Search</IonButton>
+                    <IonButton onClick={leaveMatchmaking} color="danger">End Search</IonButton>
                   </div>
 
                 ) : null}

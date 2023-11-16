@@ -32,6 +32,7 @@ const SignupPage: React.FC = () => {
     }
   }, [isLoggedIn, history]);
 
+  // Submit registration
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -54,6 +55,7 @@ const SignupPage: React.FC = () => {
         throw new Error("Signup successful, but missing login data.");
       }
     } catch (error: any) {
+      console.log(error)
       setErrorMessage(error.response?.data?.error || error.message);
     }
   };
@@ -75,7 +77,7 @@ const SignupPage: React.FC = () => {
           <IonContent className="ion-padding">
             <form onSubmit={handleSubmit}>
               <IonItem>
-                <IonLabel position="floating">Username</IonLabel>
+                <IonLabel position="floating">User Name</IonLabel>
                 <IonInput
                   value={userName}
                   onIonInput={(e) => setUserName(e.detail.value!)}

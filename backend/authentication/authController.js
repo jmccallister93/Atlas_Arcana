@@ -1,22 +1,30 @@
 //ATUH CONTROLLER
 
+// Require jasonwebtoken secret 
 const jwt = require("jsonwebtoken");
-const User = require("../database/PlayerModel"); // Adjust path as needed
+// Require Player Model  
+const Player = require("../database/PlayerModel"); 
+// Bcrypt for hashing passwords
 const bcrypt = require("bcryptjs");
+// Secret from .env to for JWT token auth 
 const secret = process.env.JWT_SECRET;
 
+// Export the registration route for new users
 exports.register = async (req, res) => {
+  console.log("From authController register is called. Req body:", JSON.stringify(req.body));
   try {
-    const user = new User(req.body);
+    const user = new Player(req.body);
+    console.log("From authController try block user from Player(req.body):" + user )
     await user.save();
 
     // Generate a token
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: "1h" });
 
     // Send back user data and token
-    res.status(201).send({ user, token });
+    res.status(201).send({id: user._id.toString(), user, token });
   } catch (error) {
-    res.status(400).send(error);
+   console.error("Error in register function:", error);
+
   }
 };
 
@@ -24,7 +32,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email: email });
+    const user = await Player.findOne({ email: email });
 
     if (!user) {
       console.log(`User not found with email: ${email}`);
@@ -50,8 +58,8 @@ exports.login = async (req, res) => {
 exports.sendFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
-    const requester = await User.findById(requesterId);
-    const recipient = await User.findById(recipientId);
+    const requester = await Player.findById(requesterId);
+    const recipient = await Player.findById(recipientId);
 
     if (!recipient.friendRequests.includes(requesterId)) {
       recipient.friendRequests.push(requesterId);
@@ -70,11 +78,11 @@ exports.sendFriendRequest = async (req, res) => {
 exports.respondToFriendRequest = async (req, res) => {
   try {
     const { recipientId, requesterId, accepted } = req.body;
-    const recipient = await User.findById(recipientId);
+    const recipient = await Player.findById(recipientId);
 
     if (accepted) {
       recipient.friends.push(requesterId);
-      const requester = await User.findById(requesterId);
+      const requester = await Player.findById(requesterId);
       requester.friends.push(recipientId);
       await requester.save();
     }
