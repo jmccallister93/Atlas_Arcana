@@ -3,27 +3,28 @@ const authMiddleware = require('../authentication/authMiddleware');
 const express = require("express");
 const router = express.Router();
 const Player = require("./PlayerModel"); // Adjust the path as necessary
-const util = require('util');
 
 // Send a friend request
 router.post("/sendRequest", async (req, res) => {
+  const { senderId, receiverId } = req.body;
 
-  const { senderUsername, receiverUsername } = req.body;
-  console.log("From friendsRoute senderId: " + senderUsername)
-  console.log("From friendsRoute receiverId: " + receiverUsername)
   try {
+    console.log("fired before try in sendRequest");
+
     // Update sender's pending requests
     await Player.updateOne(
-      { username: senderUsername },
-      { $addToSet: { pendingRequests: receiverUsername } }
+      { _id: senderId },
+      { $addToSet: { pendingRequests: receiverId } }
     );
 
     // Update receiver's friend requests
     await Player.updateOne(
-      { username: receiverUsername },
-      { $addToSet: { friendRequests: senderUsername } }
+      { _id: receiverId },
+      { $addToSet: { friendRequests: senderId } }
     );
-    res.status(200).json({ message: "Friend request sent to " + receiverUsername });
+
+    console.log("fired after try");
+    res.status(200).json({ message: "Friend request sent to " + receiverId });
   } catch (error) {
     console.error("Error in sendRequest:", error);
     res.status(500).json({ error: error.message });
@@ -32,6 +33,7 @@ router.post("/sendRequest", async (req, res) => {
 
 // Accept a friend request
 router.post("/acceptRequest", authMiddleware, async (req, res) => {
+  console.log(req.body)
   const { userId, friendId } = req.body;
   console.log("RequestID: " + friendId)
   console.log("UserID: " + userId)
@@ -47,6 +49,12 @@ router.post("/acceptRequest", authMiddleware, async (req, res) => {
       { _id: friendId },
       { $addToSet: { friendsList: userId } }
     );
+
+      // Remove friendId from the userId's friendRequests
+      await Player.updateOne(
+        { _id: userId },
+        { $pull: { friendRequests: friendId } }
+      );
 
     res.status(200).json({ message: "Friend request accepted." });
   } catch (error) {

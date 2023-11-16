@@ -66,7 +66,6 @@ const FriendsPage: React.FC = () => {
     handleSearch();
   }, [token]);
 
-  // Get FriendRequests
   useEffect(() => {
     async function fetchFriendRequests() {
       try {
@@ -125,9 +124,9 @@ const FriendsPage: React.FC = () => {
   };
 
   // Send a freind request
-  const handleSendRequest = async (receiverUsername: string) => {
-    const senderUsername = username;
-    if (!senderUsername) {
+  const handleSendRequest = async (receiverId: string) => {
+    const senderId = await getUserId();
+    if (!senderId) {
       console.error("Sender ID not found");
       return;
     }
@@ -140,7 +139,7 @@ const FriendsPage: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ senderUsername, receiverUsername }),
+          body: JSON.stringify({ senderId, receiverId }),
         }
       );
 
@@ -162,7 +161,6 @@ const FriendsPage: React.FC = () => {
       console.error("User ID not found");
       return;
     }
-
     try {
       const response = await fetch(
         `http://localhost:3001/friends/acceptRequest`,
@@ -253,7 +251,7 @@ const FriendsPage: React.FC = () => {
               <IonLabel>{request.username}</IonLabel>
               <IonButton
                 fill="clear"
-                onClick={() => handleAcceptRequest(request.username)}
+                onClick={() => handleAcceptRequest(request._id)}
               >
                 <IonIcon slot="icon-only" icon={checkmarkCircleOutline} />
               </IonButton>
@@ -284,7 +282,7 @@ const FriendsPage: React.FC = () => {
             {searchResults.map((user) => (
               <IonItem key={user._id}>
                 <IonLabel>{user.username}</IonLabel>
-                <IonButton onClick={() => handleSendRequest(user.username)}>
+                <IonButton onClick={() => handleSendRequest(user._id)}>
                   Add Friend
                 </IonButton>
               </IonItem>
