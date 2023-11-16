@@ -102,8 +102,11 @@ router.get("/search", authMiddleware, async (req, res) => {
 
   try {
     const users = await Player.find({
-      username: { $regex: username, $options: "i" },
-      username: { $ne: currentUser }, // Exclude current user
+      username: { 
+        $regex: username, 
+        $options: "i",
+        $ne: currentUser // Exclude current user
+      }
     });
     res.json(users);
   } catch (error) {

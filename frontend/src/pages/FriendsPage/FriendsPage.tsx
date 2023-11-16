@@ -22,6 +22,7 @@ import {
 
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import jwtDecode from "jwt-decode";
+import gps from "../GlobalPageStyles.module.scss";
 
 interface User {
   _id: string;
@@ -39,9 +40,8 @@ const FriendsPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const { token, username } = useAuth();
 
-  // Fetch friends and pending requests from the backend
+  // Fetch friends list
   useEffect(() => {
-    // Fetch friends list
     async function fetchFriends() {
       const headers: { [key: string]: string } = {
         "Content-Type": "application/json",
@@ -51,10 +51,13 @@ const FriendsPage: React.FC = () => {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const response = await fetch("http://localhost:3001/friends/friendsList", {
-        method: "GET",
-        headers: headers,
-      });
+      const response = await fetch(
+        "http://localhost:3001/friends/friendsList",
+        {
+          method: "GET",
+          headers: headers,
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -66,6 +69,7 @@ const FriendsPage: React.FC = () => {
     handleSearch();
   }, [token]);
 
+  // Get friend requests
   useEffect(() => {
     async function fetchFriendRequests() {
       try {
@@ -223,6 +227,7 @@ const FriendsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <div className={gps.topMargin}></div>
         <IonLabel>Friends List</IonLabel>
         <IonList>
           {/* Existing Friends */}
@@ -245,35 +250,40 @@ const FriendsPage: React.FC = () => {
         </IonList>
 
         {/* Pending Friend Requests */}
-        <IonLabel>Pending Friend Requests</IonLabel>
-        <IonList>
-          {pendingRequests.map((request) => (
-            <IonItem key={request.username}>
-              <IonLabel>{request.username}</IonLabel>
-              <IonButton
-                fill="clear"
-                onClick={() => handleAcceptRequest(request._id)}
-              >
-                <IonIcon slot="icon-only" icon={checkmarkCircleOutline} />
-              </IonButton>
-              <IonButton
-                fill="clear"
-                onClick={() => handleRejectRequest(request._id)}
-              >
-                <IonIcon slot="icon-only" icon={closeCircleOutline} />
-              </IonButton>
-            </IonItem>
-          ))}
-        </IonList>
+        {pendingRequests?.length <= 0 ? null : (
+          <>
+            <IonLabel>Pending Friend Requests</IonLabel>
+            <IonList>
+              {pendingRequests.map((request) => (
+                <IonItem key={request.username}>
+                  <IonLabel>{request.username}</IonLabel>
+                  <IonButton
+                    fill="clear"
+                    onClick={() => handleAcceptRequest(request._id)}
+                  >
+                    <IonIcon slot="icon-only" icon={checkmarkCircleOutline} />
+                  </IonButton>
+                  <IonButton
+                    fill="clear"
+                    onClick={() => handleRejectRequest(request._id)}
+                  >
+                    <IonIcon slot="icon-only" icon={closeCircleOutline} />
+                  </IonButton>
+                </IonItem>
+              ))}
+            </IonList>
+          </>
+        )}
 
         {/* Search Input Item */}
+        <IonLabel>Search Friends</IonLabel>
         <IonList>
           <IonItem>
-            <IonLabel>Search Users:</IonLabel>
+            <IonLabel>Search Usernames:</IonLabel>
             <IonInput
               value={searchTerm}
               placeholder="Enter username"
-              onIonChange={(e) => setSearchTerm(e.detail.value ?? "")}
+              onIonInput={(e) => setSearchTerm(e.detail.value ?? "")}
             />
             <IonButton onClick={handleSearch}>Search</IonButton>
           </IonItem>
