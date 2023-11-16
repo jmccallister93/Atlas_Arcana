@@ -1,4 +1,4 @@
-//AUTH ROUTE
+//AUTH ROUTE sends the routes to the app.js
 
 const express = require('express');
 const authController = require('./authController');

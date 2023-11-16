@@ -3,28 +3,27 @@ const authMiddleware = require('../authentication/authMiddleware');
 const express = require("express");
 const router = express.Router();
 const Player = require("./PlayerModel"); // Adjust the path as necessary
+const util = require('util');
 
 // Send a friend request
 router.post("/sendRequest", async (req, res) => {
-  const { senderId, receiverId } = req.body;
 
+  const { senderUsername, receiverUsername } = req.body;
+  console.log("From friendsRoute senderId: " + senderUsername)
+  console.log("From friendsRoute receiverId: " + receiverUsername)
   try {
-    console.log("fired before try in sendRequest");
-
     // Update sender's pending requests
     await Player.updateOne(
-      { _id: senderId },
-      { $addToSet: { pendingRequests: receiverId } }
+      { username: senderUsername },
+      { $addToSet: { pendingRequests: receiverUsername } }
     );
 
     // Update receiver's friend requests
     await Player.updateOne(
-      { _id: receiverId },
-      { $addToSet: { friendRequests: senderId } }
+      { username: receiverUsername },
+      { $addToSet: { friendRequests: senderUsername } }
     );
-
-    console.log("fired after try");
-    res.status(200).json({ message: "Friend request sent to " + receiverId });
+    res.status(200).json({ message: "Friend request sent to " + receiverUsername });
   } catch (error) {
     console.error("Error in sendRequest:", error);
     res.status(500).json({ error: error.message });

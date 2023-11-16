@@ -1,4 +1,4 @@
-//ATUH CONTROLLER
+//ATUH CONTROLLER handle login and logout
 
 // Require jasonwebtoken secret
 const jwt = require("jsonwebtoken");
@@ -78,51 +78,6 @@ exports.login = async (req, res) => {
     res.send({ user, token });
   } catch (error) {
     console.error("Error during user login:", error);
-    res.status(500).send({ error: "Internal server error" });
-  }
-};
-
-// Export friend request route from one user to another
-exports.sendFriendRequest = async (req, res) => {
-  try {
-    const { requesterId, recipientId } = req.body;
-    const requester = await Player.findById(requesterId);
-    const recipient = await Player.findById(recipientId);
-
-    if (!recipient.friendRequests.includes(requesterId)) {
-      recipient.friendRequests.push(requesterId);
-      await recipient.save();
-
-      res.status(200).send({ message: "Friend request sent." });
-    } else {
-      res.status(400).send({ message: "Friend request already sent." });
-    }
-  } catch (error) {
-    console.error("Error sending friend request:", error);
-    res.status(500).send({ error: "Internal server error" });
-  }
-};
-
-exports.respondToFriendRequest = async (req, res) => {
-  try {
-    const { recipientId, requesterId, accepted } = req.body;
-    const recipient = await Player.findById(recipientId);
-
-    if (accepted) {
-      recipient.friends.push(requesterId);
-      const requester = await Player.findById(requesterId);
-      requester.friends.push(recipientId);
-      await requester.save();
-    }
-
-    recipient.friendRequests = recipient.friendRequests.filter(
-      (id) => id.toString() !== requesterId
-    );
-    await recipient.save();
-
-    res.status(200).send({ message: "Friend request response processed." });
-  } catch (error) {
-    console.error("Error responding to friend request:", error);
     res.status(500).send({ error: "Internal server error" });
   }
 };

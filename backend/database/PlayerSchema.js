@@ -33,11 +33,11 @@ const playerSchema = new mongoose.Schema({
     unique: false,
   },
   friendsList: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'Player'
   }],
   friendRequests: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'Player'
   }],
   online: {

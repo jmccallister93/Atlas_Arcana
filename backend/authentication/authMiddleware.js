@@ -1,4 +1,4 @@
-//AUTH MIDDLEWARE
+//AUTH MIDDLEWARE handles the token distribution
 
 const jwt = require('jsonwebtoken');
 const User = require('../database/PlayerModel'); // Adjust path as needed

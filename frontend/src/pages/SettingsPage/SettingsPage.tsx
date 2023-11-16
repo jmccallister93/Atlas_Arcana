@@ -8,12 +8,18 @@ import {
   IonToolbar,
   IonIcon,
   IonRange,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
 } from "@ionic/react";
 import { chevronForward, chevronDown } from "ionicons/icons";
 import gps from "../GlobalPageStyles.module.scss";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const SettingsPage = () => {
+  const { isLoggedIn } = useAuth();
+
   const [accountSettingsOpen, setAccountSettingsOpen] =
     useState<boolean>(false);
   const [gameSettingsOpen, setGameSettingsOpen] = useState<boolean>(false);
@@ -33,73 +39,86 @@ const SettingsPage = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen={true} className="ion-padding">
-        <div className={gps.topMargin}></div>
-        <IonHeader>Settings</IonHeader>
-        <IonList>
-          <IonItem onClick={toggleAccountSettings}>
-            Account Settings
-            <IonIcon
-              icon={accountSettingsOpen ? chevronDown : chevronForward}
-            />
-          </IonItem>
-          {accountSettingsOpen && (
-            <IonList>
-              <IonItem>Reset Password</IonItem>
-              <IonItem>Change Username</IonItem>
-              <IonItem>Logout</IonItem>
-            </IonList>
-          )}
+      {isLoggedIn ? (
+        <IonContent fullscreen={true} className="ion-padding">
+          <div className={gps.topMargin}></div>
+          <IonHeader>Settings</IonHeader>
+          <IonList>
+            <IonItem onClick={toggleAccountSettings}>
+              Account Settings
+              <IonIcon
+                icon={accountSettingsOpen ? chevronDown : chevronForward}
+              />
+            </IonItem>
+            {accountSettingsOpen && (
+              <IonList>
+                <IonItem>Reset Password</IonItem>
+                <IonItem>Change Username</IonItem>
+                <IonItem>Logout</IonItem>
+              </IonList>
+            )}
 
-          <IonItem onClick={toggleGameSettings}>
-            Game Settings
-            <IonIcon icon={gameSettingsOpen ? chevronDown : chevronForward} />
-          </IonItem>
-          {gameSettingsOpen && <IonList></IonList>}
+            <IonItem onClick={toggleGameSettings}>
+              Game Settings
+              <IonIcon icon={gameSettingsOpen ? chevronDown : chevronForward} />
+            </IonItem>
+            {gameSettingsOpen && <IonList></IonList>}
 
-          <IonItem onClick={toggleVolumeSettings}>
-            Volume Settings
-            <IonIcon icon={volumeSettingsOpen ? chevronDown : chevronForward} />
-          </IonItem>
-          {volumeSettingsOpen && (
-            <IonList>
-              <IonItem>
-                Master Volume | {masterVolume}
-                <IonRange
-                  min={0}
-                  max={100}
-                  step={1}
-                  snaps={true}
-                  value={masterVolume}
-                  onIonChange={handleMasterVolumeChange}
-                />
-              </IonItem>
-              <IonItem>
-                Effects Volume | {effectsVolume}
-                <IonRange
-                  min={0}
-                  max={100}
-                  step={1}
-                  snaps={true}
-                  value={effectsVolume}
-                  onIonChange={handleEffectsVolumeChange}
-                />
-              </IonItem>
-              <IonItem>
-                Music Volume | {musicVolume}
-                <IonRange
-                  min={0}
-                  max={100}
-                  step={1}
-                  snaps={true}
-                  value={musicVolume}
-                  onIonChange={handleMusicVolumeChange}
-                />
-              </IonItem>
-            </IonList>
-          )}
-        </IonList>
-      </IonContent>
+            <IonItem onClick={toggleVolumeSettings}>
+              Volume Settings
+              <IonIcon
+                icon={volumeSettingsOpen ? chevronDown : chevronForward}
+              />
+            </IonItem>
+            {volumeSettingsOpen && (
+              <IonList>
+                <IonItem>
+                  Master Volume | {masterVolume}
+                  <IonRange
+                    min={0}
+                    max={100}
+                    step={1}
+                    snaps={true}
+                    value={masterVolume}
+                    onIonChange={handleMasterVolumeChange}
+                  />
+                </IonItem>
+                <IonItem>
+                  Effects Volume | {effectsVolume}
+                  <IonRange
+                    min={0}
+                    max={100}
+                    step={1}
+                    snaps={true}
+                    value={effectsVolume}
+                    onIonChange={handleEffectsVolumeChange}
+                  />
+                </IonItem>
+                <IonItem>
+                  Music Volume | {musicVolume}
+                  <IonRange
+                    min={0}
+                    max={100}
+                    step={1}
+                    snaps={true}
+                    value={musicVolume}
+                    onIonChange={handleMusicVolumeChange}
+                  />
+                </IonItem>
+              </IonList>
+            )}
+          </IonList>
+        </IonContent>
+      ) : (
+        <IonContent>
+          <div className={gps.topMargin}></div>
+          <IonCard button routerLink="/login">
+            <IonCardHeader>
+              <IonCardTitle>Please Login to continue to Dashboard</IonCardTitle>
+            </IonCardHeader>
+          </IonCard>
+        </IonContent>
+      )}
     </IonPage>
   );
 };
