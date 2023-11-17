@@ -31,7 +31,7 @@ interface User {
 
 const FriendsPage: React.FC = () => {
   const [friendsList, setFriendsList] = useState<
-    Array<{ _id: string, username: string; online: boolean }>
+    Array<{ _id: string; username: string; online: boolean }>
   >([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<
@@ -246,10 +246,12 @@ const FriendsPage: React.FC = () => {
           body: JSON.stringify({ friendId }),
         }
       );
-  
+
       if (response.ok) {
         // Remove the friend from the local state to update UI
-        setFriendsList((prevList) => prevList.filter(friend => friend._id !== friendId));
+        setFriendsList((prevList) =>
+          prevList.filter((friend) => friend._id !== friendId)
+        );
       } else {
         console.error("Error removing friend");
       }
@@ -257,7 +259,6 @@ const FriendsPage: React.FC = () => {
       console.error("Error:", error);
     }
   };
-  
 
   return (
     <IonPage>
@@ -269,32 +270,40 @@ const FriendsPage: React.FC = () => {
       <IonContent>
         <div className={gps.topMargin}></div>
         <IonLabel>Friends List</IonLabel>
-        <IonList>
-          {/* Existing Friends */}
-          {friendsList.map((friend) => (
-            <IonItem key={friend.username}>
-              <IonAvatar slot="start">
-                {/* Replace with avatar image if available */}
-                <img
-                  src={`https://via.placeholder.com/150/0000FF/808080?text=${friend.username}`}
-                />
-              </IonAvatar>
-              <IonLabel>
-                {friend.username}
-                <IonBadge color={friend.online ? "success" : "medium"}>
-                  {friend.online ? "Online" : "Offline"}
-                </IonBadge>
-              </IonLabel>
-              <IonButton
-                    fill="clear"
-                    onClick={() => handleRemoveFriend(friend._id)}
-                  >
-                    Remove
-                    <IonIcon slot="icon-only" icon={closeCircleOutline} />
-                  </IonButton>
+
+        {friendsList?.length <= 0 ? (
+          <IonList>
+            <IonItem>
+              <IonLabel>Add some friends!</IonLabel>
             </IonItem>
-          ))}
-        </IonList>
+          </IonList>
+        ) : (
+          <IonList>
+            {friendsList.map((friend) => (
+              <IonItem key={friend.username}>
+                <IonAvatar slot="start">
+                  {/* Replace with avatar image if available */}
+                  <img
+                    src={`https://via.placeholder.com/150/0000FF/808080?text=${friend.username}`}
+                  />
+                </IonAvatar>
+                <IonLabel>
+                  {friend.username}
+                  <IonBadge color={friend.online ? "success" : "medium"}>
+                    {friend.online ? "Online" : "Offline"}
+                  </IonBadge>
+                </IonLabel>
+                <IonButton
+                  fill="clear"
+                  onClick={() => handleRemoveFriend(friend._id)}
+                >
+                  Remove
+                  <IonIcon slot="icon-only" icon={closeCircleOutline} />
+                </IonButton>
+              </IonItem>
+            ))}{" "}
+          </IonList>
+        )}
 
         {/* Pending Friend Requests */}
         {pendingRequests?.length <= 0 ? null : (
