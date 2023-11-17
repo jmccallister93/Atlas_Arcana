@@ -23,15 +23,16 @@ module.exports = function (socket, io) {
   // Listen to change stream for the Player collection
   const changeStream = Player.watch();
   changeStream.on("change", (change) => {
-    console.log("From change strem changetream.on change: " + change.operationType);
     if (
       change.operationType === "update" &&
       change.updateDescription.updatedFields.friendRequests
     ) {
-        console.log("Friends list updated for user");
-      const updatedUserId = change.documentKey._id;
+        const updatedUserId = change.documentKey._id.toString();
+
       // Emit event to the specific user whose friendRequest array changed
-      io.to(userOnlineStatus.get(updatedUserId)).emit("updatePendingRequests");
+      const userSocketId = userOnlineStatus.get(updatedUserId);
+      console.log(`Emitting 'updatePendingRequests' to user with ID: ${updatedUserId} and socket ID: ${userSocketId}`);
+      io.to(userSocketId).emit("updatePendingRequests");
     }
   }).on('error', (error) => {
     console.error('Error in change stream:', error);
@@ -47,41 +48,10 @@ module.exports = function (socket, io) {
 
   // Handle user connection
   socket.on("updateOnlineStatus", async (userId, status) => {
-    console.log("User onlineStatus id: " + userId);
-    console.log("User onlineStatus status: " + status);
-    userOnlineStatus.set(userId, socket.id);
+    console.log("Received updateOnlineStatus: User ID:", userId, "Socket ID:", socket.id);
+    userOnlineStatus.set(userId.toString(), socket.id);
     await Player.findByIdAndUpdate(userId, { online: status });
     checkAndEmitUserStatus(userId, status, io);
-  });
-
-  socket.on("playerAction", async (data) => {
-    if (!validateGameActions(data.action)) {
-      return; // Invalid action, ignore or send error response
-    }
-    try {
-      const { sessionId, action, clientState } = data;
-
-      // Process the action to update the game state
-      const updatedState = {}; // Result of processing the action
-
-      await gameSessionManager.updateGameState(sessionId, updatedState);
-
-      stateManager.updateState(updatedState);
-
-      reconcileClientState(clientState, updatedState);
-    } catch (error) {
-      // Handle errors
-    }
-  });
-
-  socket.on("realTimeAction", (data) => {
-    try {
-      const { action, latency } = data;
-      const compensatedAction = compensateForLag(action, latency);
-      // Process the compensated action
-    } catch (error) {
-      // Handle errors
-    }
   });
 
   socket.on("sendFriendRequest", async (data) => {
@@ -128,24 +98,6 @@ module.exports = function (socket, io) {
     }
   });
 
-  socket.on("joinMatchmaking", (data) => {
-    console.log("User joining matchmaking:", data.userId);
-    // Add the user to the matchmaking queue
-    if (!matchmakingQueue.includes(data.userId)) {
-      matchmakingQueue.push(data.userId);
-      console.log("Current matchmaking queue:", matchmakingQueue);
-    }
-
-    // Check if there are enough players for a match
-    if (matchmakingQueue.length >= 2) {
-      // Here you would typically create a new game session for these players
-      console.log("Match ready! Players:", matchmakingQueue.slice(0, 2));
-
-      // For now, let's just remove these players from the queue
-      matchmakingQueue = matchmakingQueue.slice(2);
-      console.log("Updated matchmaking queue:", matchmakingQueue);
-    }
-  });
 };
 
 // Call to check user online status

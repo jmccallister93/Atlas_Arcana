@@ -73,14 +73,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (isLoggedIn) {
       // If the user is logged in
       socket.emit('updateOnlineStatus',  _id,  true );
-      console.log("from authcontext useffect id: " +_id)
-      console.log("from authcontext useffect status: " +status)
     } else {
       // If the user is not logged in or logs out
       if (_id) { // Check if there's an ID available
         socket.emit('updateOnlineStatus',  _id, false );
-        console.log("from authcontext useffect id: " +_id)
-        console.log("from authcontext useffect status: " +status)
       }
     }
   }, [isLoggedIn, _id]);

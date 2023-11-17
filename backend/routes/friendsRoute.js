@@ -9,8 +9,6 @@ router.post("/sendRequest", async (req, res) => {
   const { senderId, receiverId } = req.body;
 
   try {
-    console.log("fired before try in sendRequest");
-
     // Update sender's pending requests
     await Player.updateOne(
       { _id: senderId },
@@ -22,8 +20,6 @@ router.post("/sendRequest", async (req, res) => {
       { _id: receiverId },
       { $addToSet: { friendRequests: senderId } }
     );
-
-    console.log("fired after try");
     res.status(200).json({ message: "Friend request sent to " + receiverId });
   } catch (error) {
     console.error("Error in sendRequest:", error);

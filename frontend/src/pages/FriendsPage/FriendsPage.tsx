@@ -79,31 +79,63 @@ const FriendsPage: React.FC = () => {
     handleSearch();
   }, [friendsList]);
 
-  // Get friend requests OLD
-  useEffect(() => {
-    if (username != null) {
-      async function fetchFriendRequests() {
-        try {
-          const response = await fetch(
-            `http://localhost:3001/friends/friendRequests/${username}`
-          );
-          const updatedRequests = await response.json();
-          const friendRequests = await response.json();
-          setPendingRequests(friendRequests);
-        } catch (error) {
-          console.error("Error fetching friend requests:", error);
-        }
+  // Get friend requests
+  // useEffect(() => {
+  //   if (username != null) {
+  //     async function fetchFriendRequests() {
+  //       try {
+  //         const response = await fetch(
+  //           `http://localhost:3001/friends/friendRequests/${username}`
+  //         );
+  //         const updatedRequests = await response.json();
+  //         const friendRequests = await response.json();
+  //         setPendingRequests(friendRequests);
+  //       } catch (error) {
+  //         console.error("Error fetching friend requests:", error);
+  //       }
+  //     }
+
+  //     socket.on("updatePendingRequests", fetchFriendRequests);
+
+  //     // Cleanup
+  //     return () => {
+  //       socket.off("updatePendingRequests", fetchFriendRequests);
+  //     };
+  //   }
+  // }, [username, socket]);
+
+  // Refactored fetchFriendRequests function
+  const fetchFriendRequests = async () => {
+    if (username) {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/friends/friendRequests/${username}`
+        );
+        const friendRequests = await response.json();
+        setPendingRequests(friendRequests);
+      } catch (error) {
+        console.error("Error fetching friend requests:", error);
       }
-
-      
-      socket.on("updatePendingRequests", fetchFriendRequests);
-
-      // Cleanup
-      return () => {
-        socket.off("updatePendingRequests", fetchFriendRequests);
-      };
     }
-  }, [username, socket]);
+  };
+
+  // useEffect for initial fetch and real-time updates
+  useEffect(() => {
+    fetchFriendRequests(); // Fetch friend requests initially
+
+    const handleFriendRequestsUpdate = () => {
+      console.log("Received 'updatePendingRequests' event from server. Fetching new data...");
+      fetchFriendRequests(); // Fetch updated friend requests
+    };
+    
+
+    socket.on("updatePendingRequests", handleFriendRequestsUpdate);
+
+    // Cleanup
+    return () => {
+      socket.off("updatePendingRequests", handleFriendRequestsUpdate);
+    };
+  }, [username, socket]); // include other dependencies if necessary
 
   // Search usernames
   const handleSearch = async () => {
