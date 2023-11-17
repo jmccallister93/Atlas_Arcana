@@ -4,10 +4,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const Player = require('./PlayerModel');
-const authRoutes = require('../authentication/authRoutes');
+const Player = require('../database/PlayerModel');
+const authRoutes = require('../routes/authRoutes');
 const authMiddleware = require('../authentication/authMiddleware')
-const friendsRoutes = require('./friendsRoute');
+const friendsRoutes = require('../routes/friendsRoute');
 
 
 const app = express();

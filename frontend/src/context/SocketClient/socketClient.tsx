@@ -1,9 +1,28 @@
 import io from "socket.io-client";
 
-const socket = io("http://localhost:3001"); // Adjust the URL to match your server/
+// Initiate connection to socket server
+const socket = io("http://localhost:3001"); 
 
+// Connect
 socket.on("connect", () => {});
-socket.on("updateOnlineUsers", (usersCount) => {});
+
+// Total online users
+socket.on("totalConnectedUsers", (usersCount) => {});
+
+// Function to register user with the socket server
+function registerWithSocketServer(userId: string | null) {
+  socket.emit('registerUser', userId);
+}
+// Listening for online status
+socket.on('userOnlineStatus', (data: { userId: string, isOnline: boolean }) => {
+  console.log(`User ${data.userId} is online: ${data.isOnline}`);
+  // if (data.userId === /* ObjectId of interest */) {
+  //   console.log(`User ${data.userId} is online: ${data.isOnline}`);
+  // }
+});
+
+// Call this function with the ObjectId after user logs in or app component mounts
+registerWithSocketServer('ObjectId_of_the_user');
 
 // Matchmaking found
 socket.on("matchFound", (matchDetails) => {
@@ -12,4 +31,5 @@ socket.on("matchFound", (matchDetails) => {
     window.dispatchEvent(event);
   });
 
+  export { registerWithSocketServer }; // Export the function to use it in components
 export default socket;

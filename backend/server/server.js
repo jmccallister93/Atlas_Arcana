@@ -3,13 +3,13 @@
 require('dotenv').config();
 const http = require('http');
 const socketIo = require('socket.io');
-const app = require('./app'); // Import the Express app
-const socketController = require('../matchmaking/socketController'); 
+const app = require('./expressApp'); // Import the Express app
+const socketController = require('../socket/socketController'); 
 const matchmakingService = require('../matchmaking/matchmakingService');
 
 const server = http.createServer(app);
 
-let onlineUsersCount = 0;
+
 
 // Base socket setup
 const io = socketIo(server, {
@@ -20,7 +20,8 @@ const io = socketIo(server, {
   }
 });
 
-// Online users socket
+// Online total users count socket
+let onlineUsersCount = 0;
 io.on('connection', (socket) => {
   onlineUsersCount++;
   io.emit('updateOnlineUsers', onlineUsersCount);
@@ -39,10 +40,14 @@ io.on('connection', (socket) => {
   });
 });
 
+// Online Single user by ObjectId
+const connectedUsers = new Map(); // Key: ObjectId, Value: socket.id
+
+
 // Match making socket
 io.on('connection', (socket) => {
   console.log('New client connected');
-  require('../matchmaking/socketController')(socket, io);
+  require('../socket/socketController')(socket, io);
   // Additional socket event listeners...
 });
 // Start matchmaking process
@@ -53,8 +58,6 @@ io.on('connection', (socket) => {
     console.log('User joining matchmaking from server.js:', data.userId);
     // Add matchmaking logic here
   });
-
-  // ... other event handlers ...
 });
 
 // Start the server

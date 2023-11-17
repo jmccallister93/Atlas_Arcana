@@ -29,6 +29,7 @@ const LoginPage: React.FC = () => {
       setErrorMessage("");
       setTimeout(() => history.push("/dashboard"), 3000);
     }
+    
   }, [isLoggedIn, history]);
 
   // Login function
@@ -39,7 +40,9 @@ const LoginPage: React.FC = () => {
         password,
       });
       const username = response.data.user.username;
-      login(username, response.data.token, response.data._id);
+      const token = response.data.token;
+      const userId = response.data.user._id;
+      login(username, token, userId);
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || "Login failed";
       setErrorMessage(errorMessage);

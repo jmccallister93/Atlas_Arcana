@@ -24,10 +24,14 @@ import {
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import jwtDecode from "jwt-decode";
 import gps from "../GlobalPageStyles.module.scss";
+import socket, {
+  registerWithSocketServer,
+} from "../../context/SocketClient/socketClient";
 
 interface User {
   _id: string;
   username: string;
+  online?: boolean;
 }
 
 const FriendsPage: React.FC = () => {
@@ -43,7 +47,7 @@ const FriendsPage: React.FC = () => {
   const [selectedFriendIdRemoval, setSelectedFriendIdRemoval] = useState<
     string | null
   >(null);
-  const { token, username } = useAuth();
+  const { _id, token, username } = useAuth();
 
   // Fetch friends list
   useEffect(() => {
@@ -70,7 +74,37 @@ const FriendsPage: React.FC = () => {
       setFriendsList(data.friendsList);
     }
     fetchFriends();
-  }, [token]);
+
+    // Get the current user's ObjectId (You need to implement this part based on your auth system)
+    const currentUserId = _id;
+    console.log(currentUserId)
+    // Register with socket server when component mounts
+    registerWithSocketServer(currentUserId);
+
+    // Socket listener for user online status
+    const handleOnlineStatus = (data: {
+      userId: string;
+      isOnline: boolean;
+    }) => {
+      if (data && data.userId) {
+        setFriendsList((prevList) =>
+          prevList.map((friend) =>
+            friend._id === data.userId
+              ? { ...friend, online: data.isOnline }
+              : friend
+          )
+        );
+      }
+    };
+
+    // Set up socket listener
+    socket.on("userOnlineStatus", handleOnlineStatus);
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      socket.off("userOnlineStatus", handleOnlineStatus);
+    };
+  }, []);
 
   // Initial search after freinds list loads
   useEffect(() => {
@@ -79,19 +113,21 @@ const FriendsPage: React.FC = () => {
 
   // Get friend requests
   useEffect(() => {
-    async function fetchFriendRequests() {
-      try {
-        const response = await fetch(
-          `http://localhost:3001/friends/friendRequests/${username}`
-        );
-        const friendRequests = await response.json();
-        setPendingRequests(friendRequests);
-      } catch (error) {
-        console.error("Error fetching friend requests:", error);
+    if (username != null) {
+      async function fetchFriendRequests() {
+        try {
+          const response = await fetch(
+            `http://localhost:3001/friends/friendRequests/${username}`
+          );
+          const friendRequests = await response.json();
+          setPendingRequests(friendRequests);
+        } catch (error) {
+          console.error("Error fetching friend requests:", error);
+        }
       }
-    }
 
-    fetchFriendRequests();
+      fetchFriendRequests();
+    }
   }, [username]);
 
   // Search usernames
@@ -301,7 +337,7 @@ const FriendsPage: React.FC = () => {
         ) : (
           <IonList>
             {friendsList.map((friend) => (
-              <IonItem key={friend.username}>
+              <IonItem key={friend._id}>
                 <IonAvatar slot="start">
                   {/* Replace with avatar image if available */}
                   <img

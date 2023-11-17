@@ -2,7 +2,7 @@
 const authMiddleware = require("../authentication/authMiddleware");
 const express = require("express");
 const router = express.Router();
-const Player = require("./PlayerModel"); // Adjust the path as necessary
+const Player = require("../database/PlayerModel"); // Adjust the path as necessary
 
 // Send a friend request
 router.post("/sendRequest", async (req, res) => {

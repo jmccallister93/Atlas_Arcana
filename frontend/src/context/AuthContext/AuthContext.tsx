@@ -59,6 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem("username", username);
     localStorage.setItem("accessToken", accessToken);
     socket.emit("userStatusChange", { username, status: "online" });
+    console.log("From AuthContext id: "+ _id)
   };
 
   const logout = () => {

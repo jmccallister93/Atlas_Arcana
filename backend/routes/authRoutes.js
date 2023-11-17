@@ -1,7 +1,7 @@
 //AUTH ROUTE sends the routes to the app.js
 
 const express = require('express');
-const authController = require('./authController');
+const authController = require('../authentication/authController');
 const router = express.Router();
 
 router.post('/register', authController.register);
