@@ -13,6 +13,7 @@ import {
   IonButton,
   IonIcon,
   IonBadge,
+  IonAlert,
 } from "@ionic/react";
 import {
   personAdd,
@@ -38,6 +39,10 @@ const FriendsPage: React.FC = () => {
     Array<{ _id: string; username: string }>
   >([]);
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [showFriendRemoveWarning, setShowFriendRemoveWarning] = useState(false);
+  const [selectedFriendIdRemoval, setSelectedFriendIdRemoval] = useState<
+    string | null
+  >(null);
   const { token, username } = useAuth();
 
   // Fetch friends list
@@ -233,7 +238,7 @@ const FriendsPage: React.FC = () => {
   };
 
   // Remove friend
-  const handleRemoveFriend = async (friendId: string) => {
+  const handleRemoveFriendRequest = async (friendId: string | null) => {
     try {
       const response = await fetch(
         `http://localhost:3001/friends/removeFriend`,
@@ -260,6 +265,21 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  const handleRemoveFriend = (friendId: string) => {
+    setSelectedFriendIdRemoval(friendId);
+    setShowFriendRemoveWarning(true);
+  };
+
+  const confirmRemoveFriend = async () => {
+    handleRemoveFriendRequest(selectedFriendIdRemoval);
+    setSelectedFriendIdRemoval(null);
+    setShowFriendRemoveWarning(false);
+  };
+
+  const cancelRemoveFriend = () => {
+    setSelectedFriendIdRemoval(null);
+    setShowFriendRemoveWarning(false);
+  };
   return (
     <IonPage>
       <IonHeader>
@@ -304,6 +324,25 @@ const FriendsPage: React.FC = () => {
             ))}{" "}
           </IonList>
         )}
+        {/* Friend removal warning */}
+        <IonAlert
+          isOpen={showFriendRemoveWarning}
+          onDidDismiss={() => setShowFriendRemoveWarning(false)}
+          header={"Confirm Removal"}
+          message={"Are you sure you want to remove this friend?"}
+          buttons={[
+            {
+              text: "Cancel",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: cancelRemoveFriend,
+            },
+            {
+              text: "Yes, Remove",
+              handler: confirmRemoveFriend,
+            },
+          ]}
+        />
 
         {/* Pending Friend Requests */}
         {pendingRequests?.length <= 0 ? null : (
