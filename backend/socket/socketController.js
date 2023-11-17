@@ -22,21 +22,31 @@ let matchmakingQueue = [];
 module.exports = function (socket, io) {
   // Listen to change stream for the Player collection
   const changeStream = Player.watch();
-  changeStream.on("change", (change) => {
-    if (
-      change.operationType === "update" &&
-      change.updateDescription.updatedFields.friendRequests
-    ) {
+  changeStream
+    .on("change", (change) => {
+      if (
+        change.operationType === "update" &&
+        change.updateDescription.updatedFields.friendRequests
+      ) {
         const updatedUserId = change.documentKey._id.toString();
 
-      // Emit event to the specific user whose friendRequest array changed
-      const userSocketId = userOnlineStatus.get(updatedUserId);
-      console.log(`Emitting 'updatePendingRequests' to user with ID: ${updatedUserId} and socket ID: ${userSocketId}`);
-      io.to(userSocketId).emit("updatePendingRequests");
-    }
-  }).on('error', (error) => {
-    console.error('Error in change stream:', error);
-  });;
+        // Emit event to the specific user whose friendRequest array changed
+        const userSocketId = userOnlineStatus.get(updatedUserId);
+        io.to(userSocketId).emit("updatePendingRequests");
+      }
+      if (
+        change.operationType === "update" &&
+        change.updateDescription.updatedFields.friendsList
+      ) {
+        const updatedUserId = change.documentKey._id.toString();
+        const userSocketId = userOnlineStatus.get(updatedUserId);
+        console.log(`Emitting 'updateFriendsList' to user with ID: ${updatedUserId}`);
+        io.to(userSocketId).emit("updateFriendsList");
+      }
+    })
+    .on("error", (error) => {
+      console.error("Error in change stream:", error);
+    });
 
   // Total Connected Users
   totalConnectedUsers.add(socket.id);
@@ -48,7 +58,12 @@ module.exports = function (socket, io) {
 
   // Handle user connection
   socket.on("updateOnlineStatus", async (userId, status) => {
-    console.log("Received updateOnlineStatus: User ID:", userId, "Socket ID:", socket.id);
+    console.log(
+      "Received updateOnlineStatus: User ID:",
+      userId,
+      "Socket ID:",
+      socket.id
+    );
     userOnlineStatus.set(userId.toString(), socket.id);
     await Player.findByIdAndUpdate(userId, { online: status });
     checkAndEmitUserStatus(userId, status, io);
@@ -97,7 +112,6 @@ module.exports = function (socket, io) {
       socket.emit("friendRequestError", error.message);
     }
   });
-
 };
 
 // Call to check user online status

@@ -71,38 +71,29 @@ const FriendsPage: React.FC = () => {
       const data = await response.json();
       setFriendsList(data.friendsList);
     }
+    // Fetch list initially
     fetchFriends();
-  }, []);
+
+    // Setup socket listener for real-time updates
+    const handleFriendsListUpdate = () => {
+      console.log(
+        "Received 'updateFriendsList' event from server. Fetching new friends list..."
+      );
+      fetchFriends();
+    };
+
+    socket.on("updateFriendsList", handleFriendsListUpdate);
+
+    // Cleanup
+    return () => {
+      socket.off("updateFriendsList", handleFriendsListUpdate);
+    };
+  }, [socket, token]);
 
   // Initial search after freinds list loads
   useEffect(() => {
     handleSearch();
   }, [friendsList]);
-
-  // Get friend requests
-  // useEffect(() => {
-  //   if (username != null) {
-  //     async function fetchFriendRequests() {
-  //       try {
-  //         const response = await fetch(
-  //           `http://localhost:3001/friends/friendRequests/${username}`
-  //         );
-  //         const updatedRequests = await response.json();
-  //         const friendRequests = await response.json();
-  //         setPendingRequests(friendRequests);
-  //       } catch (error) {
-  //         console.error("Error fetching friend requests:", error);
-  //       }
-  //     }
-
-  //     socket.on("updatePendingRequests", fetchFriendRequests);
-
-  //     // Cleanup
-  //     return () => {
-  //       socket.off("updatePendingRequests", fetchFriendRequests);
-  //     };
-  //   }
-  // }, [username, socket]);
 
   // Refactored fetchFriendRequests function
   const fetchFriendRequests = async () => {
@@ -124,10 +115,11 @@ const FriendsPage: React.FC = () => {
     fetchFriendRequests(); // Fetch friend requests initially
 
     const handleFriendRequestsUpdate = () => {
-      console.log("Received 'updatePendingRequests' event from server. Fetching new data...");
+      console.log(
+        "Received 'updatePendingRequests' event from server. Fetching new data..."
+      );
       fetchFriendRequests(); // Fetch updated friend requests
     };
-    
 
     socket.on("updatePendingRequests", handleFriendRequestsUpdate);
 
