@@ -24,9 +24,7 @@ import {
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import jwtDecode from "jwt-decode";
 import gps from "../GlobalPageStyles.module.scss";
-import socket, {
-  registerWithSocketServer,
-} from "../../context/SocketClient/socketClient";
+import socket from "../../context/SocketClient/socketClient";
 
 interface User {
   _id: string;
@@ -49,7 +47,7 @@ const FriendsPage: React.FC = () => {
   >(null);
   const { _id, token, username } = useAuth();
 
-  // Fetch friends list
+  // Fetch friends list HTTP
   useEffect(() => {
     async function fetchFriends() {
       const headers: { [key: string]: string } = {
@@ -74,36 +72,6 @@ const FriendsPage: React.FC = () => {
       setFriendsList(data.friendsList);
     }
     fetchFriends();
-
-    // Get the current user's ObjectId (You need to implement this part based on your auth system)
-    const currentUserId = _id;
-    console.log(currentUserId)
-    // Register with socket server when component mounts
-    registerWithSocketServer(currentUserId);
-
-    // Socket listener for user online status
-    const handleOnlineStatus = (data: {
-      userId: string;
-      isOnline: boolean;
-    }) => {
-      if (data && data.userId) {
-        setFriendsList((prevList) =>
-          prevList.map((friend) =>
-            friend._id === data.userId
-              ? { ...friend, online: data.isOnline }
-              : friend
-          )
-        );
-      }
-    };
-
-    // Set up socket listener
-    socket.on("userOnlineStatus", handleOnlineStatus);
-
-    // Clean up the listener when the component unmounts
-    return () => {
-      socket.off("userOnlineStatus", handleOnlineStatus);
-    };
   }, []);
 
   // Initial search after freinds list loads
@@ -111,7 +79,7 @@ const FriendsPage: React.FC = () => {
     handleSearch();
   }, [friendsList]);
 
-  // Get friend requests
+  // Get friend requests OLD
   useEffect(() => {
     if (username != null) {
       async function fetchFriendRequests() {
@@ -119,6 +87,7 @@ const FriendsPage: React.FC = () => {
           const response = await fetch(
             `http://localhost:3001/friends/friendRequests/${username}`
           );
+          const updatedRequests = await response.json();
           const friendRequests = await response.json();
           setPendingRequests(friendRequests);
         } catch (error) {
@@ -126,9 +95,15 @@ const FriendsPage: React.FC = () => {
         }
       }
 
-      fetchFriendRequests();
+      
+      socket.on("updatePendingRequests", fetchFriendRequests);
+
+      // Cleanup
+      return () => {
+        socket.off("updatePendingRequests", fetchFriendRequests);
+      };
     }
-  }, [username]);
+  }, [username, socket]);
 
   // Search usernames
   const handleSearch = async () => {
@@ -210,7 +185,21 @@ const FriendsPage: React.FC = () => {
       console.error("Error:", error);
       // Handle error, such as showing an error message
     }
+    socket.emit("sendFriendRequest", { senderId, receiverId });
   };
+
+  // Listening for a response event from the server
+  useEffect(() => {
+    socket.on("friendRequestSent", (data) => {
+      // Handle the response, like updating UI
+      console.log("Friend request sent:", data);
+    });
+
+    // Corrected cleanup function
+    return () => {
+      socket.off("friendRequestSent");
+    };
+  }, []);
 
   // Accept a freind request
   const handleAcceptRequest = async (friendId: string) => {
@@ -243,6 +232,7 @@ const FriendsPage: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
     }
+    socket.emit("acceptFriendRequest", { userId, friendId });
   };
 
   // reject freind request
@@ -317,6 +307,7 @@ const FriendsPage: React.FC = () => {
     setSelectedFriendIdRemoval(null);
     setShowFriendRemoveWarning(false);
   };
+
   return (
     <IonPage>
       <IonHeader>
@@ -346,6 +337,7 @@ const FriendsPage: React.FC = () => {
                 </IonAvatar>
                 <IonLabel>
                   {friend.username}
+
                   <IonBadge color={friend.online ? "success" : "medium"}>
                     {friend.online ? "Online" : "Offline"}
                   </IonBadge>

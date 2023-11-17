@@ -20,6 +20,23 @@ const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id
 let matchmakingQueue = [];
 
 module.exports = function (socket, io) {
+  // Listen to change stream for the Player collection
+  const changeStream = Player.watch();
+  changeStream.on("change", (change) => {
+    console.log("From change strem changetream.on change: " + change.operationType);
+    if (
+      change.operationType === "update" &&
+      change.updateDescription.updatedFields.friendRequests
+    ) {
+        console.log("Friends list updated for user");
+      const updatedUserId = change.documentKey._id;
+      // Emit event to the specific user whose friendRequest array changed
+      io.to(userOnlineStatus.get(updatedUserId)).emit("updatePendingRequests");
+    }
+  }).on('error', (error) => {
+    console.error('Error in change stream:', error);
+  });;
+
   // Total Connected Users
   totalConnectedUsers.add(socket.id);
   io.emit("totalConnectedUsers", totalConnectedUsers.size);
@@ -28,28 +45,14 @@ module.exports = function (socket, io) {
     io.emit("totalConnectedUsers", totalConnectedUsers.size);
   });
 
-  // Single online user status
   // Handle user connection
-  socket.on("userOnlineStatus", async (userId) => {
+  socket.on("updateOnlineStatus", async (userId, status) => {
+    console.log("User onlineStatus id: " + userId);
+    console.log("User onlineStatus status: " + status);
     userOnlineStatus.set(userId, socket.id);
-    await Player.findByIdAndUpdate(userId, { online: true }); // Set user online in MongoDB
-    checkAndEmitUserStatus(userId, io); // Emit status when a user connects
+    await Player.findByIdAndUpdate(userId, { online: status });
+    checkAndEmitUserStatus(userId, status, io);
   });
-   // Handle user disconnection
-   socket.on("disconnect", async () => {
-    let disconnectedUserId = null;
-    for (let [userId, socketId] of userOnlineStatus.entries()) {
-        if (socketId === socket.id) {
-            userOnlineStatus.delete(userId);
-            disconnectedUserId = userId;
-            break;
-        }
-    }
-    if (disconnectedUserId) {
-        await Player.findByIdAndUpdate(disconnectedUserId, { online: false }); // Set user offline in MongoDB
-        checkAndEmitUserStatus(disconnectedUserId, io); // Emit status when a user disconnects
-    }
-});
 
   socket.on("playerAction", async (data) => {
     if (!validateGameActions(data.action)) {
@@ -82,12 +85,44 @@ module.exports = function (socket, io) {
   });
 
   socket.on("sendFriendRequest", async (data) => {
+    const { senderId, receiverId } = data;
+    console.log("Received  in send request senderId: " + senderId);
+    console.log("Received  in send request receiverId: " + receiverId);
     try {
-      const { senderId, receiverId } = data;
-      // Logic to handle sending friend request
-      // This is a placeholder for the actual implementation
-      const requestResult = await sendFriendRequest(senderId, receiverId);
-      io.to(receiverId).emit("friendRequestReceived", requestResult);
+      // Assume sendFriendRequest is a function that handles the request logic
+      const newRequest = await sendFriendRequest(senderId, receiverId);
+
+      // Get the receiver's socket ID from userOnlineStatus
+      const receiverSocketId = userOnlineStatus.get(receiverId);
+
+      // Check if the receiver is online (socket ID is available)
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("friendRequestReceived", newRequest);
+      } else {
+        // Handle the case when the receiver is offline
+        console.log("Receiver is offline");
+      }
+    } catch (error) {
+      socket.emit("friendRequestError", error.message);
+    }
+  });
+
+  // Accept friend request handler
+  socket.on("acceptFriendRequest", async (data) => {
+    const { userId, friendId } = data;
+
+    try {
+      // Assume acceptFriendRequest is a function that updates the friendship status
+      await acceptFriendRequest(userId, friendId);
+
+      // Notify the friend that the request has been accepted
+      const friendSocketId = userOnlineStatus.get(friendId);
+      if (friendSocketId) {
+        io.to(friendSocketId).emit("friendRequestAccepted", {
+          userId,
+          friendId,
+        });
+      }
     } catch (error) {
       socket.emit("friendRequestError", error.message);
     }
@@ -114,8 +149,7 @@ module.exports = function (socket, io) {
 };
 
 // Call to check user online status
-function checkAndEmitUserStatus(userId, io) {
-    const isOnline = userOnlineStatus.has(userId);
-    io.emit("userOnlineStatus", { userId, isOnline }); // Emit to all clients
-    // io.to(userId).emit("userOnlineStatus", { isOnline }); // Emit to a specific client (if needed)
+function checkAndEmitUserStatus(userId, status, io) {
+  console.log(`Emitting userOnlineStatus for User ID ${userId}: ${status}`);
+  io.emit("userOnlineStatus", { userId, status });
 }

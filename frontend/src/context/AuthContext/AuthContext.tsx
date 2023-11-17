@@ -12,7 +12,6 @@ interface AuthContextType {
   isLoggedIn: boolean;
   username: string | null;
   token: string | null;
-
   login: (username: string, accessToken: string, _id: string) => void;
   logout: () => void;
 }
@@ -22,7 +21,6 @@ const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   username: null,
   token: null,
-
   login: () => {},
   logout: () => {},
 });
@@ -58,8 +56,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("username", username);
     localStorage.setItem("accessToken", accessToken);
-    socket.emit("userStatusChange", { username, status: "online" });
-    console.log("From AuthContext id: "+ _id)
   };
 
   const logout = () => {
@@ -71,9 +67,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("username");
     localStorage.removeItem("accessToken");
-    socket.emit("userStatusChange", { username, status: "offline" });
   };
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      // If the user is logged in
+      socket.emit('updateOnlineStatus',  _id,  true );
+      console.log("from authcontext useffect id: " +_id)
+      console.log("from authcontext useffect status: " +status)
+    } else {
+      // If the user is not logged in or logs out
+      if (_id) { // Check if there's an ID available
+        socket.emit('updateOnlineStatus',  _id, false );
+        console.log("from authcontext useffect id: " +_id)
+        console.log("from authcontext useffect status: " +status)
+      }
+    }
+  }, [isLoggedIn, _id]);
+  
   return (
     <AuthContext.Provider
       value={{ _id, isLoggedIn, username, token, login, logout }}

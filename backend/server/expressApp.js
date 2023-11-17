@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1/atlasArcana')
+mongoose.connect('mongodb://127.0.0.1:27017/atlasArcana?replicaSet=rs0')
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
