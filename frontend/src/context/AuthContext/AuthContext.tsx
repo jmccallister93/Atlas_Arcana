@@ -12,6 +12,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   username: string | null;
   token: string | null;
+
   login: (username: string, accessToken: string, _id: string) => void;
   logout: () => void;
 }
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   username: null,
   token: null,
+
   login: () => {},
   logout: () => {},
 });

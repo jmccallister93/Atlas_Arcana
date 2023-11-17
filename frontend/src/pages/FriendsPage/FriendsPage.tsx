@@ -265,6 +265,7 @@ const FriendsPage: React.FC = () => {
     }
   };
 
+  // Removal Popup warning
   const handleRemoveFriend = (friendId: string) => {
     setSelectedFriendIdRemoval(friendId);
     setShowFriendRemoveWarning(true);
