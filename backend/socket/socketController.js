@@ -58,6 +58,7 @@ module.exports = function (socket, io) {
   totalConnectedUsers.add(socket.id);
   io.emit("totalConnectedUsers", totalConnectedUsers.size);
   socket.on("disconnect", () => {
+    console.log("User disconnected, removing socket ID:", socket.id);
     totalConnectedUsers.delete(socket.id);
     io.emit("totalConnectedUsers", totalConnectedUsers.size);
   });
@@ -65,10 +66,23 @@ module.exports = function (socket, io) {
   // Handle user connection
   socket.on("updateOnlineStatus", async (userId, status) => {
     userOnlineStatus.set(userId.toString(), socket.id);
+    console.log("Storing socket ID for user:", userId, "Socket ID:", socket.id);
     await Player.findByIdAndUpdate(userId, { online: status });
     checkAndEmitUserStatus(userId, status, io);
+
+    // Find the user's friends
+    const user = await Player.findById(userId).populate('friendsList');
+    console.log("Current userOnlineStatus map:", userOnlineStatus);
+    user.friendsList.forEach(friend => {
+      console.log("Looking up socket ID for friend:", friend._id.toString());
+        const friendSocketId = userOnlineStatus.get(friend._id.toString());
+        if (friendSocketId) {
+            io.to(friendSocketId).emit("friendOnlineStatusUpdate", { userId, status });
+        }
+    });
   });
 
+//   Friend request
   socket.on("sendFriendRequest", async (data) => {
     const { senderId, receiverId } = data;
     try {
@@ -114,6 +128,5 @@ module.exports = function (socket, io) {
 
 // Call to check user online status
 function checkAndEmitUserStatus(userId, status, io) {
-  console.log(`Emitting userOnlineStatus for User ID ${userId}: ${status}`);
   io.emit("userOnlineStatus", { userId, status });
 }

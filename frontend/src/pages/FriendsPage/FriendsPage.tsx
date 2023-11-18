@@ -32,7 +32,7 @@ interface User {
   online?: boolean;
 }
 
-interface OnlineStatusUpdate {
+interface FriendOnlineStatus {
   userId: string;
   status: boolean;
 }
@@ -48,9 +48,9 @@ const FriendsPage: React.FC = () => {
   const [selectedFriendIdRemoval, setSelectedFriendIdRemoval] = useState<
     string | null
   >(null);
-  const { _id, token, username } = useAuth();
+  const { _id, token, username, isLoggedIn } = useAuth();
 
-  // Fetch friends list HTTP
+  // Fetch friends list from mongodb
   useEffect(() => {
     async function fetchFriends() {
       const headers: { [key: string]: string } = {
@@ -75,8 +75,9 @@ const FriendsPage: React.FC = () => {
       setFriendsList(data.friendsList);
     }
     // Fetch list initially
-    fetchFriends();
-
+    if (isLoggedIn) {
+      fetchFriends();
+    }
     // Setup socket listener for real-time updates
     const handleFriendsListUpdate = () => {
       fetchFriends();
@@ -225,26 +226,25 @@ const FriendsPage: React.FC = () => {
     };
   }, []);
 
-  // Listen for online status
   useEffect(() => {
-    const handleOnlineStatusUpdate = (data: OnlineStatusUpdate) => {
-      console.log("Online status update received:", data);
+    const handleFriendOnlineStatusUpdate = ({
+      userId,
+      status,
+    }: FriendOnlineStatus) => {
+      console.log(userId, status);
       setFriendsList((currentList) =>
         currentList.map((friend) =>
-          friend._id === data.userId
-            ? { ...friend, online: data.status }
-            : friend
+          friend._id === userId ? { ...friend, online: status } : friend
         )
       );
     };
 
-    socket.on("userOnlineStatus", handleOnlineStatusUpdate);
+    socket.on("friendOnlineStatusUpdate", handleFriendOnlineStatusUpdate);
 
-    // Cleanup
     return () => {
-      socket.off("userOnlineStatus", handleOnlineStatusUpdate);
+      socket.off("friendOnlineStatusUpdate", handleFriendOnlineStatusUpdate);
     };
-  }, [socket]);
+  }, [socket, isLoggedIn]);
 
   // Accept a freind request
   const handleAcceptRequest = async (friendId: string) => {
@@ -352,11 +352,6 @@ const FriendsPage: React.FC = () => {
     setSelectedFriendIdRemoval(null);
     setShowFriendRemoveWarning(false);
   };
-  useEffect(() => {
-    friendsList.map((friend) => {
-      console.log(friend);
-    });
-  }, friendsList);
 
   return (
     <IonPage>

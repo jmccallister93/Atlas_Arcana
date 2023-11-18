@@ -3,6 +3,7 @@ const authMiddleware = require("../authentication/authMiddleware");
 const express = require("express");
 const router = express.Router();
 const Player = require("../database/PlayerModel"); // Adjust the path as necessary
+const { trusted } = require("mongoose");
 
 // Send a friend request
 router.post("/sendRequest", async (req, res) => {
@@ -120,7 +121,7 @@ router.get("/friendsList", authMiddleware, async (req, res) => {
   const userId = req.user._id;
   try {
     const user = await Player.findById(userId).populate('friendsList', 'username');
-    res.status(200).json({ friendsList: user.friendsList  });
+    res.status(200).json({ friendsList: user.friendsList});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

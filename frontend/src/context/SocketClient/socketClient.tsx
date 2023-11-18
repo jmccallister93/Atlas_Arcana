@@ -6,21 +6,17 @@ const socket = io("http://localhost:3001");
 // Connect
 socket.on("connect", () => {});
 
+// Handle online status updates of friends
+socket.on("friendOnlineStatusUpdate", ({ userId, status }) => {
+  console.log(`Friend's status updated - User ID: ${userId}, Status: ${status}`);
+  // Update the UI or state accordingly
+});
+
 // Total online users
 socket.on("totalConnectedUsers", (usersCount) => {});
 
 // Send friend request
-socket.on("sendFriendRequest",  (senderId, receiverId) => {
-  console.log("Received  in send request senderId: " + senderId)
-    console.log("Received  in send request receiverId: " + receiverId)
-} );
-
-// Matchmaking found
-socket.on("matchFound", (matchDetails) => {
-    console.log("Match found:", matchDetails);
-    const event = new CustomEvent("match-found", { detail: matchDetails });
-    window.dispatchEvent(event);
-  });
+socket.on("sendFriendRequest",  (senderId, receiverId) => {} );
 
 
 export default socket;
