@@ -2,6 +2,7 @@
 
 const StateManager = require("../networking/sync/stateManager");
 const Player = require("../database/PlayerModel");
+const gameSessionManager = require("../matchmaking/gameSessionManager")
 
 // Initialize the state manager
 const stateManager = new StateManager();
@@ -120,7 +121,31 @@ module.exports = function (socket, io) {
       socket.emit("friendRequestError", error.message);
     }
   });
+
+// Listen for game state updates from clients
+socket.on("updateGameState", async ({ sessionId, newState }) => {
+  console.log("From socket controller updateGameState sessionId: " + sessionId);
+  console.log("From socket controller updateGameState newstate: " + JSON.stringify(newState));
+  try {
+    // Process the new state (e.g., validate, apply game logic)
+    await gameSessionManager.updateGameState(io, sessionId, newState);
+
+    // Retrieve the updated state
+    const updatedState = await gameSessionManager.getGameState(sessionId);
+
+    // Broadcast the updated state to all players in the session
+    io.to(sessionId).emit("updateGameState", updatedState.gameState); // Emit the gameState part
+  } catch (error) {
+    console.error("Error updating game state:", error);
+    // Optionally, emit an error message back to the client
+    socket.emit("gameStateUpdateError", { message: "Failed to update game state." });
+  }
+});
+
+
 };
+
+
 
 // Call to check user online status
 function checkAndEmitUserStatus(userId, status, io) {

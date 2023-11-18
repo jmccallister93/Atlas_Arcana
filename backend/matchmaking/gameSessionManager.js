@@ -3,6 +3,7 @@
 const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
 const { v4: uuidv4 } = require("uuid"); // For generating unique session IDs
+const io = require("../server/server"); 
 
 // Connect to Redis client
 sessionClient.on("error", (err) =>
@@ -24,7 +25,7 @@ async function createGameSession(playerOneId, playerTwoId) {
     gameMap,
     turnOrder,
     gameState: {
-      // Initial game state
+      testState: false
     },
     isPaused: false, // Flag to indicate if game is paused
     // Other session-related data
@@ -50,14 +51,43 @@ async function handlePlayerReconnect(sessionId, playerId) {
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
 
-// Update game state
-async function updateGameState(sessionId, newState) {
-  // Retrieve the current session
-  const sessionData = JSON.parse(await sessionClient.get(sessionId));
-  // Update the game state
-  sessionData.gameState = newState;
-  // Save the updated session
-  await sessionClient.set(sessionId, JSON.stringify(sessionData));
+//Update game state
+const updateGameState = async (io, sessionId, newState) => {
+  try {
+    const sessionData = JSON.parse(await sessionClient.get(sessionId));
+    if (!sessionData) {
+      throw new Error("Session not found");
+    }
+    console.log("Existing GameState before merge:", sessionData.gameState);
+    console.log("NewState to merge:", JSON.stringify(newState));
+    // Merge newState with existing gameState
+    const updatedGameState = { ...sessionData.gameState, ...newState };
+    console.log("Updated GameState after merge:", updatedGameState);
+    sessionData.gameState = updatedGameState;
+
+    await sessionClient.set(sessionId, JSON.stringify(sessionData));
+
+    io.to(sessionId).emit("updateGameState", updatedGameState);
+  } catch (error) {
+    console.error("Error updating game state:", error);
+  }
+};
+
+
+// Retrieve game state
+async function getGameState(sessionId) {
+  try {
+    const sessionData = await sessionClient.get(sessionId);
+    if (sessionData) {
+      return JSON.parse(sessionData);
+    } else {
+      // Handle case where session data is not found
+      throw new Error("Session data not found for sessionId: " + sessionId);
+    }
+  } catch (error) {
+    console.error("Error retrieving game state:", error);
+    throw error; // Re-throw the error for handling in the calling function
+  }
 }
 
 function initializePlayers(playerIds) {
@@ -153,9 +183,6 @@ async function upgradeEquipment(sessionId, player, equipmentId) {
 async function manageInventory(sessionId, player, actionDetails) {
   // Logic for managing a player's inventory
 }
-async function emitGameStateUpdate(sessionId) {
-  // Emit the current game state to all players
-}
 
 async function notifyPlayerAction(sessionId, player, action) {
   // Notify players of a specific action taken by a player
@@ -181,8 +208,7 @@ async function endGameSession(sessionId) {
   // Additional logic for saving the game result to MongoDB, if required
 }
 
-// Assuming you have a setup for socket.io somewhere in your code
-const io = require("../server/server"); // Adjust the path as necessary
+
 
 async function notifyPlayers(playerOne, playerTwo, sessionId) {
   // Emit an event to both players with the session ID
@@ -190,4 +216,4 @@ async function notifyPlayers(playerOne, playerTwo, sessionId) {
   io.to(playerTwo.socketId).emit("gameSessionCreated", { sessionId });
 }
 
-module.exports = { createGameSession, updateGameState, endGameSession };
+module.exports = { createGameSession, updateGameState, endGameSession, getGameState };

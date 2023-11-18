@@ -18,5 +18,8 @@ socket.on("totalConnectedUsers", (usersCount) => {});
 // Send friend request
 socket.on("sendFriendRequest",  (senderId, receiverId) => {} );
 
+// // GameState updates
+// socket.on("gameStateUpdate", ( sessionId,  newTestState ) => {})
+
 
 export default socket;

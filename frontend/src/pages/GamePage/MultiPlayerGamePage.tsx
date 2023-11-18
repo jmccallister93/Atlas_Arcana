@@ -1,4 +1,5 @@
 import {
+  IonButton,
   IonCard,
   IonCardHeader,
   IonCardTitle,
@@ -12,32 +13,49 @@ import { useLocation } from "react-router";
 
 // Define the expected structure of the location state
 interface LocationState {
-  sessionId: string;
+  sessionId?: string;
+}
+
+interface GameState {
+  testState: boolean;
 }
 
 const MultiPlayerGamePage = () => {
-  const [gameState, setGameState] = useState(/* initial game state */);
+  const [gameState, setGameState] = useState<GameState>({ testState: false });
   const location = useLocation();
   const state = location.state as LocationState; // Type assertion
-  const sessionId = state.sessionId;
+  const sessionId = state?.sessionId;
 
   useEffect(() => {
     // Join the game session
     socket.emit("joinGame", { sessionId });
-    console.log("SessionId from MultiPlayerGame: " + sessionId)
+    console.log("SessionId from MultiPlayerGame: " + sessionId);
+    console.log("Initial GameState:", gameState);
     // Listen for game state updates
-    socket.on("gameStateUpdate", (newState) => {
-      setGameState(newState);
-    });
+    const handleGameStateUpdate = (newGameState: GameState) => {
+      console.log("Received GameState Update:", newGameState);
+      setGameState(newGameState);
+    };
+
+    socket.on("updateGameState", handleGameStateUpdate);
 
     return () => {
-      // Leave game session and clean up on component unmount
-      socket.emit("leaveGame", { sessionId });
-      socket.off("gameStateUpdate");
+      // Cleanup
+      socket.off("updateGameState", handleGameStateUpdate);
     };
   }, [sessionId]);
 
-  // Render your game UI based on gameState
+  const sendTestUpdate = () => {
+    const newTestState = !gameState.testState;
+    setGameState({ testState: newTestState }); // Update local state
+
+    // Emit the updated state to the server
+    socket.emit("updateGameState", {
+      sessionId,
+      newState: { testState: newTestState },
+    });
+  };
+
   return (
     <IonPage>
       <IonContent>
@@ -45,7 +63,11 @@ const MultiPlayerGamePage = () => {
         <h1>Game Page</h1>
         <IonCard>
           <IonCardHeader>
-            <IonCardTitle>Welcome to the game.</IonCardTitle>
+            <IonCardTitle>
+              Welcome to the game. Test State:{" "}
+              {gameState.testState ? "True" : "False"}
+            </IonCardTitle>
+            <IonButton onClick={sendTestUpdate}>Test me</IonButton>
           </IonCardHeader>
         </IonCard>
       </IonContent>
