@@ -40,8 +40,14 @@ module.exports = function (socket, io) {
       ) {
         const updatedUserId = change.documentKey._id.toString();
         const userSocketId = userOnlineStatus.get(updatedUserId);
-        console.log(`Emitting 'updateFriendsList' to user with ID: ${updatedUserId}`);
         io.to(userSocketId).emit("updateFriendsList");
+      }
+      if (
+        change.operationType === "update" &&
+        change.updateDescription.updatedFields.online
+      ) {
+        const updatedUserId = change.documentKey._id.toString();
+        const userSocketId = userOnlineStatus.get(updatedUserId);
       }
     })
     .on("error", (error) => {
@@ -58,12 +64,6 @@ module.exports = function (socket, io) {
 
   // Handle user connection
   socket.on("updateOnlineStatus", async (userId, status) => {
-    console.log(
-      "Received updateOnlineStatus: User ID:",
-      userId,
-      "Socket ID:",
-      socket.id
-    );
     userOnlineStatus.set(userId.toString(), socket.id);
     await Player.findByIdAndUpdate(userId, { online: status });
     checkAndEmitUserStatus(userId, status, io);
@@ -71,8 +71,6 @@ module.exports = function (socket, io) {
 
   socket.on("sendFriendRequest", async (data) => {
     const { senderId, receiverId } = data;
-    console.log("Received  in send request senderId: " + senderId);
-    console.log("Received  in send request receiverId: " + receiverId);
     try {
       // Assume sendFriendRequest is a function that handles the request logic
       const newRequest = await sendFriendRequest(senderId, receiverId);

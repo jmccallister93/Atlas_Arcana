@@ -32,10 +32,13 @@ interface User {
   online?: boolean;
 }
 
+interface OnlineStatusUpdate {
+  userId: string;
+  status: boolean;
+}
+
 const FriendsPage: React.FC = () => {
-  const [friendsList, setFriendsList] = useState<
-    Array<{ _id: string; username: string; online: boolean }>
-  >([]);
+  const [friendsList, setFriendsList] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<
     Array<{ _id: string; username: string }>
@@ -76,9 +79,6 @@ const FriendsPage: React.FC = () => {
 
     // Setup socket listener for real-time updates
     const handleFriendsListUpdate = () => {
-      console.log(
-        "Received 'updateFriendsList' event from server. Fetching new friends list..."
-      );
       fetchFriends();
     };
 
@@ -90,12 +90,12 @@ const FriendsPage: React.FC = () => {
     };
   }, [socket, token]);
 
-  // Initial search after freinds list loads
+  //Fetch Initial search after freinds list loads
   useEffect(() => {
     handleSearch();
   }, [friendsList]);
 
-  // Refactored fetchFriendRequests function
+  // FetchFriendRequests function
   const fetchFriendRequests = async () => {
     if (username) {
       try {
@@ -110,7 +110,7 @@ const FriendsPage: React.FC = () => {
     }
   };
 
-  // useEffect for initial fetch and real-time updates
+  // useEffect for initial fetch of friends request and real-time updates
   useEffect(() => {
     fetchFriendRequests(); // Fetch friend requests initially
 
@@ -127,7 +127,7 @@ const FriendsPage: React.FC = () => {
     return () => {
       socket.off("updatePendingRequests", handleFriendRequestsUpdate);
     };
-  }, [username, socket]); // include other dependencies if necessary
+  }, [username, socket]);
 
   // Search usernames
   const handleSearch = async () => {
@@ -212,11 +212,11 @@ const FriendsPage: React.FC = () => {
     socket.emit("sendFriendRequest", { senderId, receiverId });
   };
 
-  // Listening for a response event from the server
+  // Listening for a Friend Request response event from the server
   useEffect(() => {
-    socket.on("friendRequestSent", (data) => {
+    socket.on("friendRequestSent", (online) => {
       // Handle the response, like updating UI
-      console.log("Friend request sent:", data);
+      console.log("Friend request sent:", online);
     });
 
     // Corrected cleanup function
@@ -224,6 +224,27 @@ const FriendsPage: React.FC = () => {
       socket.off("friendRequestSent");
     };
   }, []);
+
+  // Listen for online status
+  useEffect(() => {
+    const handleOnlineStatusUpdate = (data: OnlineStatusUpdate) => {
+      console.log("Online status update received:", data);
+      setFriendsList((currentList) =>
+        currentList.map((friend) =>
+          friend._id === data.userId
+            ? { ...friend, online: data.status }
+            : friend
+        )
+      );
+    };
+
+    socket.on("userOnlineStatus", handleOnlineStatusUpdate);
+
+    // Cleanup
+    return () => {
+      socket.off("userOnlineStatus", handleOnlineStatusUpdate);
+    };
+  }, [socket]);
 
   // Accept a freind request
   const handleAcceptRequest = async (friendId: string) => {
@@ -331,6 +352,11 @@ const FriendsPage: React.FC = () => {
     setSelectedFriendIdRemoval(null);
     setShowFriendRemoveWarning(false);
   };
+  useEffect(() => {
+    friendsList.map((friend) => {
+      console.log(friend);
+    });
+  }, friendsList);
 
   return (
     <IonPage>
