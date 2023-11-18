@@ -36,13 +36,7 @@ interface LeftMatchmakingResponse {
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [searchingForGame, setSearchingForGame] = useState<boolean>(false);
-  const [gameSize, setGameSize] = useState<number>(2);
-  const [amountOfPlayers, setAmountOfPlayers] = useState<number>(2);
-  const [amountOfPlayerOptions, setAmountOfPlayerOptions] = useState<number[]>(
-    []
-  );
-  const [amountOfNpcs, setAmountOfNpcs] = useState<number>(0);
-  const [amountOfNpcOptions, setAmountOfNpcOptions] = useState<number[]>([]);
+  const [matchFound, setMatchFound] = useState<boolean>(false);
   const { token, isLoggedIn } = useAuth();
   const history = useHistory();
 
@@ -73,7 +67,8 @@ const LobbyPage = () => {
       console.error("Error joining matchmaking:", error);
     }
   };
-  // Function to handle leaving the matchmaking queue
+
+  // Leave matchmaking
   const leaveMatchmaking = () => {
     setSearchingForGame(false);
     console.log("Leaving matchmaking queue", { userId: token });
@@ -102,18 +97,18 @@ const LobbyPage = () => {
       socket.emit("registerPlayer", token);
     }
   }, [isLoggedIn, token]);
+
   // Handle match found event
   useEffect(() => {
     const handleMatchFound = (gameSessionInfo: GameSessionInfo) => {
       console.log("Match found! Game session info:", gameSessionInfo);
-      setSearchingForGame(false); // Update state to stop showing 'searching for game'
-
-      // // Show popup message here
-      // alert("Match Found! Joining Game...");
+      setSearchingForGame(false);
+      setMatchFound(true);
 
       // Redirect after a 5-second delay
       setTimeout(() => {
         history.push("/game", { gameSession: gameSessionInfo });
+        setMatchFound(false);
       }, 5000);
     };
 
@@ -122,39 +117,7 @@ const LobbyPage = () => {
     return () => {
       socket.off("matchFound", handleMatchFound);
     };
-  }, [history, socket]); // Add history to the dependency array
-
-  // Handler for game size change
-  const handleGameSizeChange = (event: any) => {
-    const newGameSize = parseInt(event.detail.value, 10);
-    setGameSize(newGameSize);
-    setAmountOfPlayers(Math.min(amountOfPlayers, newGameSize));
-    setAmountOfNpcs(Math.max(0, newGameSize - amountOfPlayers));
-  };
-
-  // Recalculate options for players and NPCs based on the game size
-  useEffect(() => {
-    const newPlayerOptions = Array.from({ length: gameSize }, (_, i) => i + 1);
-    const newNpcOptions = Array.from({ length: gameSize - 1 }, (_, i) => i);
-
-    // Update player and NPC options
-    setAmountOfPlayerOptions(newPlayerOptions);
-    setAmountOfNpcOptions(newNpcOptions);
-  }, [gameSize]);
-
-  // Handle changes in player count
-  const handlePlayerCountChange = (event: any) => {
-    const selectedPlayerCount = parseInt(event.detail.value, 10);
-    setAmountOfPlayers(selectedPlayerCount);
-    setAmountOfNpcs(gameSize - selectedPlayerCount);
-  };
-
-  // Handle changes in NPC count
-  const handleNpcCountChange = (event: any) => {
-    const selectedNpcCount = parseInt(event.detail.value, 10);
-    setAmountOfNpcs(selectedNpcCount);
-    setAmountOfPlayers(gameSize - selectedNpcCount);
-  };
+  }, [history, socket]);
 
   return (
     <IonPage>
@@ -174,9 +137,7 @@ const LobbyPage = () => {
                   <IonCardContent>
                     Challenge yourself in a single player game.
                     <div style={{ textAlign: "center" }}>
-                      <IonButton >
-                        Start Game
-                      </IonButton>
+                      <IonButton>Start Game</IonButton>
                     </div>
                   </IonCardContent>
                 </IonCard>
@@ -190,76 +151,28 @@ const LobbyPage = () => {
                     <IonCardSubtitle>Join a multiplayer battle</IonCardSubtitle>
                   </IonCardHeader>
                   <IonCardContent>
-                    Set Mutliplayer Game Size.
-                    <IonList>
-                      <IonItem>
-                        <IonSelect
-                          value={gameSize}
-                          onIonChange={handleGameSizeChange}
-                          label="Game Size"
-                          labelPlacement="floating"
-                        >
-                          <IonSelectOption value={2}>2</IonSelectOption>
-                          <IonSelectOption value={3}>3</IonSelectOption>
-                          <IonSelectOption value={4}>4</IonSelectOption>
-                          <IonSelectOption value={5}>5</IonSelectOption>
-                          <IonSelectOption value={6}>6</IonSelectOption>
-                          <IonSelectOption value={7}>7</IonSelectOption>
-                          <IonSelectOption value={8}>8</IonSelectOption>
-                        </IonSelect>
-                      </IonItem>
-                    </IonList>
-                    {/* Player Options */}
-                    <IonList>
-                      <IonItem>
-                        <IonSelect
-                          value={amountOfPlayers}
-                          onIonChange={handlePlayerCountChange}
-                          label="Number of Players"
-                          labelPlacement="floating"
-                        >
-                          {amountOfPlayerOptions.map((option) => (
-                            <IonSelectOption key={option} value={option}>
-                              {option}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-                      </IonItem>
-                    </IonList>
-                    {/* NPC Options */}
-                    <IonList>
-                      <IonItem>
-                        <IonSelect
-                          value={amountOfNpcs}
-                          onIonChange={handleNpcCountChange}
-                          label="Number of NPC's"
-                          labelPlacement="floating"
-                        >
-                          {amountOfNpcOptions.map((option) => (
-                            <IonSelectOption key={option} value={option}>
-                              {option}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-                      </IonItem>
-                    </IonList>
+                    Dive into intense multiplayer action.
+                    {searchingForGame ? (
+                      <div style={{ textAlign: "center" }}>
+                        <IonSpinner name="crescent" />
+                        <p>Searching for game...</p>
+                        <IonButton onClick={leaveMatchmaking} color="danger">
+                          Leave Que
+                        </IonButton>
+                      </div>
+                    ) : matchFound ? ( // Check if match is found
+                      <div style={{ textAlign: "center", color: "green" }}>
+                        <h2>Match Found!</h2>
+                        <p>Joining game...</p>
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: "center" }}>
+                        <IonButton onClick={joinMatchmaking}>
+                          Start Search
+                        </IonButton>
+                      </div>
+                    )}
                   </IonCardContent>
-
-                  {searchingForGame ? (
-                    <div style={{ textAlign: "center" }}>
-                      <IonSpinner name="crescent" />
-                      <p>Searching for game...</p>
-                      <IonButton onClick={leaveMatchmaking} color="danger">
-                        Leave Que
-                      </IonButton>
-                    </div>
-                  ) : (
-                    <div style={{ textAlign: "center" }}>
-                      <IonButton onClick={joinMatchmaking}>
-                        Start Search
-                      </IonButton>
-                    </div>
-                  )}
                 </IonCard>
               </IonCol>
 
