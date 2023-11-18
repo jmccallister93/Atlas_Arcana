@@ -190,7 +190,7 @@ const LobbyPage = () => {
                     <IonCardSubtitle>Join a multiplayer battle</IonCardSubtitle>
                   </IonCardHeader>
                   <IonCardContent>
-                    Dive into intense multiplayer action.
+                    Set Mutliplayer Game Size.
                     <IonList>
                       <IonItem>
                         <IonSelect

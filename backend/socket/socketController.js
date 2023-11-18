@@ -1,10 +1,6 @@
 //SOCKET CONTROLLER
 
-const gameSessionManager = require("../matchmaking/gameSessionManager");
 const StateManager = require("../networking/sync/stateManager");
-const reconcileClientState = require("../networking/sync/reconciliation");
-const compensateForLag = require("../networking/latency/lagCompensation");
-const validateGameActions = require("../validation/validateGameActions");
 const Player = require("../database/PlayerModel");
 
 // Initialize the state manager
@@ -14,7 +10,7 @@ const stateManager = new StateManager();
 const totalConnectedUsers = new Set();
 
 //Single User online status
-const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id 
+const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id
 
 // Initialize a matchmaking queue
 let matchmakingQueue = [];
@@ -71,18 +67,21 @@ module.exports = function (socket, io) {
     checkAndEmitUserStatus(userId, status, io);
 
     // Find the user's friends
-    const user = await Player.findById(userId).populate('friendsList');
+    const user = await Player.findById(userId).populate("friendsList");
     console.log("Current userOnlineStatus map:", userOnlineStatus);
-    user.friendsList.forEach(friend => {
+    user.friendsList.forEach((friend) => {
       console.log("Looking up socket ID for friend:", friend._id.toString());
-        const friendSocketId = userOnlineStatus.get(friend._id.toString());
-        if (friendSocketId) {
-            io.to(friendSocketId).emit("friendOnlineStatusUpdate", { userId, status });
-        }
+      const friendSocketId = userOnlineStatus.get(friend._id.toString());
+      if (friendSocketId) {
+        io.to(friendSocketId).emit("friendOnlineStatusUpdate", {
+          userId,
+          status,
+        });
+      }
     });
   });
 
-//   Friend request
+  //   Friend request
   socket.on("sendFriendRequest", async (data) => {
     const { senderId, receiverId } = data;
     try {

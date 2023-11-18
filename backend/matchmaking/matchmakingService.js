@@ -8,7 +8,7 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
 // Add player to game que
-async function addToQueue(playerId) {
+async function addToQueue(playerId, amountOfPlayers) {
   await client.rPush("matchmakingQueue", playerId);
 }
 
