@@ -51,7 +51,6 @@ async function handlePlayerReconnect(sessionId, playerId) {
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
 
-//Update game state
 const updateGameState = async (io, sessionId, newState) => {
   try {
     const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -60,18 +59,20 @@ const updateGameState = async (io, sessionId, newState) => {
     }
     console.log("Existing GameState before merge:", sessionData.gameState);
     console.log("NewState to merge:", JSON.stringify(newState));
-    // Merge newState with existing gameState
+
     const updatedGameState = { ...sessionData.gameState, ...newState };
     console.log("Updated GameState after merge:", updatedGameState);
-    sessionData.gameState = updatedGameState;
 
+    sessionData.gameState = updatedGameState;
     await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
+    console.log("Emitting updated game state to session:", sessionId);
     io.to(sessionId).emit("updateGameState", updatedGameState);
   } catch (error) {
     console.error("Error updating game state:", error);
   }
 };
+
 
 
 // Retrieve game state

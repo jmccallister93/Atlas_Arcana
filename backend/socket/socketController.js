@@ -129,11 +129,10 @@ socket.on("updateGameState", async ({ sessionId, newState }) => {
   try {
     // Process the new state (e.g., validate, apply game logic)
     await gameSessionManager.updateGameState(io, sessionId, newState);
-
     // Retrieve the updated state
     const updatedState = await gameSessionManager.getGameState(sessionId);
-
     // Broadcast the updated state to all players in the session
+    console.log("Broadcasting updated state to session:", sessionId);
     io.to(sessionId).emit("updateGameState", updatedState.gameState); // Emit the gameState part
   } catch (error) {
     console.error("Error updating game state:", error);
@@ -141,8 +140,6 @@ socket.on("updateGameState", async ({ sessionId, newState }) => {
     socket.emit("gameStateUpdateError", { message: "Failed to update game state." });
   }
 });
-
-
 };
 
 
