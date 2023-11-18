@@ -12,9 +12,6 @@ const totalConnectedUsers = new Set();
 //Single User online status
 const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id
 
-// Initialize a matchmaking queue
-let matchmakingQueue = [];
-
 module.exports = function (socket, io) {
   // Listen to change stream for the Player collection
   const changeStream = Player.watch();

@@ -27,6 +27,7 @@ interface GameSessionInfo {
   // For instance:
   playerId: string;
   opponentId: string;
+  sessionId: string;
   // Add other relevant properties
 }
 interface LeftMatchmakingResponse {
@@ -107,7 +108,7 @@ const LobbyPage = () => {
 
       // Redirect after a 5-second delay
       setTimeout(() => {
-        history.push("/game", { gameSession: gameSessionInfo });
+        history.push("/multiGame", { sessionId: gameSessionInfo.sessionId });
         setMatchFound(false);
       }, 5000);
     };

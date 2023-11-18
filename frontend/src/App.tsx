@@ -26,7 +26,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import SignupPage from "./pages/SignupPage/SignupPage";
 import SettingsPage from "./pages/SettingsPage/SettingsPage";
-import GamePage from "./pages/GamePage/GamePage";
+import MultiPlayerGamePage from "./pages/GamePage/MultiPlayerGamePage";
 import LobbyPage from "./pages/LobbyPage/LobbyPage";
 import Navbar from "./components/NavBar/Navbar";
 import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage";
@@ -40,6 +40,7 @@ import FriendsPage from "./pages/FriendsPage/FriendsPage";
 
 import MatchFoundListener from "./context/MatchFoundListener/MatchFoundListener";
 import MatchHistoryPage from "./pages/MatchHistoryPage/MatchHistoryPage";
+import SinglePlayerGamePage from "./pages/GamePage/SinglePlayerGamePage";
 
 setupIonicReact();
 
@@ -58,7 +59,8 @@ const App: React.FC = () => (
           <Route exact path="/signup" component={SignupPage} />
           <Route exact path="/resetPassword" component={ResetPasswordPage} />
           <Route exact path="/settings" component={SettingsPage} />
-          <Route exact path="/game" component={GamePage} />
+          <Route exact path="/multiGame" component={MultiPlayerGamePage} />
+          <Route exact path="/singleGame" component={SinglePlayerGamePage} />
           <Route exact path="/lobby" component={LobbyPage} />
           <Route exact path="/dashboard" component={DashBoardPage} />
           <Route exact path="/account" component={AccountPage} />
