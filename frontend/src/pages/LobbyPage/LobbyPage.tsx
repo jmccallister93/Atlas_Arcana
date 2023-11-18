@@ -16,8 +16,7 @@ import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
 import { useAuth } from "../../context/AuthContext/AuthContext";
-import { useHistory } from 'react-router-dom';
-
+import { useHistory } from "react-router-dom";
 
 interface GameSessionInfo {
   // Define the properties of gameSessionInfo
@@ -25,6 +24,9 @@ interface GameSessionInfo {
   playerId: string;
   opponentId: string;
   // Add other relevant properties
+}
+interface LeftMatchmakingResponse {
+  success: boolean;
 }
 
 const LobbyPage = () => {
@@ -66,31 +68,51 @@ const LobbyPage = () => {
     console.log("Leaving matchmaking queue", { userId: token });
     socket.emit("leaveMatchmaking", { userId: token }); // Emit an event to leave the queue
   };
+
+  // handle left matchmaking update
+  useEffect(() => {
+    const handleLeftMatchmaking = (data: LeftMatchmakingResponse) => {
+      if (data.success) {
+        setSearchingForGame(false);
+        console.log("Successfully left the matchmaking queue");
+      }
+    };
+  
+    socket.on("leftMatchmaking", handleLeftMatchmaking);
+  
+    return () => {
+      socket.off("leftMatchmaking", handleLeftMatchmaking);
+    };
+  }, []);
+  
+  // Register player with socketio
   useEffect(() => {
     if (isLoggedIn && token) {
-      console.log("Registering player with server", { playerId: token });
-      socket.emit('registerPlayer', token);
+      socket.emit("registerPlayer", token);
     }
-
-    // ... other useEffect logic
-
   }, [isLoggedIn, token]);
-// Handle match found event
-useEffect(() => {
-  const handleMatchFound = (gameSessionInfo: GameSessionInfo) => {
-    console.log("Match found! Game session info:", gameSessionInfo);
-    setSearchingForGame(false); // Update state to stop showing 'searching for game'
+  // Handle match found event
+  useEffect(() => {
+    const handleMatchFound = (gameSessionInfo: GameSessionInfo) => {
+      console.log("Match found! Game session info:", gameSessionInfo);
+      setSearchingForGame(false); // Update state to stop showing 'searching for game'
+    
+      // // Show popup message here
+      // alert("Match Found! Joining Game...");
+    
+      // Redirect after a 5-second delay
+      setTimeout(() => {
+        history.push("/game", { gameSession: gameSessionInfo });
+      }, 5000);
+    };
+    
 
-    // Redirect to the game page with the necessary game session info
-    history.push('/game', { gameSession: gameSessionInfo });
-  };
+    socket.on("matchFound", handleMatchFound);
 
-  socket.on("matchFound", handleMatchFound);
-
-  return () => {
-    socket.off("matchFound", handleMatchFound);
-  };
-}, [history, socket]); // Add history to the dependency array
+    return () => {
+      socket.off("matchFound", handleMatchFound);
+    };
+  }, [history, socket]); // Add history to the dependency array
 
   return (
     <IonPage>

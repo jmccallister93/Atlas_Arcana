@@ -9,34 +9,61 @@ client.connect();
 
 // Add player to game que
 async function addToQueue(playerId) {
-  console.log("Adding player to queue:", playerId);
   await client.rPush("matchmakingQueue", playerId);
 }
 
 // Find a match
 async function findMatch(connectedUsers, io) {
   if ((await client.lLen("matchmakingQueue")) >= 2) {
-    console.log("Attempting to find a match...");
     const playerOne = await client.lPop("matchmakingQueue");
-    const playerTwo = await client.lPop("matchmakingQueue");
-    console.log("Match found:", playerOne, playerTwo);
+    let playerTwo = await client.lPop("matchmakingQueue");
 
-    const gameSession = await gameSessionManager.createGameSession(
-      playerOne,
-      playerTwo
-    );
-    console.log("~~~FROM FIND MATCH connected users: " + connectedUsers)
-    notifyPlayers(playerOne, playerTwo, gameSession, connectedUsers, io);
+    // Check if playerOne and playerTwo are the same
+    if (playerOne === playerTwo) {
+      // If they are the same, put playerTwo back into the queue
+      await client.rPush("matchmakingQueue", playerTwo);
+
+      // Try to find a different playerTwo
+      if ((await client.lLen("matchmakingQueue")) >= 2) {
+        playerTwo = await client.lPop("matchmakingQueue");
+      } else {
+        // If there's no other player, put playerOne back and return
+        await client.rPush("matchmakingQueue", playerOne);
+        return;
+      }
+    }
+
+    // If playerOne and playerTwo are different, proceed with match creation
+    if (playerOne !== playerTwo) {
+      const gameSession = await gameSessionManager.createGameSession(playerOne, playerTwo);
+      notifyPlayers(playerOne, playerTwo, gameSession, connectedUsers, io);
+    }
   }
 }
+
+
+// Remove player from queue
+async function removeFromQueue(playerId) {
+  console.log("Removing player from queue:", playerId);
+
+  // Retrieve the entire matchmaking queue
+  const queue = await client.lRange("matchmakingQueue", 0, -1);
+
+  // Find the index of the player in the queue
+  const index = queue.indexOf(playerId);
+
+  // If the player is in the queue, remove them
+  if (index !== -1) {
+    await client.lRem("matchmakingQueue", 1, playerId);
+  }
+}
+
 
 // Notify players
 const notifyPlayers = (playerOneId, playerTwoId, gameSession, connectedUsers, io) => {
   const playerOneSocketId = connectedUsers.get(playerOneId);
   const playerTwoSocketId = connectedUsers.get(playerTwoId);
-  // console.log("NOTIFY PLAYERS HAS FIRED WITH ID'S OF::: " + playerOneSocketId + playerTwoSocketId)
   if (playerOneSocketId && playerTwoSocketId) {
-    // console.log("Match found for player 1 and player 2 with Id's of::: ", + playerOneSocketId, playerTwoSocketId)
     io.to(playerOneSocketId).emit("matchFound", gameSession);
     io.to(playerTwoSocketId).emit("matchFound", gameSession);
   }
@@ -49,4 +76,4 @@ function startMatchmaking(connectedUsers,io) {
   }, 5000); // Check for matches every 5 seconds
 }
 
-module.exports = { addToQueue, startMatchmaking };
+module.exports = { addToQueue, startMatchmaking, removeFromQueue };

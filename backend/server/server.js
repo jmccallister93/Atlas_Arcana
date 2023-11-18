@@ -41,12 +41,16 @@ io.on("connection", (socket) => {
 
   // Example of setting the player ID and socket ID mapping
   socket.on("registerPlayer", (playerId) => {
-    console.log("***** Registerplayer fired");
     connectedUsers.set(playerId, socket.id);
   });
   socket.on("joinMatchmaking", (data) => {
-    console.log("User joining matchmaking from server.js:", data.userId);
     matchmakingService.addToQueue(data.userId);
+  });
+  socket.on('leaveMatchmaking', async (data) => {
+    const { userId } = data;
+    console.log("User leaving matchmaking queue", userId);
+    matchmakingService.removeFromQueue(userId);
+    socket.emit("leftMatchmaking", { success: true });
   });
 });
 
