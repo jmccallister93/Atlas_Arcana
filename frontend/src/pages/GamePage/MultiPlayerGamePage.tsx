@@ -10,14 +10,11 @@ import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
 import { useLocation } from "react-router";
+import { GameState } from "../../context/GameState/GameState";
 
 // Define the expected structure of the location state
 interface LocationState {
   sessionId?: string;
-}
-
-interface GameState {
-  testState: boolean;
 }
 
 const MultiPlayerGamePage = () => {
@@ -38,7 +35,7 @@ const MultiPlayerGamePage = () => {
       console.log("Received GameState Update:", newGameState);
       setGameState(newGameState);
     };
-
+  
     socket.on("updateGameState", handleGameStateUpdate);
     
     return () => {
@@ -51,14 +48,15 @@ const MultiPlayerGamePage = () => {
 // Send the update
   const sendTestUpdate = () => {
     const newTestState = !gameState.testState;
-    setGameState({ testState: newTestState }); 
+
     socket.emit("updateGameState", {
       sessionId,
       newState: { testState: newTestState },
     });
   };
 
-  console.log(gameState)
+
+
 
   return (
     <IonPage>

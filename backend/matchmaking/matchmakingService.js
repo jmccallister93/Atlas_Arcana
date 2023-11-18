@@ -66,6 +66,7 @@ const notifyPlayers = (playerOneId, playerTwoId, gameSession, connectedUsers, io
   if (playerOneSocketId && playerTwoSocketId) {
     io.to(playerOneSocketId).emit("matchFound", { sessionId: gameSession });
     io.to(playerTwoSocketId).emit("matchFound", { sessionId: gameSession });
+    
   }
 };
 
