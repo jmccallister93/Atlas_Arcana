@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import socket from "../SocketClient/socketClient";
+import socket from "../SocketClient/socketClient"; 
 
 interface AuthContextType {
   _id: string | null;

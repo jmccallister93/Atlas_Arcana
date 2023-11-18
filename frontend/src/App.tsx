@@ -39,6 +39,7 @@ import "./global.scss";
 import FriendsPage from "./pages/FriendsPage/FriendsPage";
 
 import MatchFoundListener from "./context/MatchFoundListener/MatchFoundListener";
+import MatchHistoryPage from "./pages/MatchHistoryPage/MatchHistoryPage";
 
 setupIonicReact();
 
@@ -62,7 +63,7 @@ const App: React.FC = () => (
           <Route exact path="/dashboard" component={DashBoardPage} />
           <Route exact path="/account" component={AccountPage} />
           <Route exact path="/friends" component={FriendsPage} />
-         
+          <Route exact path="/matchHistory" component={MatchHistoryPage} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

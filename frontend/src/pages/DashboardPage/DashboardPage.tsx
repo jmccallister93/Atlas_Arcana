@@ -57,7 +57,7 @@ const DashBoardPage: React.FC = () => {
               </IonCardHeader>
             </IonCard>
 
-            <IonCard button>
+            <IonCard button routerLink="/matchHistory">
               <IonCardHeader>
                 <IonCardTitle>
                   {" "}

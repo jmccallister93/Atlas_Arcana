@@ -32,6 +32,11 @@ const playerSchema = new mongoose.Schema({
     require: false,
     unique: false,
   },
+  pastMatches: {
+    type: Object,
+    require: false,
+    unique: false,
+  },
   friendsList: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Player'

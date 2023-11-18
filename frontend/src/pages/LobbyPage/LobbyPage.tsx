@@ -15,17 +15,25 @@ import {
 import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
-import axios from "axios";
 import { useAuth } from "../../context/AuthContext/AuthContext";
+import { useHistory } from 'react-router-dom';
+
+
+interface GameSessionInfo {
+  // Define the properties of gameSessionInfo
+  // For instance:
+  playerId: string;
+  opponentId: string;
+  // Add other relevant properties
+}
 
 const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [searchingForGame, setSearchingForGame] = useState<boolean>(false);
   const { token, isLoggedIn } = useAuth();
-  useEffect(() => {
-    console.log("User accessToken from AuthContext:", token);
-    // ...
-  }, []);
+  const history = useHistory();
+
+  // Handle online user count
   useEffect(() => {
     // Existing socket setup
     const handleUpdateOnlineUsers = (usersCount: number) => {
@@ -58,6 +66,31 @@ const LobbyPage = () => {
     console.log("Leaving matchmaking queue", { userId: token });
     socket.emit("leaveMatchmaking", { userId: token }); // Emit an event to leave the queue
   };
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      console.log("Registering player with server", { playerId: token });
+      socket.emit('registerPlayer', token);
+    }
+
+    // ... other useEffect logic
+
+  }, [isLoggedIn, token]);
+// Handle match found event
+useEffect(() => {
+  const handleMatchFound = (gameSessionInfo: GameSessionInfo) => {
+    console.log("Match found! Game session info:", gameSessionInfo);
+    setSearchingForGame(false); // Update state to stop showing 'searching for game'
+
+    // Redirect to the game page with the necessary game session info
+    history.push('/game', { gameSession: gameSessionInfo });
+  };
+
+  socket.on("matchFound", handleMatchFound);
+
+  return () => {
+    socket.off("matchFound", handleMatchFound);
+  };
+}, [history, socket]); // Add history to the dependency array
 
   return (
     <IonPage>
@@ -95,7 +128,7 @@ const LobbyPage = () => {
                       <IonSpinner name="crescent" />
                       <p>Searching for game...</p>
                       <IonButton onClick={leaveMatchmaking} color="danger">
-                        End Search
+                        Leave Que
                       </IonButton>
                     </div>
                   ) : null}

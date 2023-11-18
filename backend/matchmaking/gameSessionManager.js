@@ -9,11 +9,11 @@ sessionClient.on("error", (err) => console.log("Redis Session Client Error", err
 sessionClient.connect();
 
 // Create a game session
-async function createGameSession(playerOne, playerTwo) {
-  console.log("Creating game session for players:", playerOne, playerTwo);
+async function createGameSession(playerOneId, playerTwoId) {
+  console.log("Creating game session for players:", playerOneId, playerTwoId);
   const sessionId = uuidv4(); // Generate a unique session ID
   const newSession = {
-    players: [playerOne, playerTwo],
+    players: [playerOneId, playerTwoId],
     gameState: {}, // Initial game state
     // Other session-related data
   };

@@ -14,7 +14,7 @@ const stateManager = new StateManager();
 const totalConnectedUsers = new Set();
 
 //Single User online status
-const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id
+const userOnlineStatus = new Map(); // Key: ObjectId, Value: socket.id 
 
 // Initialize a matchmaking queue
 let matchmakingQueue = [];
