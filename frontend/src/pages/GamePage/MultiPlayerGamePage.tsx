@@ -32,7 +32,6 @@ const MultiPlayerGamePage = () => {
 // Listen for game state updates
   useEffect(() => {
     const handleGameStateUpdate = (newGameState: GameState) => {
-      console.log("Received GameState Update:", newGameState);
       setGameState(newGameState);
     };
   
@@ -72,6 +71,7 @@ const MultiPlayerGamePage = () => {
             <IonButton onClick={sendTestUpdate}>Test me</IonButton>
           </IonCardHeader>
         </IonCard>
+        
       </IonContent>
     </IonPage>
   );
