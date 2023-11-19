@@ -35,12 +35,14 @@ async function findMatch(connectedUsers, io) {
 
     // If playerOne and playerTwo are different, proceed with match creation
     if (playerOne !== playerTwo) {
-      const gameSession = await gameSessionManager.createGameSession(playerOne, playerTwo);
+      const gameSession = await gameSessionManager.createGameSession(
+        playerOne,
+        playerTwo
+      );
       notifyPlayers(playerOne, playerTwo, gameSession, connectedUsers, io);
     }
   }
 }
-
 
 // Remove player from queue
 async function removeFromQueue(playerId) {
@@ -58,20 +60,28 @@ async function removeFromQueue(playerId) {
   }
 }
 
-
 // Notify players
-const notifyPlayers = (playerOneId, playerTwoId, gameSession, connectedUsers, io) => {
+const notifyPlayers = (
+  playerOneId,
+  playerTwoId,
+  gameSession,
+  connectedUsers,
+  io
+) => {
   const playerOneSocketId = connectedUsers.get(playerOneId);
   const playerTwoSocketId = connectedUsers.get(playerTwoId);
   if (playerOneSocketId && playerTwoSocketId) {
-    io.to(playerOneSocketId).emit("matchFound", { sessionId: gameSession });
-    io.to(playerTwoSocketId).emit("matchFound", { sessionId: gameSession });
-    
+    const roomName = gameSession;
+    // Join both players to the room
+    io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
+    io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
+    // Notify players in the room
+    io.to(roomName).emit("matchFound", { sessionId: gameSession });
   }
 };
 
 // Start the match making
-function startMatchmaking(connectedUsers,io) {
+function startMatchmaking(connectedUsers, io) {
   setInterval(() => {
     findMatch(connectedUsers, io).catch(console.error); // Pass connectedUsers here
   }, 5000); // Check for matches every 5 seconds

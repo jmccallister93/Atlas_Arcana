@@ -111,7 +111,7 @@ const LobbyPage = () => {
         history.push("/multiGame", { sessionId: gameSessionInfo.sessionId });
         setMatchFound(false);
       }, 5000);
-    };
+    }; 
 
     socket.on("matchFound", handleMatchFound);
 

@@ -142,7 +142,7 @@ module.exports = function (socket, io) {
       .emit("updateGameState", updatedState.gameState); // Emit the gameState part
     } catch (error) {
       console.error("Error updating game state:", error);
-      // Optionally, emit an error message back to the client
+      // Optionally, emit  an error message back to the client
       socket.emit("gameStateUpdateError", {
         message: "Failed to update game state.",
       });
