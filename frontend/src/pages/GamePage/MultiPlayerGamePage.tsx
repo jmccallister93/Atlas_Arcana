@@ -17,7 +17,7 @@ import { useLocation } from "react-router";
 import { GameState } from "../../context/GameState/GameState";
 import GameBoard from "../../components/GameComponents/GameBoard";
 import "./MultiPlayerGamePage.scss";
-import { addCircleOutline } from "ionicons/icons";
+import { addCircleOutline, arrowForwardCircleOutline } from "ionicons/icons";
 
 // Define the expected structure of the location state
 interface LocationState {
@@ -78,14 +78,21 @@ const MultiPlayerGamePage = () => {
           <div className="actionsContent">{/* Menu items go here */}</div>
         </div>
         <h1 className="pageHeader">Multiplayer Game</h1>
-        <h3 className="pageHeader">Player Turn: </h3>
-        <h3 className="pageHeader">Game Phase: </h3>
-        <h3 className="pageHeader">Turn Number: </h3>
-        <h3 className="pageHeader">VP Counts: </h3>
+        <h4 className="pageHeader">Player Turn: </h4>
+        <h4 className="pageHeader">Game Phase: </h4>
+        <h4 className="pageHeader">Turn Number: </h4>
+        <h4 className="pageHeader">VP Counts: </h4>
+        <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}
           <GameBoard />
         </div>
+        <h4 className="pageHeader">Next Phase  <IonIcon
+              icon={arrowForwardCircleOutline}
+              size="large"
+              color="success"
+              onClick={toggleMenu}
+            /></h4>
       </IonContent>
     </IonPage>
   );
