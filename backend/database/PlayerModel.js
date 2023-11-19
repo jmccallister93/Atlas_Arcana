@@ -34,6 +34,13 @@ playerSchema.add({
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }]
 });
 
+// Find player by ID
+playerSchema.statics.findUsernameById = async function(id) {
+  console.log("FromPlayermodel: " + id)
+  const player = await this.findById(id);
+  return player ? player.username : null;
+};
+
 // Use the schema to create a model.
 const Player = mongoose.model('Player', playerSchema);
 

@@ -4,6 +4,7 @@ const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
 const { v4: uuidv4 } = require("uuid"); // For generating unique session IDs
 const io = require("../server/server"); 
+const Player = require('../database/PlayerModel'); // Import the Player model
 
 // Connect to Redis client
 sessionClient.on("error", (err) =>
@@ -11,14 +12,34 @@ sessionClient.on("error", (err) =>
 );
 sessionClient.connect();
 
+// Correct implementation of initializePlayers
+async function initializePlayers(playerIds) {
+  console.log("From initialize player, playerID: " +playerIds)
+  return Promise.all(playerIds.map(async (id) => {
+   
+    const player = await Player.findById(id); // Retrieve the player data from the database
+    console.log("From initialize player, players: " +player)
+    if (!player) {
+      throw new Error(`Player not found with ID: ${id}`);
+    }
+    return {
+      id: player._id,
+      username: player.username, // Get username from the player document
+      // ... other properties
+    };
+  }));
+}
+
+
 // Create a game session
 async function createGameSession(playerOneId, playerTwoId) {
   console.log("Creating game session for players:", playerOneId, playerTwoId);
   const sessionId = uuidv4(); // Generate a unique session ID
-  const players = initializePlayers([playerOneId, playerTwoId]);
+  const players = await initializePlayers([playerOneId, playerTwoId]);
   const gameMap = createMap();
   const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
+  console.log("From createGame session  players: " + players)
   const newSession = {
     sessionId,
     players,
@@ -91,6 +112,7 @@ function initializePlayers(playerIds) {
   // Create player objects with initial stats, inventory, etc.
   return playerIds.map((id) => ({
     id,
+    username,
     rank: 1,
     health: 3,
     offense: 0,
@@ -207,10 +229,10 @@ async function endGameSession(sessionId) {
 
 
 
-async function notifyPlayers(playerOne, playerTwo, sessionId) {
-  // Emit an event to both players with the session ID
-  io.to(playerOne.socketId).emit("gameSessionCreated", { sessionId });
-  io.to(playerTwo.socketId).emit("gameSessionCreated", { sessionId });
-}
+// async function notifyPlayers(playerOne, playerTwo, sessionId) {
+//   // Emit an event to both players with the session ID
+//   io.to(playerOne.socketId).emit("gameSessionCreated", { sessionId });
+//   io.to(playerTwo.socketId).emit("gameSessionCreated", { sessionId });
+// }
 
 module.exports = { createGameSession, updateGameState, endGameSession, getGameState };
