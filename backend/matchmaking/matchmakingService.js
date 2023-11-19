@@ -35,11 +35,22 @@ async function findMatch(connectedUsers, io) {
 
     // If playerOne and playerTwo are different, proceed with match creation
     if (playerOne !== playerTwo) {
-      const gameSession = await gameSessionManager.createGameSession(
+      const newSession = await gameSessionManager.createGameSession(
         playerOne,
         playerTwo
       );
-      notifyPlayers(playerOne, playerTwo, gameSession, connectedUsers, io);
+      console.log(
+        "From matchmakingservice new gamesession: ",
+        JSON.stringify(newSession)
+      ); // Log the entire session
+      notifyPlayers(
+        playerOne,
+        playerTwo,
+        newSession,
+        newSession.sessionId,
+        connectedUsers,
+        io
+      );
     }
   }
 }
@@ -64,20 +75,25 @@ async function removeFromQueue(playerId) {
 const notifyPlayers = (
   playerOneId,
   playerTwoId,
-  gameSession,
+  newSession,
+  sessionId,
   connectedUsers,
   io
 ) => {
   const playerOneSocketId = connectedUsers.get(playerOneId);
   const playerTwoSocketId = connectedUsers.get(playerTwoId);
   if (playerOneSocketId && playerTwoSocketId) {
-    const roomName = gameSession;
+    const roomName = sessionId;
     // Join both players to the room
     io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
     io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
     // Notify players in the room
-    io.to(roomName).emit("matchFound", { sessionId: gameSession });
+    io.to(roomName).emit("matchFound",  newSession );
   }
+  console.log(
+    "From matchmaking service notifying players gameSession: " +
+      JSON.stringify(newSession)
+  );
 };
 
 // Start the match making

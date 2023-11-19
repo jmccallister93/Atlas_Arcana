@@ -22,17 +22,13 @@ async function createGameSession(playerOneId, playerTwoId) {
   const newSession = {
     sessionId,
     players,
-    gameMap,
-    turnOrder,
     gameState: {
       testState: false
     },
-    isPaused: false, // Flag to indicate if game is paused
-    // Other session-related data
   };
-
+  console.log("NewSession created in gameSessionManager: ", JSON.stringify(newSession));
   await sessionClient.set(sessionId, JSON.stringify(newSession));
-  return sessionId;
+  return newSession;
 }
 
 // Function to handle player disconnection

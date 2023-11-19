@@ -108,7 +108,7 @@ const LobbyPage = () => {
 
       // Redirect after a 5-second delay
       setTimeout(() => {
-        history.push("/multiGame", { sessionId: gameSessionInfo.sessionId });
+        history.push("/multiGame", { gameSessionInfo });
         setMatchFound(false);
       }, 5000);
     }; 

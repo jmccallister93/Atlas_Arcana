@@ -1,6 +1,9 @@
 
 export interface GameState {
-    testState: boolean;
-    // Add other game state properties as needed
+  totalTurns: number;  
+  playerTurn: string;
+  gamePhase: string;
+  playerPool: Array<string>;
+  timer: string;  
   }
   

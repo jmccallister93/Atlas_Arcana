@@ -22,13 +22,45 @@ import { addCircleOutline, arrowForwardCircleOutline } from "ionicons/icons";
 // Define the expected structure of the location state
 interface LocationState {
   sessionId?: string;
+  gameSessionInfo?: GameSessionInfo;
 }
 
+interface PlayerInfo {
+  id: string;
+  rank: number;
+  health: number;
+  offense: number;
+  defense: number;
+  // Add other player properties as needed
+}
+
+interface GameSessionInfo {
+  sessionId: string;
+  gameState: { testState: boolean };
+  players: PlayerInfo[];
+}
+
+
 const MultiPlayerGamePage = () => {
-  const [gameState, setGameState] = useState<GameState>({ testState: false });
-  const location = useLocation();
-  const state = location.state as LocationState; // Type assertion
-  const sessionId = state?.sessionId;
+  const [gameState, setGameState] = useState<GameSessionInfo>();
+  const location = useLocation<LocationState>(); // Specify the type here
+  const { gameSessionInfo, sessionId } = location.state; // Destructure the properties
+
+  useEffect(() => {
+    if (gameSessionInfo) {
+      setGameState(gameSessionInfo);
+      console.log("Game Session Info:", gameSessionInfo);
+    }
+  }, [gameSessionInfo]);
+
+  useEffect(() => {
+    console.log(gameState)
+    if (gameState && gameState.players) {
+      gameState.players.forEach(player => {
+        console.log("Player:", player);
+      });
+    }
+  }, [gameState]);
 
   // Join the game session
   useEffect(() => {
@@ -37,7 +69,7 @@ const MultiPlayerGamePage = () => {
 
   // Listen for game state updates
   useEffect(() => {
-    const handleGameStateUpdate = (newGameState: GameState) => {
+    const handleGameStateUpdate = (newGameState: GameSessionInfo) => {
       setGameState(newGameState);
     };
 
@@ -50,14 +82,14 @@ const MultiPlayerGamePage = () => {
   }, [sessionId]);
 
   // Send the update
-  const sendTestUpdate = () => {
-    const newTestState = !gameState.testState;
+  // const sendTestUpdate = () => {
+  //   const newTestState = !gameState.testState;
 
-    socket.emit("updateGameState", {
-      sessionId,
-      newState: { testState: newTestState },
-    });
-  };
+  //   socket.emit("updateGameState", {
+  //     sessionId,
+  //     newState: { testState: newTestState },
+  //   });
+  // };
 
   const toggleMenu = () => {};
 
@@ -87,12 +119,15 @@ const MultiPlayerGamePage = () => {
           {" "}
           <GameBoard />
         </div>
-        <h4 className="pageHeader">Next Phase  <IonIcon
-              icon={arrowForwardCircleOutline}
-              size="large"
-              color="success"
-              onClick={toggleMenu}
-            /></h4>
+        <h4 className="pageHeader">
+          Next Phase{" "}
+          <IonIcon
+            icon={arrowForwardCircleOutline}
+            size="large"
+            color="success"
+            onClick={toggleMenu}
+          />
+        </h4>
       </IonContent>
     </IonPage>
   );
