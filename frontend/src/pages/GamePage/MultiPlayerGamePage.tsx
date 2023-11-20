@@ -18,6 +18,7 @@ import { GameState } from "../../context/GameState/GameState";
 import GameBoard from "../../components/GameComponents/GameBoard";
 import "./MultiPlayerGamePage.scss";
 import { addCircleOutline, arrowForwardCircleOutline } from "ionicons/icons";
+import WelcomeModal from "../../components/GameComponents/WelcomeModal";
 
 // Define the expected structure of the location state
 interface LocationState {
@@ -46,7 +47,32 @@ const MultiPlayerGamePage = () => {
   const location = useLocation<LocationState>(); // Specify the type here
   const { gameSessionInfo, sessionId } = location.state;
   const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const [showModal, setShowModal] = useState<boolean>(true);
+  const [modalMessage, setModalMessage] = useState<string>(
+    "Welcome to the game"
+  );
+  useEffect(() => {
+    const sequence = [
+      { message: "Welcome to the game", delay: 3000 },
+      { message: "Rolling for turn order", delay: 8000 },
+      { message: "Drawing cards", delay: 15000 },
+    ];
 
+    sequence
+      .reduce((promise, item) => {
+        return promise.then(() => {
+          return new Promise<void>((resolve) => {
+            setModalMessage(item.message);
+            setTimeout(() => {
+              resolve();
+            }, item.delay);
+          });
+        });
+      }, Promise.resolve())
+      .then(() => {
+        setShowModal(false);
+      });
+  }, []);
   useEffect(() => {
     if (gameSessionInfo) {
       setGameState(gameSessionInfo);
@@ -105,6 +131,11 @@ const MultiPlayerGamePage = () => {
 
   return (
     <IonPage>
+      <WelcomeModal
+        isOpen={showModal}
+        message={modalMessage}
+        onClose={() => setShowModal(false)}
+      />
       <IonContent>
         {/* Floating hamburger menu */}
         <div className="actionsMenu">
