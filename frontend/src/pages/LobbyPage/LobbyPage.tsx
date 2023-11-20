@@ -38,7 +38,7 @@ const LobbyPage = () => {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [searchingForGame, setSearchingForGame] = useState<boolean>(false);
   const [matchFound, setMatchFound] = useState<boolean>(false);
-  const { token, isLoggedIn } = useAuth();
+  const { token, isLoggedIn, username } = useAuth();
   const history = useHistory();
 
   // Handle online user count
@@ -59,15 +59,16 @@ const LobbyPage = () => {
   }, []);
 
   // Join matchmaking
-  const joinMatchmaking = async () => {
-    setSearchingForGame(true);
-    try {
-      console.log("Attempting to join matchmaking queue", { userId: token });
-      socket.emit("joinMatchmaking", { userId: token });
-    } catch (error) {
-      console.error("Error joining matchmaking:", error);
-    }
-  };
+// Join matchmaking
+const joinMatchmaking = async () => {
+  setSearchingForGame(true);
+  try {
+    console.log("Attempting to join matchmaking queue", { userId: token, username });
+    socket.emit("joinMatchmaking", { userId: token, username });
+  } catch (error) {
+    console.error("Error joining matchmaking:", error);
+  }
+};
 
   // Leave matchmaking
   const leaveMatchmaking = () => {
@@ -95,9 +96,9 @@ const LobbyPage = () => {
   // Register player with socketio
   useEffect(() => {
     if (isLoggedIn && token) {
-      socket.emit("registerPlayer", token);
+      socket.emit("registerPlayer", { token, username });
     }
-  }, [isLoggedIn, token]);
+  }, [isLoggedIn, token, username]);
 
   // Handle match found event
   useEffect(() => {

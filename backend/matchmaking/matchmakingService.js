@@ -8,44 +8,65 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
 // Add player to game que
-async function addToQueue(playerId) {
-  await client.rPush("matchmakingQueue", playerId);
+async function addToQueue(playerData) {
+  const playerDataString = JSON.stringify(playerData);
+  await client.rPush("matchmakingQueue", playerDataString);
 }
 
 // Find a match
 async function findMatch(connectedUsers, io) {
+  // Check if there are at least two players in the queue
   if ((await client.lLen("matchmakingQueue")) >= 2) {
-    const playerOne = await client.lPop("matchmakingQueue");
-    let playerTwo = await client.lPop("matchmakingQueue");
+    let playerOneDataString = await client.lPop("matchmakingQueue");
+    let playerTwoDataString = await client.lPop("matchmakingQueue");
+
+    let playerOneData;
+    let playerTwoData;
+
+    try {
+      // Parse the player data from the string
+      playerOneData = JSON.parse(playerOneDataString);
+      playerTwoData = JSON.parse(playerTwoDataString);
+    } catch (error) {
+      console.error("Error parsing player data from matchmaking queue:", error);
+      return;
+    }
 
     // Check if playerOne and playerTwo are the same
-    if (playerOne === playerTwo) {
+    if (playerOneData.token === playerTwoData.token) {
       // If they are the same, put playerTwo back into the queue
-      await client.rPush("matchmakingQueue", playerTwo);
+      await client.rPush("matchmakingQueue", JSON.stringify(playerTwoData));
 
       // Try to find a different playerTwo
       if ((await client.lLen("matchmakingQueue")) >= 2) {
-        playerTwo = await client.lPop("matchmakingQueue");
+        let newPlayerTwoDataString = await client.lPop("matchmakingQueue");
+        try {
+          playerTwoData = JSON.parse(newPlayerTwoDataString);
+        } catch (error) {
+          console.error("Error parsing new playerTwo data from matchmaking queue:", error);
+          await client.rPush("matchmakingQueue", JSON.stringify(playerOneData));
+          return;
+        }
       } else {
         // If there's no other player, put playerOne back and return
-        await client.rPush("matchmakingQueue", playerOne);
+        await client.rPush("matchmakingQueue", JSON.stringify(playerOneData));
         return;
       }
     }
 
     // If playerOne and playerTwo are different, proceed with match creation
-    if (playerOne !== playerTwo) {
+    if (playerOneData.token !== playerTwoData.token) {
       const newSession = await gameSessionManager.createGameSession(
-        playerOne,
-        playerTwo
+        playerOneData.token,
+        playerTwoData.token
       );
       console.log(
         "From matchmakingservice new gamesession: ",
         JSON.stringify(newSession)
       ); // Log the entire session
       notifyPlayers(
-        playerOne,
-        playerTwo,
+        playerOneData.token,
+        playerTwoData.token,
         newSession,
         newSession.sessionId,
         connectedUsers,
@@ -54,6 +75,7 @@ async function findMatch(connectedUsers, io) {
     }
   }
 }
+
 
 // Remove player from queue
 async function removeFromQueue(playerId) {
@@ -88,7 +110,7 @@ const notifyPlayers = (
     io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
     io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
     // Notify players in the room
-    io.to(roomName).emit("matchFound",  newSession );
+    io.to(roomName).emit("matchFound", newSession);
   }
   console.log(
     "From matchmaking service notifying players gameSession: " +

@@ -14,18 +14,17 @@ sessionClient.connect();
 
 // Correct implementation of initializePlayers
 async function initializePlayers(playerIds) {
-  console.log("From initialize player, playerID: " +playerIds)
+  console.log("From initialize player, playerID: " + playerIds)
   return Promise.all(playerIds.map(async (id) => {
-   
-    const player = await Player.findById(id); // Retrieve the player data from the database
-    console.log("From initialize player, players: " +player)
+    const player = await Player.findById(id);
+    console.log("From initialize player, players: " + player)
     if (!player) {
       throw new Error(`Player not found with ID: ${id}`);
     }
     return {
       id: player._id,
-      username: player.username, // Get username from the player document
-      // ... other properties
+      username: player.username, // Ensure this matches your Player model
+      // ...other properties
     };
   }));
 }
@@ -35,7 +34,7 @@ async function initializePlayers(playerIds) {
 async function createGameSession(playerOneId, playerTwoId) {
   console.log("Creating game session for players:", playerOneId, playerTwoId);
   const sessionId = uuidv4(); // Generate a unique session ID
-  const players = await initializePlayers([playerOneId, playerTwoId]);
+  const players =  await initializePlayers([playerOneId, playerTwoId]);
   const gameMap = createMap();
   const turnOrder = determineTurnOrder(players.map((p) => p.id));
 

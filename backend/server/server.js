@@ -40,12 +40,22 @@ io.on("connection", (socket) => {
   });
 
   // Example of setting the player ID and socket ID mapping
-  socket.on("registerPlayer", (playerId) => {
-    connectedUsers.set(playerId, socket.id);
+  socket.on("registerPlayer", (data) => {
+    const { token, username } = data;
+    console.log("From registerplayer socket token: " + token)
+    console.log("From registerplayer socket username: " + username)
+    console.log("From registerplayer socket socketId: " + socket.id)
+    connectedUsers.set(token, { socketId: socket.id, username });
   });
+  
   socket.on("joinMatchmaking", (data) => {
-    matchmakingService.addToQueue(data.userId);
+    const { userId: token, username } = data;
+    console.log("From joinMatchmaking socket token: " + token)
+    console.log("From joinMatchmaking socket username: " + username)
+    console.log("From joinMatchmaking socket socketId: " + socket.id)
+    matchmakingService.addToQueue({ token, username });
   });
+
   socket.on('leaveMatchmaking', async (data) => {
     const { userId } = data;
     console.log("User leaving matchmaking queue", userId);
