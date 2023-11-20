@@ -7,11 +7,13 @@ const gameSessionManager = require("./gameSessionManager");
 client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
-// Add player to game que
 async function addToQueue(playerData) {
   const playerDataString = JSON.stringify(playerData);
+  console.log("Adding to queue:", playerData); // Log the original data
+  console.log("Serialized data:", playerDataString); // Log the serialized data
   await client.rPush("matchmakingQueue", playerDataString);
 }
+
 
 // Find a match
 async function findMatch(connectedUsers, io) {
@@ -24,13 +26,15 @@ async function findMatch(connectedUsers, io) {
     let playerTwoData;
 
     try {
-      // Parse the player data from the string
       playerOneData = JSON.parse(playerOneDataString);
       playerTwoData = JSON.parse(playerTwoDataString);
+      console.log("Player One Data:", playerOneData); // Log player one's data
+      console.log("Player Two Data:", playerTwoData); // Log player two's data
     } catch (error) {
       console.error("Error parsing player data from matchmaking queue:", error);
       return;
     }
+    
 
     // Check if playerOne and playerTwo are the same
     if (playerOneData.token === playerTwoData.token) {
@@ -57,16 +61,16 @@ async function findMatch(connectedUsers, io) {
     // If playerOne and playerTwo are different, proceed with match creation
     if (playerOneData.token !== playerTwoData.token) {
       const newSession = await gameSessionManager.createGameSession(
-        playerOneData.token,
-        playerTwoData.token
+        playerOneData,
+        playerTwoData
       );
       console.log(
         "From matchmakingservice new gamesession: ",
         JSON.stringify(newSession)
       ); // Log the entire session
       notifyPlayers(
-        playerOneData.token,
-        playerTwoData.token,
+        playerOneData,
+        playerTwoData,
         newSession,
         newSession.sessionId,
         connectedUsers,
@@ -102,8 +106,11 @@ const notifyPlayers = (
   connectedUsers,
   io
 ) => {
-  const playerOneSocketId = connectedUsers.get(playerOneId);
-  const playerTwoSocketId = connectedUsers.get(playerTwoId);
+  // IISUE IS RIGHT HERE WITH SOCKETID BEING PASSED
+  const playerOneSocketId = connectedUsers.get(playerOneId.token.socketId);
+  const playerTwoSocketId = connectedUsers.get(playerTwoId.token.socketId);
+  console.log("From notify players Player One ID:", playerOneId, "Socket ID:", playerOneSocketId);
+  console.log("From notify players Player Two ID:", playerTwoId, "Socket ID:", playerTwoSocketId);
   if (playerOneSocketId && playerTwoSocketId) {
     const roomName = sessionId;
     // Join both players to the room

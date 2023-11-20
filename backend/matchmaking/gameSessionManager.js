@@ -12,33 +12,18 @@ sessionClient.on("error", (err) =>
 );
 sessionClient.connect();
 
-// Correct implementation of initializePlayers
-async function initializePlayers(playerIds) {
-  console.log("From initialize player, playerID: " + playerIds)
-  return Promise.all(playerIds.map(async (id) => {
-    const player = await Player.findById(id);
-    console.log("From initialize player, players: " + player)
-    if (!player) {
-      throw new Error(`Player not found with ID: ${id}`);
-    }
-    return {
-      id: player._id,
-      username: player.username, // Ensure this matches your Player model
-      // ...other properties
-    };
-  }));
-}
-
 
 // Create a game session
-async function createGameSession(playerOneId, playerTwoId) {
-  console.log("Creating game session for players:", playerOneId, playerTwoId);
-  const sessionId = uuidv4(); // Generate a unique session ID
-  const players =  await initializePlayers([playerOneId, playerTwoId]);
-  const gameMap = createMap();
-  const turnOrder = determineTurnOrder(players.map((p) => p.id));
+async function createGameSession(playerOneData, playerTwoData) {
+  console.log("createGameSession - playerOneId:", playerOneData, "playerTwoId:", playerTwoData);
+  const sessionId = uuidv4(); 
+  console.log("Before calling initializePlayers - player IDs:", [playerOneData.username, playerTwoData.username]);
+  const players = [playerOneData.username, playerTwoData.username]
+  console.log("createGameSession - Players array:", players);
 
-  console.log("From createGame session  players: " + players)
+  // const gameMap = createMap();
+  // const turnOrder = determineTurnOrder(players.map((p) => p.id));
+  
   const newSession = {
     sessionId,
     players,
@@ -46,10 +31,11 @@ async function createGameSession(playerOneId, playerTwoId) {
       testState: false
     },
   };
-  console.log("NewSession created in gameSessionManager: ", JSON.stringify(newSession));
+  console.log("createGameSession - New session created:", JSON.stringify(newSession));
   await sessionClient.set(sessionId, JSON.stringify(newSession));
   return newSession;
 }
+
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
