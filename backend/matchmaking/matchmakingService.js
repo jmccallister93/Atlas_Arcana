@@ -14,7 +14,6 @@ async function addToQueue(playerData) {
   await client.rPush("matchmakingQueue", playerDataString);
 }
 
-
 // Find a match
 async function findMatch(connectedUsers, io) {
   // Check if there are at least two players in the queue
@@ -34,7 +33,6 @@ async function findMatch(connectedUsers, io) {
       console.error("Error parsing player data from matchmaking queue:", error);
       return;
     }
-    
 
     // Check if playerOne and playerTwo are the same
     if (playerOneData.token === playerTwoData.token) {
@@ -47,7 +45,10 @@ async function findMatch(connectedUsers, io) {
         try {
           playerTwoData = JSON.parse(newPlayerTwoDataString);
         } catch (error) {
-          console.error("Error parsing new playerTwo data from matchmaking queue:", error);
+          console.error(
+            "Error parsing new playerTwo data from matchmaking queue:",
+            error
+          );
           await client.rPush("matchmakingQueue", JSON.stringify(playerOneData));
           return;
         }
@@ -80,7 +81,6 @@ async function findMatch(connectedUsers, io) {
   }
 }
 
-
 // Remove player from queue
 async function removeFromQueue(playerId) {
   console.log("Removing player from queue:", playerId);
@@ -98,32 +98,34 @@ async function removeFromQueue(playerId) {
 }
 
 // Notify players
-const notifyPlayers = (
-  playerOneId,
-  playerTwoId,
-  newSession,
-  sessionId,
-  connectedUsers,
-  io
-) => {
-  // IISUE IS RIGHT HERE WITH SOCKETID BEING PASSED
-  const playerOneSocketId = connectedUsers.get(playerOneId.token);
-  const playerTwoSocketId = connectedUsers.get(playerTwoId.token);
-  console.log("From notify players Player One ID:", playerOneId, "Socket ID:", playerOneSocketId);
-  console.log("From notify players Player Two ID:", playerTwoId, "Socket ID:", playerTwoSocketId);
+const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, connectedUsers, io) => {
+  // Extract the token from the player data
+  const playerOneToken = playerOneData.token;
+  const playerTwoToken = playerTwoData.token;
+
+  // Get socket IDs using the tokens
+  const playerOneSocketId = connectedUsers.get(playerOneData.token).socketId;
+  const playerTwoSocketId = connectedUsers.get(playerTwoData.token).socketId;
+
+  // Log the information with more specific details
+  console.log("Player One (Token:", playerOneToken, ") Socket ID:", playerOneSocketId);
+  console.log("Player Two (Token:", playerTwoToken, ") Socket ID:", playerTwoSocketId);
+
   if (playerOneSocketId && playerTwoSocketId) {
     const roomName = sessionId;
-    // Join both players to the room
     io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
     io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
-    // Notify players in the room
+
+    console.log("Players joined room:", roomName);
+    
+    // Emitting to the room
     io.to(roomName).emit("matchFound", newSession);
+    console.log("Emitting 'matchFound' to room:", roomName);
+  } else {
+    console.log("One or both players are not connected");
   }
-  console.log(
-    "From matchmaking service notifying players gameSession: " +
-      JSON.stringify(newSession)
-  );
 };
+
 
 // Start the match making
 function startMatchmaking(connectedUsers, io) {
