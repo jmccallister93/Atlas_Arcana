@@ -27,6 +27,7 @@ interface LocationState {
 
 interface PlayerInfo {
   id: string;
+  name: string;
   rank: number;
   health: number;
   offense: number;
@@ -37,14 +38,14 @@ interface PlayerInfo {
 interface GameSessionInfo {
   sessionId: string;
   gameState: { testState: boolean };
-  players: PlayerInfo[];
+  players: string[];
 }
-
 
 const MultiPlayerGamePage = () => {
   const [gameState, setGameState] = useState<GameSessionInfo>();
   const location = useLocation<LocationState>(); // Specify the type here
-  const { gameSessionInfo, sessionId } = location.state; // Destructure the properties
+  const { gameSessionInfo, sessionId } = location.state;
+  const [playerNames, setPlayerNames] = useState<string[]>([]);
 
   useEffect(() => {
     if (gameSessionInfo) {
@@ -53,12 +54,19 @@ const MultiPlayerGamePage = () => {
     }
   }, [gameSessionInfo]);
 
+  // Update player names
   useEffect(() => {
-    console.log(gameState)
+    console.log(gameState?.players);
     if (gameState && gameState.players) {
-      gameState.players.forEach(player => {
+      const names = gameState.players.forEach((player) => {
         console.log("Player:", player);
       });
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    if (gameState && gameState.players) {
+      setPlayerNames(gameState.players);
     }
   }, [gameState]);
 
@@ -93,6 +101,8 @@ const MultiPlayerGamePage = () => {
 
   const toggleMenu = () => {};
 
+  console.log("Before return, playerNames:", playerNames);
+
   return (
     <IonPage>
       <IonContent>
@@ -110,6 +120,17 @@ const MultiPlayerGamePage = () => {
           <div className="actionsContent">{/* Menu items go here */}</div>
         </div>
         <h1 className="pageHeader">Multiplayer Game</h1>
+        <h4 className="pageHeader">Players in Game:</h4>
+        <div className="playerList">
+          {playerNames?.map((name, index) => {
+            console.log(`Rendering player at index ${index}:`, name);
+            return (
+              <div key={index} className="playerName">
+                {name}
+              </div>
+            );
+          })}
+        </div>
         <h4 className="pageHeader">Player Turn: </h4>
         <h4 className="pageHeader">Game Phase: </h4>
         <h4 className="pageHeader">Turn Number: </h4>
