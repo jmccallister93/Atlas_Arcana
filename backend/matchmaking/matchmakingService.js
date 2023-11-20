@@ -99,28 +99,19 @@ async function removeFromQueue(playerId) {
 
 // Notify players
 const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, connectedUsers, io) => {
-  // Extract the token from the player data
-  const playerOneToken = playerOneData.token;
-  const playerTwoToken = playerTwoData.token;
 
   // Get socket IDs using the tokens
   const playerOneSocketId = connectedUsers.get(playerOneData.token).socketId;
   const playerTwoSocketId = connectedUsers.get(playerTwoData.token).socketId;
-
-  // Log the information with more specific details
-  console.log("Player One (Token:", playerOneToken, ") Socket ID:", playerOneSocketId);
-  console.log("Player Two (Token:", playerTwoToken, ") Socket ID:", playerTwoSocketId);
 
   if (playerOneSocketId && playerTwoSocketId) {
     const roomName = sessionId;
     io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
     io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
 
-    console.log("Players joined room:", roomName);
-    
     // Emitting to the room
     io.to(roomName).emit("matchFound", newSession);
-    console.log("Emitting 'matchFound' to room:", roomName);
+    console.log("From notifyplayers newSession: " + JSON.stringify(newSession))
   } else {
     console.log("One or both players are not connected");
   }
