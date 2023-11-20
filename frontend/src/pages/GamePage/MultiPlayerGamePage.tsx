@@ -37,32 +37,64 @@ const MultiPlayerGamePage = () => {
   const [modalMessage, setModalMessage] = useState<string>(
     "Welcome to the game"
   );
+  // useEffect(() => {
+  //   const sequence = [
+  //     { message: "Welcome to the game", delay: 2000 },
+  //     { message: "Rolling for turn order", delay: 2000 },
+  //     { message: "Drawing cards", delay: 2000 },
+  //   ];
+
+  //   sequence
+  //     .reduce((promise, item) => {
+  //       return promise.then(() => {
+  //         return new Promise<void>((resolve) => {
+  //           setModalMessage(item.message);
+  //           setTimeout(() => {
+  //             resolve();
+  //           }, item.delay);
+  //         });
+  //       });
+  //     }, Promise.resolve())
+  //     .then(() => {
+  //       setShowModal(false);
+  //     });
+  // }, []);
+
+  // const handleGameStateUpdate = (newGameState: GameSessionInfo) => {
+  //   console.log("From multiplayer newGameState: ",newGameState)
+  //   setGameState(newGameState);
+  // };
+
+ 
+
+  // Join the game session
   useEffect(() => {
-    const sequence = [
-      { message: "Welcome to the game", delay: 2000 },
-      { message: "Rolling for turn order", delay: 2000 },
-      { message: "Drawing cards", delay: 2000 },
-    ];
+    socket.emit("joinGame", { sessionId });
+  }, [sessionId]);
 
-    sequence
-      .reduce((promise, item) => {
-        return promise.then(() => {
-          return new Promise<void>((resolve) => {
-            setModalMessage(item.message);
-            setTimeout(() => {
-              resolve();
-            }, item.delay);
-          });
-        });
-      }, Promise.resolve())
-      .then(() => {
-        setShowModal(false);
-      });
-  }, []);
-
-  const handleGameStateUpdate = (newGameState: GameSessionInfo) => {
-    setGameState(newGameState);
-  };
+  // Handle game stateupdate
+  useEffect(() => {
+    const handleGameStateUpdate = (updatedGameState: any) => {
+      console.log("Received updated game state:", updatedGameState);
+      
+      // Update the entire game state
+      setGameState(updatedGameState);
+  
+      // Check if the updated game state contains player information and update accordingly
+      if (updatedGameState && updatedGameState.players) {
+        setPlayers(updatedGameState.players);
+      }
+    };
+  
+    // Register the event listener
+    socket.on("updateGameState", handleGameStateUpdate);
+  
+    // Clean up the event listener
+    return () => {
+      socket.off("updateGameState", handleGameStateUpdate);
+    };
+  }, []); 
+  
 
   // Set local gamestate
   useEffect(() => {
@@ -78,19 +110,6 @@ const MultiPlayerGamePage = () => {
     }
   }, [gameState]);
 
-
-  // Set local players State
-  //  useEffect(() => {
-  //   if (gameState && gameState.players) {
-  //     const playerInfos = gameState.players.map(username => {
-  //       // Assuming you have a way to get or derive the full PlayerInfo from the username
-  //       const playerInfo = getPlayerInfoByUsername(username); // This is a hypothetical function
-  //       return playerInfo;
-  //     });
-  //     setPlayers(playerInfos);
-  //   }
-  // }, [gameState]);
-
   // Example function to update a part of the game state
   const updateGame = (newData: any) => {
     // Update the local game state
@@ -104,32 +123,48 @@ const MultiPlayerGamePage = () => {
       sessionId: gameState?.sessionId,
       newState: newData,
     };
-
+    console.log("Multiplayer  updatedState from updateGame: ", updatedState);
     // Emit the updated state to the server
     socket.emit("updateGameState", updatedState);
   };
 
   const toggleMenu = () => {};
 
-  useEffect(() => {
-    console.log(gameSessionInfo);
-  }, [gameState, sessionId]);
+  // Function to handle the rank update
+  const updatePlayerRank = () => {
+    if (gameState && gameState.players && gameState.players.length > 0) {
+      const updatedPlayers = gameState.players.map((player, index) => {
+        if (index === 0) {
+          // Assuming player 1 is at index 0
+          return { ...player, rank: 2 };
+        }
+        return player;
+      });
+
+      // Update the gameState with the new players array
+      const updatedGameState = { ...gameState, players: updatedPlayers };
+      setGameState(updatedGameState);
+
+      // Emit the updated state to the server
+      updateGame({ players: updatedPlayers });
+    }
+  };
 
   return (
     <IonPage>
-      {sessionId && (
+      {/* {sessionId && (
         <GameSocket
           sessionId={sessionId}
           gameState={gameState}
           setGameState={setGameState}
           onGameStateUpdate={handleGameStateUpdate}
         />
-      )}
-      <WelcomeModal
+      )} */}
+      {/* <WelcomeModal
         isOpen={showModal}
         message={modalMessage}
         onClose={() => setShowModal(false)}
-      />
+      /> */}
       <IonContent>
         {/* Floating hamburger menu */}
         <div className="actionsMenu">
@@ -154,6 +189,7 @@ const MultiPlayerGamePage = () => {
             </div>
           ))}
         </div>
+        <IonButton onClick={updatePlayerRank}>Rank up</IonButton>
         <h4 className="pageHeader">Player Turn: </h4>
         <h4 className="pageHeader">Game Phase: </h4>
         <h4 className="pageHeader">Turn Number: </h4>

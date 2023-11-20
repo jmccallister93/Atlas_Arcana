@@ -19,28 +19,19 @@ const GameSocket: React.FC<GameSocketProps> = ({ sessionId, gameState, setGameSt
   // Listen for game state updates
   useEffect(() => {
     const handleGameStateUpdate = (newGameState: GameSessionInfo) => {
+        console.log("From GameSocket.tsx newGameState: ", newGameState)
       onGameStateUpdate(newGameState);
     };
+    
     socket.on("updateGameState", handleGameStateUpdate);
+
+    // Cleanup listener on unmount
     return () => {
       socket.off("updateGameState", handleGameStateUpdate);
     };
-  }, [sessionId, onGameStateUpdate]);
+  }, [onGameStateUpdate]);
 
-   // Update individual player rank
-//    const updatePlayerRank = (playerId: string, newRank: number) => {
-//     if (!gameState) return;
-
-//     const newState: GameSessionInfo = {
-//       ...gameState,
-//       players: gameState.players.map(player =>
-//         player.id === playerId ? { ...player, rank: newRank } : player
-//       )
-//     };
-
-//     setGameState(newState);
-//     socket.emit("updateGameState", { sessionId, newState });
-//   };
-  return null;
+  return null; // This component does not render anything
 }
+
 export default GameSocket;

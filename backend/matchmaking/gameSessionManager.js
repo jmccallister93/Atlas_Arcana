@@ -3,8 +3,8 @@
 const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
 const { v4: uuidv4 } = require("uuid"); // For generating unique session IDs
-const io = require("../server/server"); 
-const Player = require('../database/PlayerModel'); // Import the Player model
+const io = require("../server/server");
+const Player = require("../database/PlayerModel"); // Import the Player model
 
 // Connect to Redis client
 sessionClient.on("error", (err) =>
@@ -12,14 +12,20 @@ sessionClient.on("error", (err) =>
 );
 sessionClient.connect();
 
-
 // Create a game session
 async function createGameSession(playerOneData, playerTwoData) {
-  console.log("createGameSession - playerOneId:", playerOneData, "playerTwoId:", playerTwoData);
-  const sessionId = uuidv4(); 
-  console.log("Before calling initializePlayers - player IDs:", [playerOneData.username, playerTwoData.username]);
+  console.log(
+    "createGameSession - playerOneId:",
+    playerOneData,
+    "playerTwoId:",
+    playerTwoData
+  );
+  const sessionId = uuidv4();
+  console.log("Before calling initializePlayers - player IDs:", [
+    playerOneData.username,
+    playerTwoData.username,
+  ]);
   // const players = [playerOneData.username, playerTwoData.username]
- 
 
   // Initialize players with more detailed data
   const players = initializePlayers([playerOneData, playerTwoData]);
@@ -27,19 +33,21 @@ async function createGameSession(playerOneData, playerTwoData) {
 
   // const gameMap = createMap();
   // const turnOrder = determineTurnOrder(players.map((p) => p.id));
-  
+
   const newSession = {
     sessionId,
     players,
     gameState: {
-      testState: false
+      testState: false,
     },
   };
-  console.log("createGameSession - New session created:", JSON.stringify(newSession));
+  console.log(
+    "createGameSession - New session created:",
+    JSON.stringify(newSession)
+  );
   await sessionClient.set(sessionId, JSON.stringify(newSession));
   return newSession;
 }
-
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
@@ -57,6 +65,7 @@ async function handlePlayerReconnect(sessionId, playerId) {
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
 
+// Update the Game State
 const updateGameState = async (io, sessionId, newState) => {
   try {
     const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -78,8 +87,6 @@ const updateGameState = async (io, sessionId, newState) => {
     console.error("Error updating game state:", error);
   }
 };
-
-
 
 // Retrieve game state
 async function getGameState(sessionId) {
@@ -215,4 +222,9 @@ async function endGameSession(sessionId) {
   // Additional logic for saving the game result to MongoDB, if required
 }
 
-module.exports = { createGameSession, updateGameState, endGameSession, getGameState };
+module.exports = {
+  createGameSession,
+  updateGameState,
+  endGameSession,
+  getGameState,
+};
