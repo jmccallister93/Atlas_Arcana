@@ -18,7 +18,11 @@ async function createGameSession(playerOneData, playerTwoData) {
   console.log("createGameSession - playerOneId:", playerOneData, "playerTwoId:", playerTwoData);
   const sessionId = uuidv4(); 
   console.log("Before calling initializePlayers - player IDs:", [playerOneData.username, playerTwoData.username]);
-  const players = [playerOneData.username, playerTwoData.username]
+  // const players = [playerOneData.username, playerTwoData.username]
+ 
+
+  // Initialize players with more detailed data
+  const players = initializePlayers([playerOneData, playerTwoData]);
   console.log("createGameSession - Players array:", players);
 
   // const gameMap = createMap();
@@ -93,11 +97,11 @@ async function getGameState(sessionId) {
   }
 }
 
-function initializePlayers(playerIds) {
+function initializePlayers(playerData) {
   // Create player objects with initial stats, inventory, etc.
-  return playerIds.map((id) => ({
-    id,
-    username,
+  return playerData.map((player) => ({
+    id: player.id,
+    username: player.username,
     rank: 1,
     health: 3,
     offense: 0,
@@ -111,7 +115,6 @@ function initializePlayers(playerIds) {
       treasures: [],
       quests: [],
     },
-    // Other player-specific details
   }));
 }
 
@@ -211,13 +214,5 @@ async function endGameSession(sessionId) {
   await sessionClient.del(sessionId);
   // Additional logic for saving the game result to MongoDB, if required
 }
-
-
-
-// async function notifyPlayers(playerOne, playerTwo, sessionId) {
-//   // Emit an event to both players with the session ID
-//   io.to(playerOne.socketId).emit("gameSessionCreated", { sessionId });
-//   io.to(playerTwo.socketId).emit("gameSessionCreated", { sessionId });
-// }
 
 module.exports = { createGameSession, updateGameState, endGameSession, getGameState };

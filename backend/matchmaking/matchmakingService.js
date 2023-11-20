@@ -68,9 +68,13 @@ async function findMatch(connectedUsers, io) {
       console.log(
         "From matchmakingservice new gamesession: ",
         JSON.stringify(newSession)
-      ); // Log the entire session
+      ); 
+      console.log(
+        "From matchmakingservice new playerOneData: ",
+        JSON.stringify(playerOneData)
+      ); 
       notifyPlayers(
-        playerOneData,
+        playerOneData, 
         playerTwoData,
         newSession,
         newSession.sessionId,
@@ -81,21 +85,6 @@ async function findMatch(connectedUsers, io) {
   }
 }
 
-// Remove player from queue
-async function removeFromQueue(playerId) {
-  console.log("Removing player from queue:", playerId);
-
-  // Retrieve the entire matchmaking queue
-  const queue = await client.lRange("matchmakingQueue", 0, -1);
-
-  // Find the index of the player in the queue
-  const index = queue.indexOf(playerId);
-
-  // If the player is in the queue, remove them
-  if (index !== -1) {
-    await client.lRem("matchmakingQueue", 1, playerId);
-  }
-}
 
 // Notify players
 const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, connectedUsers, io) => {
@@ -116,6 +105,23 @@ const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, conn
     console.log("One or both players are not connected");
   }
 };
+
+// Remove player from queue
+async function removeFromQueue(playerId) {
+  console.log("Removing player from queue:", playerId);
+
+  // Retrieve the entire matchmaking queue
+  const queue = await client.lRange("matchmakingQueue", 0, -1);
+
+  // Find the index of the player in the queue
+  const index = queue.indexOf(playerId);
+
+  // If the player is in the queue, remove them
+  if (index !== -1) {
+    await client.lRem("matchmakingQueue", 1, playerId);
+  }
+}
+
 
 
 // Start the match making
