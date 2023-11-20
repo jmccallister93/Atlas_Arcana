@@ -107,8 +107,8 @@ const notifyPlayers = (
   io
 ) => {
   // IISUE IS RIGHT HERE WITH SOCKETID BEING PASSED
-  const playerOneSocketId = connectedUsers.get(playerOneId.token.socketId);
-  const playerTwoSocketId = connectedUsers.get(playerTwoId.token.socketId);
+  const playerOneSocketId = connectedUsers.get(playerOneId.token);
+  const playerTwoSocketId = connectedUsers.get(playerTwoId.token);
   console.log("From notify players Player One ID:", playerOneId, "Socket ID:", playerOneSocketId);
   console.log("From notify players Player Two ID:", playerTwoId, "Socket ID:", playerTwoSocketId);
   if (playerOneSocketId && playerTwoSocketId) {
