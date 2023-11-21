@@ -98,6 +98,7 @@ function initializePlayers(playerData) {
   return playerData.map((player) => ({
     id: player.id,
     username: player.username,
+    victoryPoints: 0,
     rank: 1,
     health: 3,
     offense: 0,

@@ -12,6 +12,7 @@ export interface LocationState {
 
 export interface PlayerInfo {
   username: string;
+  victoryPoints: number;
   rank: number;
   health: number;
   offense: number;

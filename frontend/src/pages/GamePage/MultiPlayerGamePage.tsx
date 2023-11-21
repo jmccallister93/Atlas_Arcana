@@ -132,11 +132,11 @@ const MultiPlayerGamePage = () => {
 
   return (
     <IonPage>
-      <WelcomeModal
+      {/* <WelcomeModal
         gameState={gameState}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-      />
+      /> */}
         <PlayerMenu
           isOpen={isPlayerMenuOpen}
           onClose={() => setIsPlayerMenuOpen(false)}

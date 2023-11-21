@@ -26,6 +26,9 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         <h2>Stats Menu</h2>
         <IonList>
           <IonItem>
+            <IonLabel>Victory Points: {player?.victoryPoints}</IonLabel>
+          </IonItem>
+          <IonItem>
             <IonLabel>Player Stats</IonLabel>
           </IonItem>
           <IonItem slot="center">
@@ -77,11 +80,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
           <IonItem>
             <IonLabel>Buildings</IonLabel>
             {/* Display Building Information */}
-          </IonItem>
-          <IonItem>
-            <IonLabel>Victory Points: </IonLabel>
-            {/* {player?.victoryPoints} */}
-            {/* Display Victory Points */}
+            {/* Need building name */}
+            {/* Building benefit */}
           </IonItem>
         </IonList>
         <IonButton onClick={onClose}>Close Menu</IonButton>
