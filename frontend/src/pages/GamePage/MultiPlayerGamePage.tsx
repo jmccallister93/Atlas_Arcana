@@ -29,29 +29,45 @@ const MultiPlayerGamePage = () => {
   const { gameSessionInfo, sessionId } = location.state;
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [showModal, setShowModal] = useState<boolean>(true);
-  const [modalMessages, setModalMessages] = useState<{ message: string; delay: number }[]>([])
+  const [modalMessages, setModalMessages] = useState<
+    { message: string; delay: number }[][]
+  >([]);
 
   // Turn order message
   useEffect(() => {
-    const turnOrder = gameState?.gameState?.turnOrder || []; 
+    const turnOrder = gameState?.gameState?.turnOrder || [];
+
     const turnOrderMessages = turnOrder.map((username, index) => ({
-      message: `${username} - ${index + 1}${index === 0 ? 'st' : 'nd'}`,
-      delay: 1000,
+      message: `${username} - ${index + 1}${index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}`,
+      delay: 2000, // Adjust the delay as needed
     }));
-  
-    const sequence = [
-      { message: "Welcome to the game", delay: 2000 },
-      { message: "Rolling for turn order", delay: 2000 },
-      ...turnOrderMessages, // Spread the turn order messages here
-      { message: "Drawing cards", delay: 2000 },
-    ];
-  
-   setModalMessages(sequence)
+
   }, [gameState]); // Add gameState as a dependency
-  
-useEffect(() => {
-console.log("Turn order from backend:", gameSessionInfo )
-},[gameState])
+
+  const messageGroups = [
+    {
+      title: "Welcome to the game",
+      content: [{ message: "Player1, Player2", delay: 2000 }]
+    },
+    {
+      title: "Determining turn order",
+      content: [
+        { message: "Player1", delay: 1000 },
+        { message: "Player2", delay: 1000 }
+      ]
+    },
+    {
+      title: "Drawing cards...",
+      content: [
+        { message: "Card1", delay: 500 },
+        { message: "Card2", delay: 500 },
+        { message: "Card3", delay: 500 }
+      ]
+    }
+  ];
+  useEffect(() => {
+    console.log("Turn order from backend:", gameSessionInfo);
+  }, [gameState]);
 
   // Join the game session
   useEffect(() => {
@@ -137,11 +153,11 @@ console.log("Turn order from backend:", gameSessionInfo )
 
   return (
     <IonPage>
-      {/* <WelcomeModal
+      <WelcomeModal
         isOpen={showModal}
-        messages={modalMessages}
+        messageGroups={messageGroups}
         onClose={() => setShowModal(false)}
-      /> */}
+      />
       <IonContent>
         {/* Floating hamburger menu */}
         <div className="actionsMenu">
