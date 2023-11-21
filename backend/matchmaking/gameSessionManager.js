@@ -125,8 +125,7 @@ function determineTurnOrder(players) {
   return players;
 }
 
-// Example arrays of resources and equipment cards
-const resourceCards = ['Resource1', 'Resource2', 'Resource3', ];
+// equipment cards
 const equipmentCards = ['Equipment1', 'Equipment2', 'Equipment3',]
 // Draw Cards
 function determineStartingCards(players) {
@@ -135,7 +134,7 @@ function determineStartingCards(players) {
   players.forEach(player => {
     // Allocate 3 resources
     for (let i = 0; i < 3; i++) {
-      player.inventory.resources.push(resourceCards[i]);
+      player.inventory.resources.push(3);
     }
 
     // Allocate 1 random equipment card

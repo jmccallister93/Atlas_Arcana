@@ -2,10 +2,12 @@
 import { IonModal, IonButton, IonContent } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import "./WelcomeModal.scss";
+import { GameSessionInfo, GameState } from '../../components/GameComponents/Interfaces';
 
 interface WelcomeModalProps {
+  gameState?: GameSessionInfo;
   isOpen: boolean;
-  messageGroups: MessageGroup[];
+  // messageGroups: MessageGroup[];
   onClose: () => void;
 }
 
@@ -15,17 +17,56 @@ interface MessageGroup {
 }
 
 const WelcomeModal: React.FC<WelcomeModalProps> = ({
+  gameState,
   isOpen,
-  messageGroups,
+  // messageGroups,
   onClose,
 }) => {
   // State to hold the current message group
-  const [currentMessageGroup, setCurrentMessageGroup] = useState<MessageGroup | null>(null);
+
+  const [currentMessageGroup, setCurrentMessageGroup] =
+    useState<MessageGroup | null>(null);
   const [currentContentIndex, setCurrentContentIndex] = useState(0);
+  const [modalMessages, setModalMessages] = useState<
+    { title: string; content: { message: string; delay: number }[] }[]
+  >([]);
+
+  // Welcome Modal message
+  useEffect(() => {
+    if (!gameState) return;
+    // Welcome players
+    const players = gameState?.players || [];
+    const playerNames = players.map((player) => player.username).join(", ");
+
+    // Map each username in the turnOrder to a message object
+    const turnOrder = gameState?.gameState?.turnOrder || [];
+    const turnOrderMessages = turnOrder.map(
+      (username: string, index: number) => ({
+        message: username,
+        delay: 1000 + index * 1000, // This adds a delay between each player's name
+      })
+    );
+
+    const messageGroups = [
+      {
+        title: "Welcome to the game",
+        content: [{ message: playerNames, delay: 1000 }],
+      },
+      {
+        title: "Rolling for turn order...",
+        content: turnOrderMessages,
+      },
+      {
+        title: "Let's Play!",
+        content: [],
+      },
+    ];
+    setModalMessages(messageGroups);
+  }, [gameState]); // Add gameState as a dependency
 
   useEffect(() => {
     const displayMessageGroups = async () => {
-      for (const group of messageGroups) {
+      for (const group of modalMessages) {
         setCurrentMessageGroup(group); // Set the current group
         setCurrentContentIndex(-1); // Set to -1 to indicate that content messages are not yet displayed
 
@@ -35,7 +76,9 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({
         // Display each content message with a delay
         for (let i = 0; i < group.content.length; i++) {
           setCurrentContentIndex(i);
-          await new Promise((resolve) => setTimeout(resolve, group.content[i].delay));
+          await new Promise((resolve) =>
+            setTimeout(resolve, group.content[i].delay)
+          );
         }
 
         // Optional: Add a delay between groups
@@ -44,22 +87,27 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({
       onClose(); // Close the modal after all groups
     };
 
-    if (isOpen && messageGroups.length > 0) {
+    if (isOpen && modalMessages.length > 0) {
       displayMessageGroups();
     }
-  }, [isOpen, messageGroups, onClose]);
+  }, [isOpen, modalMessages, onClose]);
 
   return (
     <IonModal isOpen={isOpen}>
       <IonContent>
         <h1>{currentMessageGroup?.title}</h1>
-        {currentMessageGroup && currentContentIndex >= 0 && currentMessageGroup.content.slice(0, currentContentIndex + 1).map((msg, index) => (
-          <p key={index} className="fadeIn">{msg.message}</p>
-        ))}
+        {currentMessageGroup &&
+          currentContentIndex >= 0 &&
+          currentMessageGroup.content
+            .slice(0, currentContentIndex + 1)
+            .map((msg, index) => (
+              <p key={index} className="fadeIn">
+                {msg.message}
+              </p>
+            ))}
       </IonContent>
     </IonModal>
   );
 };
-
 
 export default WelcomeModal;

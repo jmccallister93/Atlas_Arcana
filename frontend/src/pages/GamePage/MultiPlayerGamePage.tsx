@@ -29,40 +29,6 @@ const MultiPlayerGamePage = () => {
   const { gameSessionInfo, sessionId } = location.state;
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [showModal, setShowModal] = useState<boolean>(true);
-  const [modalMessages, setModalMessages] = useState<
-    { title: string; content: { message: string; delay: number }[] }[]
-  >([]);
-
-  // Turn order message
-  useEffect(() => {
-    // Welcome players
-    const players = gameState?.players || [];
-    const playerNames = players.map((player) => player.username).join(", ");
-
-    // Map each username in the turnOrder to a message object
-    const turnOrder = gameState?.gameState?.turnOrder || [];
-    const turnOrderMessages = turnOrder.map((username, index) => ({
-      message: username,
-      delay: 1000 + index * 1000, // This adds a delay between each player's name
-    }));
-
-
-    const messageGroups = [
-      {
-        title: "Welcome to the game",
-        content: [{ message: playerNames, delay: 1000 }],
-      },
-      {
-        title: "Rolling for turn order...",
-        content: turnOrderMessages,
-      },
-      {
-        title: "Let's Play!",
-        content: [],
-      },
-    ];
-    setModalMessages(messageGroups);
-  }, [gameState]); // Add gameState as a dependency
 
   // Join the game session
   useEffect(() => {
@@ -149,8 +115,8 @@ const MultiPlayerGamePage = () => {
   return (
     <IonPage>
       <WelcomeModal
+        gameState={gameState}
         isOpen={showModal}
-        messageGroups={modalMessages}
         onClose={() => setShowModal(false)}
       />
       <IonContent>
