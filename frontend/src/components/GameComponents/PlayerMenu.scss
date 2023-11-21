@@ -1,0 +1,72 @@
+ion-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%; // Ensures the list takes full width
+  text-align: center;
+
+  .statsCards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); // Three columns
+    grid-template-rows: repeat(2, auto); // Two rows
+    grid-gap: 10px; // Spacing between cards
+    padding: 10px;
+    margin: 10px 0;
+    justify-content: center;
+    align-items: center;
+
+    .statCard {
+      justify-content: center;
+      align-items: center;
+      background-color: #3f3f3f;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      @media (min-width: 768px) {
+        padding: 20px;
+      }
+
+      &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
+  .inventoryCards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); // Two columns
+    grid-template-rows: repeat(2, auto); // Two rows
+    grid-gap: 10px; // Spacing between cards
+    padding: 10px;
+    margin: 10px 0;
+    justify-content: center;
+    align-items: center;
+
+    .inventoryCard {
+      justify-content: center;
+      align-items: center;
+      background-color: #3f3f3f;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      @media (min-width: 768px) {
+        padding: 20px;
+      }
+
+      &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+      }
+    }
+  }
+}

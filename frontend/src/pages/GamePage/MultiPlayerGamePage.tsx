@@ -141,6 +141,7 @@ const MultiPlayerGamePage = () => {
           isOpen={isPlayerMenuOpen}
           onClose={() => setIsPlayerMenuOpen(false)}
           player={currentPlayer}
+          gameState={gameState}
         />
       <IonContent>
         {/* Floating player menu */}
@@ -152,15 +153,13 @@ const MultiPlayerGamePage = () => {
               color="success"
             />
           </button>
-          <div className="actionsContent"></div>
         </div>
         <h1 className="pageHeader">Multiplayer Game</h1>
         <h4 className="pageHeader">Players in Game:</h4>
         <div className="playerList">
           {players.map((player, index) => (
             <div key={index} className="playerName">
-              {player.username} - Rank: {player.rank}, Health: {player.health}
-              {/* Display other player details as needed */}
+              {player.username}
             </div>
           ))}
         </div>
