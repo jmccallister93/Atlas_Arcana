@@ -38,6 +38,9 @@ const MultiPlayerGamePage = () => {
   useEffect(() => {
     const turnOrder = gameState?.gameState?.turnOrder || [];
 
+    const players = gameState?.players || []
+
+    const playerNames = players.map(player => player.username).join(", ");
    // Map each username in the turnOrder to a message object
    const turnOrderMessages = turnOrder.map((username, index) => ({
     message: username,
@@ -46,7 +49,7 @@ const MultiPlayerGamePage = () => {
     const messageGroups = [
       {
         title: "Welcome to the game",
-        content: [{ message: "Player1, Player2", delay: 2000 }]
+        content: [{ message: playerNames, delay: 2000 }]
       },
       {
         title: "Rolling for turn order...",
