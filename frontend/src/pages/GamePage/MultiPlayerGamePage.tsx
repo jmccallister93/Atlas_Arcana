@@ -26,8 +26,6 @@ import {
   GameState,
 } from "../../components/GameComponents/Interfaces";
 
-import GameSocket from "../../components/GameComponents/GameSocket";
-
 const MultiPlayerGamePage = () => {
   const [gameState, setGameState] = useState<GameSessionInfo>();
   const location = useLocation<LocationState>();
@@ -37,35 +35,39 @@ const MultiPlayerGamePage = () => {
   const [modalMessage, setModalMessage] = useState<string>(
     "Welcome to the game"
   );
-  // useEffect(() => {
-  //   const sequence = [
-  //     { message: "Welcome to the game", delay: 2000 },
-  //     { message: "Rolling for turn order", delay: 2000 },
-  //     { message: "Drawing cards", delay: 2000 },
-  //   ];
 
-  //   sequence
-  //     .reduce((promise, item) => {
-  //       return promise.then(() => {
-  //         return new Promise<void>((resolve) => {
-  //           setModalMessage(item.message);
-  //           setTimeout(() => {
-  //             resolve();
-  //           }, item.delay);
-  //         });
-  //       });
-  //     }, Promise.resolve())
-  //     .then(() => {
-  //       setShowModal(false);
-  //     });
-  // }, []);
+  // Turn order message
+  useEffect(() => {
+    const turnOrder = gameState?.gameState?.turnOrder || []; 
+    const turnOrderMessages = turnOrder.map((username, index) => ({
+      message: `${username} - ${index + 1}${index === 0 ? 'st' : 'nd'}`,
+      delay: 1000,
+    }));
+  
+    const sequence = [
+      { message: "Welcome to the game", delay: 2000 },
+      { message: "Rolling for turn order", delay: 2000 },
+      ...turnOrderMessages, // Spread the turn order messages here
+      { message: "Drawing cards", delay: 2000 },
+    ];
+  
+    sequence
+      .reduce((promise, item) => {
+        return promise.then(() => {
+          return new Promise<void>((resolve) => {
+            setModalMessage(item.message);
+            setTimeout(() => {
+              resolve();
+            }, item.delay);
+          });
+        });
+      }, Promise.resolve())
+      .then(() => {
+        setShowModal(false);
+      });
+  }, [gameState]); // Add gameState as a dependency
+  
 
-  // const handleGameStateUpdate = (newGameState: GameSessionInfo) => {
-  //   console.log("From multiplayer newGameState: ",newGameState)
-  //   setGameState(newGameState);
-  // };
-
- 
 
   // Join the game session
   useEffect(() => {
@@ -76,25 +78,24 @@ const MultiPlayerGamePage = () => {
   useEffect(() => {
     const handleGameStateUpdate = (updatedGameState: any) => {
       console.log("Received updated game state:", updatedGameState);
-      
+
       // Update the entire game state
       setGameState(updatedGameState);
-  
+
       // Check if the updated game state contains player information and update accordingly
       if (updatedGameState && updatedGameState.players) {
         setPlayers(updatedGameState.players);
       }
     };
-  
+
     // Register the event listener
     socket.on("updateGameState", handleGameStateUpdate);
-  
+
     // Clean up the event listener
     return () => {
       socket.off("updateGameState", handleGameStateUpdate);
     };
-  }, []); 
-  
+  }, []);
 
   // Set local gamestate
   useEffect(() => {
@@ -152,19 +153,11 @@ const MultiPlayerGamePage = () => {
 
   return (
     <IonPage>
-      {/* {sessionId && (
-        <GameSocket
-          sessionId={sessionId}
-          gameState={gameState}
-          setGameState={setGameState}
-          onGameStateUpdate={handleGameStateUpdate}
-        />
-      )} */}
-      {/* <WelcomeModal
+      <WelcomeModal
         isOpen={showModal}
         message={modalMessage}
         onClose={() => setShowModal(false)}
-      /> */}
+      />
       <IonContent>
         {/* Floating hamburger menu */}
         <div className="actionsMenu">

@@ -31,6 +31,9 @@ async function createGameSession(playerOneData, playerTwoData) {
   const players = initializePlayers([playerOneData, playerTwoData]);
   console.log("createGameSession - Players array:", players);
 
+  // Determine random turn order
+  const turnOrder = determineTurnOrder(players.map((p) => p.username));
+
   // const gameMap = createMap();
   // const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
@@ -38,7 +41,7 @@ async function createGameSession(playerOneData, playerTwoData) {
     sessionId,
     players,
     gameState: {
-      testState: false,
+      turnOrder
     },
   };
   console.log(
@@ -48,23 +51,6 @@ async function createGameSession(playerOneData, playerTwoData) {
   await sessionClient.set(sessionId, JSON.stringify(newSession));
   return newSession;
 }
-
-// Function to handle player disconnection
-async function handlePlayerDisconnect(sessionId, playerId) {
-  const sessionData = JSON.parse(await sessionClient.get(sessionId));
-  // Logic to pause game and replace player with NPC
-  // Update session state accordingly
-  await sessionClient.set(sessionId, JSON.stringify(sessionData));
-}
-
-// Function to handle player reconnection
-async function handlePlayerReconnect(sessionId, playerId) {
-  const sessionData = JSON.parse(await sessionClient.get(sessionId));
-  // Logic to swap NPC back with the player
-  // Update session state accordingly
-  await sessionClient.set(sessionId, JSON.stringify(sessionData));
-}
-
 // Update the Game State
 const updateGameState = async (io, sessionId, newState) => {
   try {
@@ -104,6 +90,7 @@ async function getGameState(sessionId) {
   }
 }
 
+// Initialize Player Stats and names
 function initializePlayers(playerData) {
   // Create player objects with initial stats, inventory, etc.
   return playerData.map((player) => ({
@@ -124,6 +111,33 @@ function initializePlayers(playerData) {
     },
   }));
 }
+
+//Determine Turn Order
+function determineTurnOrder(playerUsernames) {
+  for (let i = playerUsernames.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [playerUsernames[i], playerUsernames[j]] = [playerUsernames[j], playerUsernames[i]];
+  }
+  return playerUsernames;
+}
+
+// Function to handle player disconnection
+async function handlePlayerDisconnect(sessionId, playerId) {
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
+  // Logic to pause game and replace player with NPC
+  // Update session state accordingly
+  await sessionClient.set(sessionId, JSON.stringify(sessionData));
+}
+
+// Function to handle player reconnection
+async function handlePlayerReconnect(sessionId, playerId) {
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
+  // Logic to swap NPC back with the player
+  // Update session state accordingly
+  await sessionClient.set(sessionId, JSON.stringify(sessionData));
+}
+
+
 
 function createMap() {
   // Map creation logic

@@ -1,3 +1,10 @@
+
+export interface GameSessionInfo {
+    sessionId: string;
+    gameState: {  turnOrder: string[] };
+    players: PlayerInfo[];
+  }
+
 export interface LocationState {
   sessionId?: string;
   gameSessionInfo?: GameSessionInfo;
@@ -20,11 +27,6 @@ export interface PlayerInfo {
   };
 }
 
-export interface GameSessionInfo {
-  sessionId: string;
-  gameState: { testState: boolean };
-  players: PlayerInfo[];
-}
 
 export interface GameState {
   totalTurns: number;
