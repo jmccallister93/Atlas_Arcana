@@ -22,6 +22,8 @@ import {
   GameSessionInfo,
   GameState,
 } from "../../components/GameComponents/Interfaces";
+import PlayerMenu from "../../components/GameComponents/PlayerMenu";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const MultiPlayerGamePage = () => {
   // Game State
@@ -34,7 +36,11 @@ const MultiPlayerGamePage = () => {
   const [showModal, setShowModal] = useState<boolean>(true);
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<string>();
+  const auth = useAuth();
+  // Set the current player based on authxontext
+  const currentPlayer = players.find(player => player.username === auth.username);
+  const [currentPlayerData, setCurrentPlayerData] = useState<PlayerInfo[]>([]);
 
   // Join the game session
   useEffect(() => {
@@ -96,7 +102,11 @@ const MultiPlayerGamePage = () => {
     socket.emit("updateGameState", updatedState);
   };
 
-  const toggleMenu = () => {};
+  const togglePlayerMenu = () => {
+    console.log(currentPlayer)
+    setIsPlayerMenuOpen(!isPlayerMenuOpen);
+  };
+ 
 
   // Function to handle the rank update
   const updatePlayerRank = () => {
@@ -118,6 +128,8 @@ const MultiPlayerGamePage = () => {
     }
   };
 
+
+
   return (
     <IonPage>
       <WelcomeModal
@@ -125,19 +137,22 @@ const MultiPlayerGamePage = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
       />
+        <PlayerMenu
+          isOpen={isPlayerMenuOpen}
+          onClose={() => setIsPlayerMenuOpen(false)}
+          player={currentPlayer}
+        />
       <IonContent>
-        {/* Floating hamburger menu */}
+        {/* Floating player menu */}
         <div className="actionsMenu">
-          <button className="actionsIcon" onClick={toggleMenu}>
+          <button className="actionsIcon" onClick={togglePlayerMenu}>
             <IonIcon
               icon={addCircleOutline}
               size="large"
               color="success"
-              onClick={toggleMenu}
             />
           </button>
-
-          <div className="actionsContent">{/* Menu items go here */}</div>
+          <div className="actionsContent"></div>
         </div>
         <h1 className="pageHeader">Multiplayer Game</h1>
         <h4 className="pageHeader">Players in Game:</h4>
@@ -165,7 +180,7 @@ const MultiPlayerGamePage = () => {
             icon={arrowForwardCircleOutline}
             size="large"
             color="success"
-            onClick={toggleMenu}
+            // onClick={toggleMenu}
           />
         </h4>
       </IonContent>

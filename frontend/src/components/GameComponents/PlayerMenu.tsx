@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { IonModal, IonButton, IonList, IonItem, IonLabel } from '@ionic/react';
-import { PlayerInfo } from './Interfaces'; // Adjust the path as needed
+import React, { useState, useEffect } from "react";
+import { IonModal, IonButton, IonList, IonItem, IonLabel } from "@ionic/react";
+import { PlayerInfo } from "./Interfaces"; // Adjust the path as needed
 
 interface PlayerMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  player: PlayerInfo | null;
+  player?: PlayerInfo;
 }
 
 const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
   // You can add more states and effects as needed based on your game's functionality
-
+  if (!player) {
+    return null; // or some placeholder UI
+  }
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <div className="playerMenuContainer">
