@@ -43,12 +43,9 @@ const MultiPlayerGamePage = () => {
     const turnOrder = gameState?.gameState?.turnOrder || [];
     const turnOrderMessages = turnOrder.map((username, index) => ({
       message: username,
-      delay: 1000, // This adds a delay between each player's name
+      delay: 1000 + index * 1000, // This adds a delay between each player's name
     }));
 
-    // Determine starting cards
-    const startingCards = gameState?.players || []
-    const startingCardsMessage = startingCards.map((player) => player.inventory.equipment).join()
 
     const messageGroups = [
       {
@@ -58,14 +55,6 @@ const MultiPlayerGamePage = () => {
       {
         title: "Rolling for turn order...",
         content: turnOrderMessages,
-      },
-      {
-        title: "Drawing starting cards...",
-        content: [
-          { message: startingCardsMessage, delay: 1000 },
-          { message: "Card2", delay: 1000 },
-          { message: "Card3", delay: 2000 },
-        ],
       },
       {
         title: "Let's Play!",

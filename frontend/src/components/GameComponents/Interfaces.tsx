@@ -20,7 +20,7 @@ export interface PlayerInfo {
   movement: number;
   build: number;
   inventory: {
-    resources: any[]; // Update the type based on your actual data structure
+    resources: any; // Update the type based on your actual data structure
     equipment: any[]; // Same as above
     treasures: any[]; // Same as above
     quests: any[]; // Same as above
