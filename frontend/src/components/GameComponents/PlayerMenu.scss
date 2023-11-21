@@ -62,7 +62,7 @@
 
     .statsCards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); // Three columns
+      grid-template-columns: repeat(2, 1fr); // Three columns
       grid-template-rows: repeat(2, auto); // Two rows
       grid-gap: 10px; // Spacing between cards
       padding: 10px;
@@ -125,7 +125,7 @@
     }
     .buildingCards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); // three columns
+      grid-template-columns: repeat(2, 1fr); // three columns
       grid-template-rows: repeat(2, auto); // Two rows
       grid-gap: 10px; // Spacing between cards
       padding: 10px;

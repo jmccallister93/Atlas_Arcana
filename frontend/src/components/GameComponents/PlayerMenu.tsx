@@ -4,6 +4,7 @@ import { GameSessionInfo, GameState, PlayerInfo } from "./Interfaces"; // Adjust
 import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
+import PlayerMenuDetails from "./PlayerMenuDetails";
 
 interface PlayerMenuProps {
   isOpen: boolean;
@@ -13,10 +14,56 @@ interface PlayerMenuProps {
 }
 
 const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
-  // You can add more states and effects as needed based on your game's functionality
+  const [showDetails, setShowDetails] = useState(false);
+  const [currentDetailType, setCurrentDetailType] = useState<string>("");
+  const [currentDetailContent, setCurrentDetailContent] = useState<string>("");
+
+  // Need to verify player exists
   if (!player) {
-    return null; // or some placeholder UI
+    return null;
   }
+
+  const stats = [
+    {
+      label: "Rank",
+      value: player.rank,
+      description: "Used to determine usable equipment level.",
+    },
+    {
+      label: "Health",
+      value: player.health,
+      description: "Used for total life force, when 0 player dies.",
+    },
+    {
+      label: "Offense",
+      value: player.offense,
+      description: "Used to determine number added to attack rolls.",
+    },
+    {
+      label: "Defense",
+      value: player.defense,
+      description: "Used to determine number added to defense rolls.",
+    },
+    {
+      label: "Stamina",
+      value: player.stamina,
+      description: "Used to determine usable total attacks per combat round.",
+    },
+    {
+      label: "Movement",
+      value: player.movement,
+      description: "Used to determine move spaces on the board.",
+    },
+  ];
+  const statsCards = stats.map((stat) => (
+    <div
+      className="statCard"
+      key={stat.label}
+      onClick={() => handleItemClick(stat.label, stat.description)}
+    >
+      {stat.label} <div>{stat.value}</div>
+    </div>
+  ));
 
   //Conditional if inventory item is empty
   const renderInventoryItem = (item: any) => {
@@ -27,8 +74,21 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     return item && item.length > 0 ? item : "None";
   };
 
+  // Handling click to call details on item
+  const handleItemClick = (type: string, content: string) => {
+    setCurrentDetailType(type);
+    setCurrentDetailContent(content);
+    setShowDetails(true);
+  };
+
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
+      <PlayerMenuDetails
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
+        detailType={currentDetailType}
+        detailContent={currentDetailContent}
+      />
       <div className="playerMenuContainer">
         <div className="modalHeader">
           <h2>{player?.username}'s Menu</h2>
@@ -40,40 +100,17 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
           <IonItem>
             <div className="victoryPointsCards">
               <div className="victoryPointsCard">
-                Victory Points: {player?.victoryPoints}
+                Victory Points <div>{player?.victoryPoints}</div>
               </div>
             </div>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Player Stats</IonLabel>
           </IonItem>
           <IonItem slot="center">
-            <div className="statsCards">
-              <div className="statCard">
-                Rank <div>{player.rank} </div>
-              </div>
-              <div className="statCard">
-                Health <div>{player.health}</div>
-              </div>
-              <div className="statCard">
-                Offense <div>{player.offense}</div>
-              </div>
-              <div className="statCard">
-                Defense <div>{player.defense}</div>
-              </div>
-              <div className="statCard">
-                Stamina <div>{player.stamina}</div>
-              </div>
-              <div className="statCard">
-                Movement <div>{player.movement}</div>
-              </div>
-            </div>
-          </IonItem>
-          <IonItem>
-            <IonLabel>Inventory</IonLabel>
+            <h3>Player Stats</h3>
+            <div className="statsCards">{statsCards}</div>
           </IonItem>
 
           <IonItem slot="center">
+            <h3>Inventory</h3>
             <div className="inventoryCards">
               <div className="inventoryCard">
                 Resources{" "}
@@ -92,14 +129,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
               </div>
             </div>
           </IonItem>
-
-          <IonItem>
-            <IonLabel>Buildings</IonLabel>
-            {/* Display Building Information */}
-            {/* Need building name */}
-            {/* Building benefit */}
-          </IonItem>
           <IonItem slot="center">
+            <h3>Buildings</h3>
             <div className="buildingCards">
               <div className="buildingCard">
                 Defense{" "}
