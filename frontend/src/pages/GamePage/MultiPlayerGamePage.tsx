@@ -30,44 +30,42 @@ const MultiPlayerGamePage = () => {
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [showModal, setShowModal] = useState<boolean>(true);
   const [modalMessages, setModalMessages] = useState<
-    { message: string; delay: number }[][]
-  >([]);
+  { title: string, content: { message: string; delay: number }[] }[]
+>([]);
+
 
   // Turn order message
   useEffect(() => {
     const turnOrder = gameState?.gameState?.turnOrder || [];
 
-    const turnOrderMessages = turnOrder.map((username, index) => ({
-      message: `${username} - ${index + 1}${index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}`,
-      delay: 2000, // Adjust the delay as needed
-    }));
-
+   // Map each username in the turnOrder to a message object
+   const turnOrderMessages = turnOrder.map((username, index) => ({
+    message: username,
+    delay: 1000 + index * 1000 // This adds a delay between each player's name
+  }));
+    const messageGroups = [
+      {
+        title: "Welcome to the game",
+        content: [{ message: "Player1, Player2", delay: 2000 }]
+      },
+      {
+        title: "Rolling for turn order...",
+        content: turnOrderMessages
+      },
+      {
+        title: "Drawing cards...",
+        content: [
+          { message: "Card1", delay: 500 },
+          { message: "Card2", delay: 500 },
+          { message: "Card3", delay: 500 }
+        ]
+      }
+    ];
+    setModalMessages(messageGroups)
   }, [gameState]); // Add gameState as a dependency
 
-  const messageGroups = [
-    {
-      title: "Welcome to the game",
-      content: [{ message: "Player1, Player2", delay: 2000 }]
-    },
-    {
-      title: "Determining turn order",
-      content: [
-        { message: "Player1", delay: 1000 },
-        { message: "Player2", delay: 1000 }
-      ]
-    },
-    {
-      title: "Drawing cards...",
-      content: [
-        { message: "Card1", delay: 500 },
-        { message: "Card2", delay: 500 },
-        { message: "Card3", delay: 500 }
-      ]
-    }
-  ];
-  useEffect(() => {
-    console.log("Turn order from backend:", gameSessionInfo);
-  }, [gameState]);
+ 
+
 
   // Join the game session
   useEffect(() => {
@@ -155,7 +153,7 @@ const MultiPlayerGamePage = () => {
     <IonPage>
       <WelcomeModal
         isOpen={showModal}
-        messageGroups={messageGroups}
+        messageGroups={modalMessages}
         onClose={() => setShowModal(false)}
       />
       <IonContent>
