@@ -7,9 +7,6 @@ import {
   IonIcon,
   IonPage,
 } from "@ionic/react";
-// import {
-//   addCircleIcon
-// } from "ionicons/icons";
 import gps from "../GlobalPageStyles.module.scss";
 import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
@@ -32,9 +29,7 @@ const MultiPlayerGamePage = () => {
   const { gameSessionInfo, sessionId } = location.state;
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [showModal, setShowModal] = useState<boolean>(true);
-  const [modalMessage, setModalMessage] = useState<string>(
-    "Welcome to the game"
-  );
+  const [modalMessages, setModalMessages] = useState<{ message: string; delay: number }[]>([])
 
   // Turn order message
   useEffect(() => {
@@ -51,23 +46,12 @@ const MultiPlayerGamePage = () => {
       { message: "Drawing cards", delay: 2000 },
     ];
   
-    sequence
-      .reduce((promise, item) => {
-        return promise.then(() => {
-          return new Promise<void>((resolve) => {
-            setModalMessage(item.message);
-            setTimeout(() => {
-              resolve();
-            }, item.delay);
-          });
-        });
-      }, Promise.resolve())
-      .then(() => {
-        setShowModal(false);
-      });
+   setModalMessages(sequence)
   }, [gameState]); // Add gameState as a dependency
   
-
+useEffect(() => {
+console.log("Turn order from backend:", gameSessionInfo )
+},[gameState])
 
   // Join the game session
   useEffect(() => {
@@ -153,11 +137,11 @@ const MultiPlayerGamePage = () => {
 
   return (
     <IonPage>
-      <WelcomeModal
+      {/* <WelcomeModal
         isOpen={showModal}
-        message={modalMessage}
+        messages={modalMessages}
         onClose={() => setShowModal(false)}
-      />
+      /> */}
       <IonContent>
         {/* Floating hamburger menu */}
         <div className="actionsMenu">

@@ -14,26 +14,26 @@ sessionClient.connect();
 
 // Create a game session
 async function createGameSession(playerOneData, playerTwoData) {
-  console.log(
-    "createGameSession - playerOneId:",
-    playerOneData,
-    "playerTwoId:",
-    playerTwoData
-  );
+  // console.log(
+  //   "createGameSession - playerOneId:",
+  //   playerOneData,
+  //   "playerTwoId:",
+  //   playerTwoData
+  // );
   const sessionId = uuidv4();
-  console.log("Before calling initializePlayers - player IDs:", [
-    playerOneData.username,
-    playerTwoData.username,
-  ]);
+  // console.log("Before calling initializePlayers - player IDs:", [
+  //   playerOneData.username,
+  //   playerTwoData.username,
+  // ]);
   // const players = [playerOneData.username, playerTwoData.username]
 
   // Initialize players with more detailed data
   const players = initializePlayers([playerOneData, playerTwoData]);
-  console.log("createGameSession - Players array:", players);
-
+  // console.log("createGameSession - Players array:", players);
+ 
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
-
+  console.log("From createGameSession turnOrder:", players.map((p) => p.username));
   // const gameMap = createMap();
   // const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
@@ -41,7 +41,7 @@ async function createGameSession(playerOneData, playerTwoData) {
     sessionId,
     players,
     gameState: {
-      turnOrder
+      turnOrder,
     },
   };
   console.log(
@@ -113,12 +113,17 @@ function initializePlayers(playerData) {
 }
 
 //Determine Turn Order
-function determineTurnOrder(playerUsernames) {
-  for (let i = playerUsernames.length - 1; i > 0; i--) {
+function determineTurnOrder(players) {
+  console.log("From deteremineTurnOrder playerUsernames:", players);
+  for (let i = players.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [playerUsernames[i], playerUsernames[j]] = [playerUsernames[j], playerUsernames[i]];
+    [players[i], players[j]] = [
+      players[j],
+      players[i],
+    ];
   }
-  return playerUsernames;
+  console.log("From deteremineTurnOrder playerUsernames:", players);
+  return players;
 }
 
 // Function to handle player disconnection
@@ -137,98 +142,6 @@ async function handlePlayerReconnect(sessionId, playerId) {
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
 
-
-
-function createMap() {
-  // Map creation logic
-}
-
-function determineTurnOrder(playerIds) {
-  // Turn order determination logic
-}
-async function handleCombat(sessionId, combatDetails) {
-  // Implement combat logic (PvP, PvE, Building Combat)
-}
-async function processWorldEvent(sessionId, event) {
-  // Handle the effects of world events
-}
-async function checkVictoryCondition(sessionId) {
-  // Check if any player has met the victory conditions
-}
-
-async function checkDefeatCondition(sessionId) {
-  // Check if the lose condition (Titan Domination) is met
-}
-async function startNextTurn(sessionId) {
-  // Logic to start the next turn (handle draw phase, reset stats, etc.)
-}
-async function handleTitanEvents(sessionId) {
-  // Implement Titan movement and event handling
-}
-async function manageBuildings(sessionId, buildingAction) {
-  // Handle building construction, upgrades, and destruction
-}
-async function handleTileInteraction(sessionId, tileDetails) {
-  // Logic for handling different tile events
-}
-async function handleTreasureDiscovery(sessionId, player, treasureType) {
-  // Logic for handling treasure discoveries
-}
-
-async function useTreasureCard(sessionId, player, treasureCard) {
-  // Logic for using a treasure card
-}
-async function assignQuestCard(sessionId, player) {
-  // Logic for assigning a quest card to a player
-}
-
-async function completeQuest(sessionId, player, questId) {
-  // Logic for completing a quest and awarding VPs
-}
-async function movePlayer(sessionId, player, destination) {
-  // Logic for moving a player on the map
-}
-async function drawResourceCard(sessionId, player) {
-  // Logic for drawing a resource card
-}
-
-async function tradeResources(
-  sessionId,
-  playerFrom,
-  playerTo,
-  resourceDetails
-) {
-  // Logic for trading resources between players
-}
-async function drawEquipmentCard(sessionId, player) {
-  // Logic for drawing an equipment card
-}
-
-async function upgradeEquipment(sessionId, player, equipmentId) {
-  // Logic for upgrading equipment
-}
-
-async function manageInventory(sessionId, player, actionDetails) {
-  // Logic for managing a player's inventory
-}
-
-async function notifyPlayerAction(sessionId, player, action) {
-  // Notify players of a specific action taken by a player
-}
-async function rankUpPlayer(sessionId, player) {
-  // Logic for handling player rank ups
-}
-
-async function updatePlayerStats(sessionId, player, statChanges) {
-  // Logic for updating player stats
-}
-function validatePlayerAction(sessionId, player, action) {
-  // Validate a player action and return an error if invalid
-}
-
-function handleGameError(sessionId, error) {
-  // Logic for handling game errors
-}
 
 async function endGameSession(sessionId) {
   // Clean up the session data from Redis

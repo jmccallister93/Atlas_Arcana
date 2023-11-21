@@ -65,14 +65,14 @@ async function findMatch(connectedUsers, io) {
         playerOneData,
         playerTwoData
       );
-      console.log(
-        "From matchmakingservice new gamesession: ",
-        JSON.stringify(newSession)
-      ); 
-      console.log(
-        "From matchmakingservice new playerOneData: ",
-        JSON.stringify(playerOneData)
-      ); 
+      // console.log(
+      //   "From matchmakingservice new gamesession: ",
+      //   JSON.stringify(newSession)
+      // ); 
+      // console.log(
+      //   "From matchmakingservice new playerOneData: ",
+      //   JSON.stringify(playerOneData)
+      // ); 
       notifyPlayers(
         playerOneData, 
         playerTwoData,
@@ -100,7 +100,7 @@ const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, conn
 
     // Emitting to the room
     io.to(roomName).emit("matchFound", newSession);
-    console.log("From notifyplayers newSession: " + JSON.stringify(newSession))
+    // console.log("From notifyplayers newSession: " + JSON.stringify(newSession))
   } else {
     console.log("One or both players are not connected");
   }

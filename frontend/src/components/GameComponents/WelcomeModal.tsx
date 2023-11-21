@@ -1,7 +1,7 @@
 // WelcomeModal.tsx
-import { IonModal, IonButton, IonContent } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
-import "./WelcomeModal.scss"
+import { IonModal, IonButton, IonContent } from "@ionic/react";
+import React, { useEffect, useState } from "react";
+import "./WelcomeModal.scss";
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -9,15 +9,19 @@ interface WelcomeModalProps {
   onClose: () => void;
 }
 
-const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, messages, onClose }) => {
+const WelcomeModal: React.FC<WelcomeModalProps> = ({
+  isOpen,
+  messages,
+  onClose,
+}) => {
   // State to hold the current message
-  const [currentMessage, setCurrentMessage] = useState('');
+  const [currentMessage, setCurrentMessage] = useState("");
 
   useEffect(() => {
     // Function to display messages in sequence
     const displayMessagesInSequence = async () => {
       for (const messageObj of messages) {
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setCurrentMessage(messageObj.message);
           setTimeout(resolve, messageObj.delay);
         });
@@ -38,7 +42,5 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, messages, onClose }
     </IonModal>
   );
 };
-
-
 
 export default WelcomeModal;
