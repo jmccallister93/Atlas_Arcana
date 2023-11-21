@@ -24,11 +24,17 @@ import {
 } from "../../components/GameComponents/Interfaces";
 
 const MultiPlayerGamePage = () => {
+  // Game State
   const [gameState, setGameState] = useState<GameSessionInfo>();
   const location = useLocation<LocationState>();
   const { gameSessionInfo, sessionId } = location.state;
+  // Player State
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
+  // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
+  // Player Menu
+  const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
 
   // Join the game session
   useEffect(() => {
