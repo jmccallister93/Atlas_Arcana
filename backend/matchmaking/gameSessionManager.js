@@ -105,7 +105,13 @@ function initializePlayers(playerData) {
     defense: 0,
     stamina: 0,
     movement: 3,
-    build: 1,
+    buildings: {
+      defense: [],
+      equipment: [],
+      quest: [],
+      resource: [],
+      movement:[],
+    },
     inventory: {
       resources: [],
       equipment: [],

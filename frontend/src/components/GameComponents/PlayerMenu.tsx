@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { IonModal, IonButton, IonList, IonItem, IonLabel } from "@ionic/react";
 import { GameSessionInfo, GameState, PlayerInfo } from "./Interfaces"; // Adjust the path as needed
 import "./PlayerMenu.scss";
+import { IonIcon } from "@ionic/react";
+import { closeOutline } from "ionicons/icons";
+
 interface PlayerMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,14 +22,27 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
   const renderInventoryItem = (item: any) => {
     return item && item.length > 0 ? item : "None";
   };
+  //Conditional if building item is empty
+  const renderBuildingItem = (item: any) => {
+    return item && item.length > 0 ? item : "None";
+  };
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <div className="playerMenuContainer">
-        <h2>Stats Menu</h2>
+        <div className="modalHeader">
+          <h2>{player?.username}'s Menu</h2>
+          <button className="closeButton" onClick={onClose}>
+            <IonIcon icon={closeOutline} />
+          </button>
+        </div>
         <IonList>
           <IonItem>
-            <IonLabel>Victory Points: {player?.victoryPoints}</IonLabel>
+            <div className="victoryPointsCards">
+              <div className="victoryPointsCard">
+                Victory Points: {player?.victoryPoints}
+              </div>
+            </div>
           </IonItem>
           <IonItem>
             <IonLabel>Player Stats</IonLabel>
@@ -82,6 +98,29 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
             {/* Display Building Information */}
             {/* Need building name */}
             {/* Building benefit */}
+          </IonItem>
+          <IonItem slot="center">
+            <div className="buildingCards">
+              <div className="buildingCard">
+                Defense{" "}
+                <div>{renderBuildingItem(player.buildings.defense)}</div>
+              </div>
+              <div className="buildingCard">
+                Equipment{" "}
+                <div>{renderBuildingItem(player.buildings.equipment)}</div>
+              </div>
+              <div className="buildingCard">
+                Quest <div>{renderBuildingItem(player.buildings.quest)}</div>
+              </div>
+              <div className="buildingCard">
+                Resource{" "}
+                <div>{renderBuildingItem(player.buildings.resource)}</div>
+              </div>
+              <div className="buildingCard">
+                Movement{" "}
+                <div>{renderBuildingItem(player.buildings.movement)}</div>
+              </div>
+            </div>
           </IonItem>
         </IonList>
         <IonButton onClick={onClose}>Close Menu</IonButton>

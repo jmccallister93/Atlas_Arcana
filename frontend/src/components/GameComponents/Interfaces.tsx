@@ -19,7 +19,13 @@ export interface PlayerInfo {
   defense: number;
   stamina: number;
   movement: number;
-  build: number;
+  buildings: {
+    defense: any[],
+    equipment: any[],
+    quest: any[],
+    resource: any[],
+    movement:any[],
+  },
   inventory: {
     resources: any; // Update the type based on your actual data structure
     equipment: any[]; // Same as above

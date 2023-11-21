@@ -84,6 +84,11 @@ const MultiPlayerGamePage = () => {
     }
   }, [gameState]);
 
+  //Display all players Victory Points
+  useEffect(() => {
+    players
+  }, [gameState])
+
   // Example function to update a part of the game state
   const updateGame = (newData: any) => {
     // Update the local game state
@@ -159,7 +164,7 @@ const MultiPlayerGamePage = () => {
         <div className="playerList">
           {players.map((player, index) => (
             <div key={index} className="playerName">
-              {player.username}
+              {player.username} - VP's: {player.victoryPoints}
             </div>
           ))}
         </div>
