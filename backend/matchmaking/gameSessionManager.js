@@ -30,10 +30,12 @@ async function createGameSession(playerOneData, playerTwoData) {
   // Initialize players with more detailed data
   const players = initializePlayers([playerOneData, playerTwoData]);
   // console.log("createGameSession - Players array:", players);
- 
+
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
-  console.log("From createGameSession turnOrder:", players.map((p) => p.username));
+
+  //Determine starting cards
+  const startingCards = determineStartingCards(players)
   // const gameMap = createMap();
   // const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
@@ -117,15 +119,32 @@ function determineTurnOrder(players) {
   console.log("From deteremineTurnOrder playerUsernames:", players);
   for (let i = players.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [players[i], players[j]] = [
-      players[j],
-      players[i],
-    ];
+    [players[i], players[j]] = [players[j], players[i]];
   }
   console.log("From deteremineTurnOrder playerUsernames:", players);
   return players;
 }
 
+// Example arrays of resources and equipment cards
+const resourceCards = ['Resource1', 'Resource2', 'Resource3', ];
+const equipmentCards = ['Equipment1', 'Equipment2', 'Equipment3',]
+// Draw Cards
+function determineStartingCards(players) {
+  console.log("from determineStartingCards: ");
+
+  players.forEach(player => {
+    // Allocate 3 resources
+    for (let i = 0; i < 3; i++) {
+      player.inventory.resources.push(resourceCards[i]);
+    }
+
+    // Allocate 1 random equipment card
+    const randomIndex = Math.floor(Math.random() * equipmentCards.length);
+    player.inventory.equipment.push(equipmentCards[randomIndex]);
+  });
+
+  return players;
+}
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -141,7 +160,6 @@ async function handlePlayerReconnect(sessionId, playerId) {
   // Update session state accordingly
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
-
 
 async function endGameSession(sessionId) {
   // Clean up the session data from Redis
