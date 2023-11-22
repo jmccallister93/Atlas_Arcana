@@ -60,10 +60,12 @@ export interface PlayerInfo {
         plantation: any[],
       },
       movement: {
-        portal: 0,
-        road: 0,
-        humanCatapult:0,
+        portal:  any[],
+        road:  any[],
+        humanCatapult: any[],
       },
+      equipmentCardCapacity: number,
+      treasureCardCapacity: number,
   },
   inventory: {
     resources: any; 

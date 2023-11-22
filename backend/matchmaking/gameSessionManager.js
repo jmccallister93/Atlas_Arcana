@@ -143,6 +143,8 @@ function initializePlayers(playerData) {
       boots: [],
       gloves: [],
     },
+    equipmentCardCapacity: 5,
+    treasureCardCapacity: 5,
     inventory: {
       resources: [],
       equipment: [],

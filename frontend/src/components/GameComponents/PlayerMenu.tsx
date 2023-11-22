@@ -197,12 +197,12 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     const slot = item.label.toLowerCase() as keyof PlayerInfo["equippedItems"];
     return (
       <div
-        className="statCard"
+        className="inventoryCard"
         key={item.label}
         onClick={() => handleItemClick(item.label, item.description)}
       >
         {item.label}{" "}
-        <div>{renderEquippedItem(player.equippedItems[slot], slot)}</div>
+        <div className="namedCard">{renderEquippedItem(player.equippedItems[slot], slot)}</div>
       </div>
     );
   });
@@ -351,7 +351,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
             </div>
           </IonItem>
           <IonItem slot="center">
-            <div className="statsCards">
+            <div className="inventoryCards">
               <h3>Equipped Gear</h3>
               {equippedItemsCards}
             </div>
