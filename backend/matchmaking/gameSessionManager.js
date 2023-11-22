@@ -103,7 +103,7 @@ function initializePlayers(playerData) {
     health: 3,
     offense: 0,
     defense: 0,
-    stamina: 0,
+    stamina: 1,
     movement: 3,
     build: 1,
     buildings: {
@@ -184,13 +184,15 @@ function determineStartingCards(players) {
 
   players.forEach((player) => {
     // Allocate 3 resources
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 1; i++) {
       player.inventory.resources.push(3);
     }
 
     // Allocate 1 random equipment card
+    for (let i = 0; i < 2; i++) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     player.inventory.equipment.push(equipmentCards[randomIndex]);
+    }
   });
 
   return players;
