@@ -12,6 +12,7 @@ export interface LocationState {
 
 export interface EquipmentItem {
     equipmentName: string;
+    rank: number;
     slot: string;
     set: string;
     element: string;

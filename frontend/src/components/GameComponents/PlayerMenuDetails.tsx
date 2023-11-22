@@ -50,6 +50,9 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                   <strong>Name:</strong> {item.equipmentName}
                 </p>
                 <p>
+                  <strong>Rank:</strong> {item.rank}
+                </p>
+                <p>
                   <strong>Slot:</strong> {item.slot}
                 </p>
                 <p>

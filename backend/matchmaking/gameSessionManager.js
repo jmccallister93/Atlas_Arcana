@@ -169,6 +169,7 @@ function determineTurnOrder(players) {
 const equipmentCards = [
   {
     equipmentName: "Monster's Bane",
+    rank: "1",
     slot: "weapon",
     set: "Slayer",
     element: "none",
@@ -176,6 +177,7 @@ const equipmentCards = [
   },
   {
     equipmentName: "Duelist's Edge",
+    rank: "1",
     slot: "weapon",
     set: "Duelist",
     element: "none",
@@ -183,6 +185,7 @@ const equipmentCards = [
   },
   {
     equipmentName: "Doom Blade",
+    rank: "1",
     slot: "weapon",
     set: "Conquerer",
     element: "none",
@@ -190,6 +193,7 @@ const equipmentCards = [
   },
   {
     equipmentName: "Guardian's Defender",
+    rank: "1",
     slot: "weapon",
     set: "Guardian",
     element: "none",
@@ -197,6 +201,7 @@ const equipmentCards = [
   },
   {
     equipmentName: "Striker's Fury",
+    rank: "1",
     slot: "weapon",
     set: "Berserker",
     element: "none",

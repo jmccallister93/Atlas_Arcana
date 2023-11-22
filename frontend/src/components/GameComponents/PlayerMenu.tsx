@@ -202,7 +202,9 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         onClick={() => handleItemClick(item.label, item.description)}
       >
         {item.label}{" "}
-        <div className="namedCard">{renderEquippedItem(player.equippedItems[slot], slot)}</div>
+        <div className="namedCard">
+          {renderEquippedItem(player.equippedItems[slot], slot)}
+        </div>
       </div>
     );
   });
@@ -282,7 +284,11 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     setCurrentDetailType(type);
 
     // Check if content is an array of EquipmentItem, if so, handle it as equipable items
-    if (Array.isArray(content) && content[0] && content[0].hasOwnProperty("equipmentName")) {
+    if (
+      Array.isArray(content) &&
+      content[0] &&
+      content[0].hasOwnProperty("equipmentName")
+    ) {
       setCurrentEquipableItems(content as EquipmentItem[]);
     } else {
       // Only set content if it's a string, otherwise clear it
@@ -292,20 +298,29 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         setCurrentDetailContent("");
       }
     }
-  
+
     setShowDetails(true);
-  
+
     // Fetch equipable items if the clicked type is an equipment category or "Equipment Cards"
-    if (["Weapon", "Armor", "Amulet", "Boots", "Gloves", "Equipment Cards"].includes(type)) {
-      const equipableItems = type === "Equipment Cards" ? 
-                              (content as EquipmentItem[]) : 
-                              player.inventory.equipment.filter(
-                                (item) => item.slot.toLowerCase() === type.toLowerCase()
-                              );
+    if (
+      [
+        "Weapon",
+        "Armor",
+        "Amulet",
+        "Boots",
+        "Gloves",
+        "Equipment Cards",
+      ].includes(type)
+    ) {
+      const equipableItems =
+        type === "Equipment Cards"
+          ? (content as EquipmentItem[])
+          : player.inventory.equipment.filter(
+              (item) => item.slot.toLowerCase() === type.toLowerCase()
+            );
       setCurrentEquipableItems(equipableItems);
     }
   };
-
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
