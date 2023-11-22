@@ -23,62 +23,80 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   onEquipItem,
   player,
 }) => {
-    const [hasWhetstone, setHasWhetstone] = useState<boolean>(false);
-    const [hasForge, setHasForge] = useState<boolean>(false);
-    const [hasRankUpResources, setHasRankUpResources] = useState<boolean>(false);
+  // Rank up variables
+  const [hasWhetstone, setHasWhetstone] = useState<boolean>(false);
+  const [hasForge, setHasForge] = useState<boolean>(false);
+  const [hasRankUpResources, setHasRankUpResources] = useState<boolean>(false);
+  const [missingRankUp, setMissingRankUp] = useState<string>(
+    "Missing Whetsone, or Forge and Resources"
+  );
   const [rankUpPrereq, setRankUpPrereq] = useState<boolean>(false);
-  const [attunePrereq, setAttunePrereq] = useState<boolean>(false);
+
+  //   Attunement variables
+  const [hasEmber, setHasEmber] = useState<boolean>(false);
+  const [hasAttunementShrine, setHasAttunementShrine] =
+    useState<boolean>(false);
+  const [hasAttunementResources, setHasAttunementResources] =
+    useState<boolean>(false);
+  const [missingAttunement, setMissingAttunement] = useState<string>(
+    "Missing Ember, or Attunement Shrine and Resources"
+  );
+  const [attunementPrereq, setAttunementPrereq] = useState<boolean>(false);
 
   // Rankup check
   useEffect(() => {
-    let hasWhetstone = false;
-    let hasForge = false;
-    let hasResources = false;
     // Check for Whetstone
     if (player.inventory.treasures.includes("Whetstone")) {
-        setHasWhetstone(true);
+      setHasWhetstone(true);
+      setMissingRankUp("Requirements Met");
     }
     if (player.buildings.equipment.forge.length > 0) {
-        setHasForge(true);
+      setHasForge(true);
+      setMissingRankUp("Missing Resources or Forge");
     }
     if (player.inventory.resources > 3) {
-        setHasRankUpResources(true);
+      setHasRankUpResources(true);
+      setMissingRankUp("Missing Forge or Whestone");
     }
 
     if (hasWhetstone) {
       setRankUpPrereq(true);
-    } else if (hasForge && hasResources) {
+      setMissingRankUp("Requirements Met");
+    } else if (hasForge && hasRankUpResources) {
       setRankUpPrereq(true);
+      setMissingRankUp("Requirements Met");
     }
   }, [player]);
 
   // attunement check
   useEffect(() => {
-    let hasEmber = false;
-    let hasAttunementShrine = false;
-    let hasResources = false;
-    // Check for Whetstone
-    if (player.inventory.treasures.includes("Whetstone")) {
-      hasEmber = true;
+    // Check for ember
+    if (
+      player.inventory.treasures.some((treasure) =>
+        treasure.startsWith("Ember")
+      )
+    ) {
+      setMissingRankUp("Requirements Met");
+      setHasEmber(true);
     }
-    if (player.buildings.equipment.forge.length > 0) {
-      hasAttunementShrine = true;
+    if (player.buildings.equipment.attunementShrine.length > 0) {
+      setHasAttunementShrine(true);
+      setMissingRankUp("Missing Resources or Ember");
     }
     if (player.inventory.resources > 3) {
-      hasResources = true;
+      setHasAttunementResources(true);
+      setMissingRankUp("Missing Attunement Srhine or Ember");
     }
 
     if (hasEmber) {
-      setAttunePrereq(true);
-    } else if (hasAttunementShrine && hasResources) {
-      setAttunePrereq(true);
+      setAttunementPrereq(true);
+      setMissingRankUp("Requirements Met");
+    } else if (hasAttunementShrine && hasAttunementResources) {
+      setAttunementPrereq(true);
+      setMissingRankUp("Requirements Met");
     }
   }, [player]);
 
-  // Check for Ember
-  const hasEmber = player.inventory.treasures.some((treasure) =>
-    treasure.startsWith("Ember")
-  );
   // Function to rank up an item
   const rankUpItem = (item: EquipmentItem) => {
     // Implement logic to increase rank and update player inventory
@@ -110,43 +128,49 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
               );
 
               return (
-                <div key={index} className={`equipmentDetails `}>
-                  <div key={index} className="equipmentDetails">
-                    <p>
-                      <strong>Name:</strong> {item.equipmentName}
-                      {isEquipped ? (
-                        <IonButton>Equipped</IonButton>
-                      ) : (
-                        <IonButton
-                          onClick={() => onEquipItem(item)}
-                          color="success"
-                        >
-                          Equip
-                        </IonButton>
-                      )}
-                    </p>
-                    <p>
-                      <strong>Rank:</strong> {item.rank}
-                      {rankUpPrereq ? (
-                        <IonButton color="tertiary">Rank Up</IonButton>
-                      ) : (
-                        <IonButton color="medium" title="">Rank Up</IonButton>
-                      )}
-                    </p>
-                    <p>
-                      <strong>Slot:</strong> {item.slot}
-                    </p>
-                    <p>
-                      <strong>Set:</strong> {item.set}
-                    </p>
-                    <p>
-                      <strong>Element:</strong> {item.element}
-                      <IonButton color="secondary">Attune Element</IonButton>
-                    </p>
-                    <p>
-                      <strong>Bonus:</strong> {item.bonus}
-                    </p>
-                  </div>
+                <div key={index} className='equipmentDetails'>
+                  <p>
+                    <strong>Name:</strong> {item.equipmentName}
+                    {isEquipped ? (
+                      <IonButton>Equipped</IonButton>
+                    ) : (
+                      <IonButton
+                        onClick={() => onEquipItem(item)}
+                        color="success"
+                      >
+                        Equip
+                      </IonButton>
+                    )}
+                  </p>
+                  <p>
+                    <strong>Rank:</strong> {item.rank}
+                    {rankUpPrereq ? (
+                      <IonButton color="tertiary">Rank Up</IonButton>
+                    ) : (
+                      <IonButton color="medium" title={missingRankUp}>
+                        Rank Up
+                      </IonButton>
+                    )}
+                  </p>
+                  <p>
+                    <strong>Slot:</strong> {item.slot}
+                  </p>
+                  <p>
+                    <strong>Set:</strong> {item.set}
+                  </p>
+                  <p>
+                    <strong>Element:</strong> {item.element}
+                    {attunementPrereq ? (
+                      <IonButton color="tertiary">Attune</IonButton>
+                    ) : (
+                      <IonButton color="medium" title={missingAttunement}>
+                        Attune
+                      </IonButton>
+                    )}
+                  </p>
+                  <p>
+                    <strong>Bonus:</strong> {item.bonus}
+                  </p>
                 </div>
               );
             })}
