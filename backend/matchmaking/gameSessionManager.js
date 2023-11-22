@@ -107,11 +107,34 @@ function initializePlayers(playerData) {
     movement: 3,
     build: 1,
     buildings: {
-      defense: [],
-      equipment: [],
-      quest: [],
-      resource: [],
-      movement: [],
+      defense: {
+        outpost: 0,
+        fortification: 0,
+        archerTower: 0,
+        battlement: 0
+      },
+      equipment: {
+        armory: 0,
+        forge: 0,
+        attunementShrine:0,
+        warehouse:0,
+      },
+      quest: {
+        tavern: 0,
+        guildHall: 0,
+        library: 0,
+        oracleHut: 0,
+      },
+      resource: {
+        farm: 0,
+        ranch: 0,
+        plantation: 0,
+      },
+      movement: {
+        portal: 0,
+        road: 0,
+        humanCatapult:0,
+      },
     },
     equippedItems: {
       weapon: [],

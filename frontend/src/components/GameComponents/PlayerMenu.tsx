@@ -53,6 +53,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
             <div>Set: {equipment.set}</div>
             <div>Element: {equipment.element}</div>
             <div>Bonus: {equipment.bonus}</div>
+            <div>-------------------------------------</div>
           </div>
         ))
       : "None";
