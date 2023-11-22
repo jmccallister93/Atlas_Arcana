@@ -2,7 +2,7 @@ import React from "react";
 import { IonModal, IonButton, IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
-import { EquipmentItem } from "./Interfaces";
+import { EquipmentItem, PlayerInfo } from "./Interfaces";
 
 interface PlayerMenuDetailsProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface PlayerMenuDetailsProps {
   detailContent: string;
   equipableItems?: any[];
   onEquipItem: (item: EquipmentItem) => void
+  player: PlayerInfo;
 }
 
 const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
@@ -20,6 +21,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   detailContent,
   equipableItems,
   onEquipItem,
+  player,
 }) => {
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
@@ -30,10 +32,20 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
         <h3>{detailType}</h3>
         <p>{detailContent}</p>
         {equipableItems && equipableItems.length > 0 && (
-          <div>
-            <h4>Equipable Items</h4>
-            {equipableItems.map((item, index) => (
-              <div key={index} className="equipmentDetails">
+  <div>
+    <h4>Equipable Items</h4>
+    {equipableItems.map((item: any, index: any) => {
+          // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
+          const slot = item.slot as keyof PlayerInfo["equippedItems"];
+
+          // Check if the item is equipped
+          const isEquipped = player.equippedItems[slot]?.some(
+            (equippedItem) => equippedItem.equipmentName === item.equipmentName
+          );
+
+      return (
+        <div key={index} className={`equipmentDetails ${isEquipped ? "equipped" : ""}`}>
+          <div key={index} className="equipmentDetails">
                 <p>
                   <strong>Name:</strong> {item.equipmentName}
                 </p>
@@ -49,14 +61,21 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                 <p>
                   <strong>Bonus:</strong> {item.bonus}
                 </p>
-                <IonButton onClick={() => onEquipItem(item)}>Equip</IonButton>
               </div>
-            ))}
-          </div>
-        )}
+          {isEquipped ? (
+            <IonButton disabled={true}>Equipped</IonButton>
+          ) : (
+            <IonButton onClick={() => onEquipItem(item)}>Equip</IonButton>
+          )}
+        </div>
+      );
+    })}
+  </div>
+)}
       </div>
     </IonModal>
   );
 };
 
 export default PlayerMenuDetails;
+

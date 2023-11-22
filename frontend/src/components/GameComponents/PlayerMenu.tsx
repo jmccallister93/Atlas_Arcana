@@ -328,6 +328,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         detailContent={currentDetailContent}
         equipableItems={currentEquipableItems}
         onEquipItem={onEquipItem}
+        player={player}
       />
       <div className="playerMenuContainer">
         <div className="modalHeader">

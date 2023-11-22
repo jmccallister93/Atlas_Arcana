@@ -74,3 +74,14 @@
 .backButton {
   font-size: 3rem;
 }
+.equipped {
+    // Example styles for equipped items
+    opacity: 0.5; // Make it look disabled
+    pointer-events: none; // Disable mouse events
+  
+    button {
+      // Styles for the button when the item is equipped
+      cursor: not-allowed;
+      background-color: grey;
+    }
+  }
