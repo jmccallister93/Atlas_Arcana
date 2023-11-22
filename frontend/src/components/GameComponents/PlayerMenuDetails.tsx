@@ -78,4 +78,3 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
 };
 
 export default PlayerMenuDetails;
-

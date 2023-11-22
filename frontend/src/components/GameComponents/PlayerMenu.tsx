@@ -281,43 +281,31 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const handleItemClick = (type: string, content: string | EquipmentItem[]) => {
     setCurrentDetailType(type);
 
-    // Only set content if it's a string, otherwise clear it
-    if (typeof content === "string") {
-      setCurrentDetailContent(content);
+    // Check if content is an array of EquipmentItem, if so, handle it as equipable items
+    if (Array.isArray(content) && content[0] && content[0].hasOwnProperty("equipmentName")) {
+      setCurrentEquipableItems(content as EquipmentItem[]);
     } else {
-      setCurrentDetailContent("");
+      // Only set content if it's a string, otherwise clear it
+      if (typeof content === "string") {
+        setCurrentDetailContent(content);
+      } else {
+        setCurrentDetailContent("");
+      }
     }
-
+  
     setShowDetails(true);
-
-    // Fetch equipable items if the clicked type is an equipment category
-    if (["Weapon", "Armor", "Amulet", "Boots", "Gloves"].includes(type)) {
-      const equipableItems = player.inventory.equipment.filter(
-        (item) => item.slot.toLowerCase() === type.toLowerCase()
-      );
+  
+    // Fetch equipable items if the clicked type is an equipment category or "Equipment Cards"
+    if (["Weapon", "Armor", "Amulet", "Boots", "Gloves", "Equipment Cards"].includes(type)) {
+      const equipableItems = type === "Equipment Cards" ? 
+                              (content as EquipmentItem[]) : 
+                              player.inventory.equipment.filter(
+                                (item) => item.slot.toLowerCase() === type.toLowerCase()
+                              );
       setCurrentEquipableItems(equipableItems);
     }
   };
 
-  //Handle equipping an item
-  const handleEquipItem = (itemToEquip: EquipmentItem) => {
-    // Cast the slot to the correct type
-    const slotKey = itemToEquip.slot as keyof PlayerInfo["equippedItems"];
-
-    // Now TypeScript knows that slotKey is one of the keys of equippedItems
-    const updatedEquippedItems = { ...player.equippedItems };
-    updatedEquippedItems[slotKey] = [itemToEquip];
-
-    // Now you can safely update the player state
-    // Assuming you have a setter for your player state, which might look like this:
-    // setPlayer({ ...player, equippedItems: updatedEquippedItems });
-
-    // Close the details modal
-    setShowDetails(false);
-
-    // If you need to update the state in a parent component or send it to the server,
-    // You would typically do that here
-  };
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
