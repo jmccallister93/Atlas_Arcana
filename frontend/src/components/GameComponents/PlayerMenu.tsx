@@ -16,29 +16,38 @@ interface PlayerMenuProps {
   onClose: () => void;
   player?: PlayerInfo;
   gameState?: GameSessionInfo;
+  onEquipItem: (item: EquipmentItem) => void;
 }
 
-const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
+const PlayerMenu: React.FC<PlayerMenuProps> = ({
+  isOpen,
+  onClose,
+  player,
+  onEquipItem,
+  gameState,
+}) => {
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");
   const [currentDetailContent, setCurrentDetailContent] = useState<string>("");
   const [currentEquipableItems, setCurrentEquipableItems] = useState<
-  EquipmentItem[]
->([]);
+    EquipmentItem[]
+  >([]);
 
   // Need to verify player exists
   if (!player) {
     return null;
   }
   //Conditional if equippedItems item is empty
-  const renderEquippedItem = (item: any) => {
-    return item && item.length > 0 ? item : "None";
+  const renderEquippedItem = (
+    item: any[],
+    slot: keyof PlayerInfo["equippedItems"]
+  ) => {
+    return item && item.length > 0 ? item[0].equipmentName : "None";
   };
   //Conditional if inventory item is empty
   const renderInventoryItem = (item: any) => {
     return item && item.length > 0 ? item : "None";
   };
-
 
   //Conditional if equipment item is empty
   const renderEquipmentCardItem = (equipment: any) => {
@@ -50,22 +59,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         ))
       : "None";
   };
-  //Conditional if equipment card item is empty
-//   const renderEquipmentCardDescription = (equipment: any) => {
-//     // return equipment && equipment.length > 0
-//     //   ? equipment.map((equipment: any, index: any) => (
-//     //       <div className="namedCard" key={index}>
-//     //         <div>Name: {equipment.equipmentName}</div>
-//     //         <div>Slot: {equipment.slot}</div>
-//     //         <div>Set: {equipment.set}</div>
-//     //         <div>Element: {equipment.element}</div>
-//     //         <div>Bonus: {equipment.bonus}</div>
-//     //         <hr />
-//     //       </div>
-//     //     ))
-//     //   : "None";
-//     return 
-//   };
+
   //Conditional if inventory item is empty
   const renderQuestCardDescription = (equipment: any) => {
     return equipment && equipment.length > 0
@@ -174,41 +168,45 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
   const equippedItems = [
     {
       label: "Weapon",
-      value: renderEquippedItem(player.equippedItems.weapon),
+      value: renderEquippedItem(player.equippedItems.weapon, "weapon"),
       description: "Used to increase offense.",
-      equippableCards: "",
     },
     {
       label: "Armor",
-      value: renderEquippedItem(player.equippedItems.armor),
+      value: renderEquippedItem(player.equippedItems.armor, "armor"),
       description: "Used to increase defense.",
     },
     {
       label: "Amulet",
-      value: renderEquippedItem(player.equippedItems.amulet),
+      value: renderEquippedItem(player.equippedItems.amulet, "amulet"),
       description: "Used to increase health.",
     },
     {
       label: "Boots",
-      value: renderEquippedItem(player.equippedItems.boots),
+      value: renderEquippedItem(player.equippedItems.boots, "boots"),
       description: "Used to increase speed.",
     },
-
     {
       label: "Gloves",
-      value: renderEquippedItem(player.equippedItems.gloves),
+      value: renderEquippedItem(player.equippedItems.gloves, "gloves"),
       description: "Used to increase build.",
     },
   ];
-  const equippedItemsCards = equippedItems.map((item) => (
-    <div
-      className="statCard"
-      key={item.label}
-      onClick={() => handleItemClick(item.label, item.description)}
-    >
-      {item.label} <div>{item.value}</div>
-    </div>
-  ));
+
+  const equippedItemsCards = equippedItems.map((item) => {
+    const slot = item.label.toLowerCase() as keyof PlayerInfo["equippedItems"];
+    return (
+      <div
+        className="statCard"
+        key={item.label}
+        onClick={() => handleItemClick(item.label, item.description)}
+      >
+        {item.label}{" "}
+        <div>{renderEquippedItem(player.equippedItems[slot], slot)}</div>
+      </div>
+    );
+  });
+
   //Get and display inventory
   const inventory = [
     {
@@ -219,7 +217,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     {
       label: "Equipment Cards",
       value: renderEquipmentCardItem(player.inventory.equipment),
-      description: (player.inventory.equipment),
+      description: player.inventory.equipment,
     },
     {
       label: "Treasures",
@@ -279,21 +277,19 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     </div>
   ));
 
-
-
   // Handling click to call details on item
   const handleItemClick = (type: string, content: string | EquipmentItem[]) => {
     setCurrentDetailType(type);
-  
+
     // Only set content if it's a string, otherwise clear it
-    if (typeof content === 'string') {
+    if (typeof content === "string") {
       setCurrentDetailContent(content);
     } else {
-      setCurrentDetailContent('');
+      setCurrentDetailContent("");
     }
-  
+
     setShowDetails(true);
-  
+
     // Fetch equipable items if the clicked type is an equipment category
     if (["Weapon", "Armor", "Amulet", "Boots", "Gloves"].includes(type)) {
       const equipableItems = player.inventory.equipment.filter(
@@ -302,7 +298,26 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
       setCurrentEquipableItems(equipableItems);
     }
   };
-  
+
+  //Handle equipping an item
+  const handleEquipItem = (itemToEquip: EquipmentItem) => {
+    // Cast the slot to the correct type
+    const slotKey = itemToEquip.slot as keyof PlayerInfo["equippedItems"];
+
+    // Now TypeScript knows that slotKey is one of the keys of equippedItems
+    const updatedEquippedItems = { ...player.equippedItems };
+    updatedEquippedItems[slotKey] = [itemToEquip];
+
+    // Now you can safely update the player state
+    // Assuming you have a setter for your player state, which might look like this:
+    // setPlayer({ ...player, equippedItems: updatedEquippedItems });
+
+    // Close the details modal
+    setShowDetails(false);
+
+    // If you need to update the state in a parent component or send it to the server,
+    // You would typically do that here
+  };
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
@@ -312,7 +327,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         detailType={currentDetailType}
         detailContent={currentDetailContent}
         equipableItems={currentEquipableItems}
-        // onEquipItem={handleEquipItem}
+        onEquipItem={onEquipItem}
       />
       <div className="playerMenuContainer">
         <div className="modalHeader">

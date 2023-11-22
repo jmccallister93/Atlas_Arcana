@@ -21,6 +21,7 @@ import {
   PlayerInfo,
   GameSessionInfo,
   GameState,
+  EquipmentItem
 } from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
@@ -133,7 +134,31 @@ const MultiPlayerGamePage = () => {
     }
   };
 
+//Equipping item
+const equipItem = (itemToEquip: EquipmentItem) => {
+  if (currentPlayer && gameState) {
+    // Update the equipped items for the current player
+    const updatedPlayer = {
+      ...currentPlayer,
+      equippedItems: {
+        ...currentPlayer.equippedItems,
+        [itemToEquip.slot]: [itemToEquip],
+      },
+    };
 
+    // Update the players array with the updated player
+    const updatedPlayers = gameState.players.map((player) =>
+      player.username === updatedPlayer.username ? updatedPlayer : player
+    );
+
+    // Update the gameState with the new players array
+    const updatedGameState = { ...gameState, players: updatedPlayers };
+    setGameState(updatedGameState);
+
+    // Emit the updated state to the server
+    updateGame({ players: updatedPlayers });
+  }
+};
 
   return (
     <IonPage>
@@ -147,6 +172,7 @@ const MultiPlayerGamePage = () => {
           onClose={() => setIsPlayerMenuOpen(false)}
           player={currentPlayer}
           gameState={gameState}
+          onEquipItem={equipItem}
         />
       <IonContent>
         {/* Floating player menu */}
