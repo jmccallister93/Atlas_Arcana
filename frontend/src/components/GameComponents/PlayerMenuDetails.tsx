@@ -1,6 +1,7 @@
 import React from 'react';
 import { IonModal, IonButton, IonIcon } from '@ionic/react';
 import { arrowBack } from 'ionicons/icons';
+import "./PlayerMenu.scss"
 
 interface PlayerMenuDetailsProps {
     isOpen: boolean;
@@ -13,9 +14,9 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({ isOpen, onClose, 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <div className="detailsContainer">
-        <button className="backButton" onClick={onClose}>
-          <IonIcon icon={arrowBack} />
-        </button>
+        <div className="backButton" >
+          <IonIcon icon={arrowBack} onClick={onClose} />
+        </div>
         <h3>{detailType}</h3>
         <p>{detailContent}</p>
       </div>

@@ -19,6 +19,14 @@ export interface PlayerInfo {
   defense: number;
   stamina: number;
   movement: number;
+  build: number;
+  equippedItems: {
+    weapon: any[],
+    armor: any[],
+    amulet: any[],
+    boots: any[],
+    gloves: any[]
+  }
   buildings: {
     defense: any[],
     equipment: any[],
@@ -28,7 +36,13 @@ export interface PlayerInfo {
   },
   inventory: {
     resources: any; // Update the type based on your actual data structure
-    equipment: any[]; // Same as above
+    equipment: {
+        equipmentName: any[],
+        slot: any[],
+        set: any[],
+        element: any[],
+        bonus: any[],
+    }; // Same as above
     treasures: any[]; // Same as above
     quests: any[]; // Same as above
   };

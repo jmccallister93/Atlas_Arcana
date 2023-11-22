@@ -35,7 +35,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
 
   //Determine starting cards
-  const startingCards = determineStartingCards(players)
+  const startingCards = determineStartingCards(players);
   // const gameMap = createMap();
   // const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
@@ -105,12 +105,20 @@ function initializePlayers(playerData) {
     defense: 0,
     stamina: 0,
     movement: 3,
+    build: 1,
     buildings: {
       defense: [],
       equipment: [],
       quest: [],
       resource: [],
-      movement:[],
+      movement: [],
+    },
+    equippedItems: {
+      weapon: [],
+      armor: [],
+      amulet: [],
+      boots: [],
+      gloves: [],
     },
     inventory: {
       resources: [],
@@ -133,12 +141,48 @@ function determineTurnOrder(players) {
 }
 
 // equipment cards
-const equipmentCards = ['Equipment1', 'Equipment2', 'Equipment3',]
+const equipmentCards = [
+  {
+    equipmentName: "Monster's Bane",
+    slot: "weapon",
+    set: "Slayer",
+    element: "none",
+    bonus: "monsters"
+  },
+  {
+    equipmentName: "Duelist's Edge",
+    slot: "weapon",
+    set: "Duelist",
+    element: "none",
+    bonus: "players"
+  },
+  {
+    equipmentName: "Doom Blade",
+    slot: "weapon",
+    set: "Conquerer",
+    element: "none",
+    bonus: "titans"
+  },
+  {
+    equipmentName: "Guardian's Defender",
+    slot: "weapon",
+    set: "Guardian",
+    element: "none",
+    bonus: "defending"
+  },
+  {
+    equipmentName: "Striker's Fury",
+    slot: "weapon",
+    set: "Berserker",
+    element: "none",
+    bonus: "attacking"
+  },
+];
 // Draw Cards
 function determineStartingCards(players) {
   console.log("from determineStartingCards: ");
 
-  players.forEach(player => {
+  players.forEach((player) => {
     // Allocate 3 resources
     for (let i = 0; i < 3; i++) {
       player.inventory.resources.push(3);
