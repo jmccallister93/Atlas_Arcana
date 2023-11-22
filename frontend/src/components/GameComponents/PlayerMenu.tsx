@@ -16,15 +16,15 @@ interface PlayerMenuProps {
   onClose: () => void;
   player?: PlayerInfo;
   gameState?: GameSessionInfo;
-  onEquipItem: (item: EquipmentItem) => void;
+  updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
 const PlayerMenu: React.FC<PlayerMenuProps> = ({
   isOpen,
   onClose,
   player,
-  onEquipItem,
   gameState,
+  updatePlayerData,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");
@@ -330,8 +330,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         detailType={currentDetailType}
         detailContent={currentDetailContent}
         equipableItems={currentEquipableItems}
-        onEquipItem={onEquipItem}
         player={player}
+        updatePlayerData={updatePlayerData}
       />
       <div className="playerMenuContainer">
         <div className="modalHeader">

@@ -10,8 +10,8 @@ interface PlayerMenuDetailsProps {
   detailType: string;
   detailContent: string;
   equipableItems?: any[];
-  onEquipItem: (item: EquipmentItem) => void;
   player: PlayerInfo;
+  updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
 const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
@@ -20,8 +20,8 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   detailType,
   detailContent,
   equipableItems,
-  onEquipItem,
   player,
+  updatePlayerData
 }) => {
   // Rank up variables
   const [hasWhetstone, setHasWhetstone] = useState<boolean>(false);
@@ -97,14 +97,22 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     }
   }, [player]);
 
-  // Function to rank up an item
-  const rankUpItem = (item: EquipmentItem) => {
-    // Implement logic to increase rank and update player inventory
-  };
+  // Function to equip up an item
+  const equipItem = (itemToEquip: EquipmentItem) => {
+    // Update the equipped items for the current player
+    const updatedEquippedItems = {
+      ...player.equippedItems,
+      [itemToEquip.slot]: [itemToEquip], // Assuming you want to replace the item in the slot
+    };
 
-  // Function to change element of an item
-  const changeItemElement = (item: EquipmentItem, newElement: string) => {
-    // Implement logic to change element and update player inventory
+    // Create an updated player object
+    const updatedPlayer = {
+      ...player,
+      equippedItems: updatedEquippedItems
+    };
+
+    // Use updatePlayerData to update the player's data
+    updatePlayerData(updatedPlayer);
   };
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
@@ -135,7 +143,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                       <IonButton>Equipped</IonButton>
                     ) : (
                       <IonButton
-                        onClick={() => onEquipItem(item)}
+                        onClick={() => equipItem(item)}
                         color="success"
                       >
                         Equip

@@ -108,6 +108,7 @@ const MultiPlayerGamePage = () => {
     socket.emit("updateGameState", updatedState);
   };
 
+  // Open and close playermenu
   const togglePlayerMenu = () => {
     console.log(currentPlayer)
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
@@ -134,31 +135,42 @@ const MultiPlayerGamePage = () => {
     }
   };
 
-//Equipping item
-const equipItem = (itemToEquip: EquipmentItem) => {
-  if (currentPlayer && gameState) {
-    // Update the equipped items for the current player
-    const updatedPlayer = {
-      ...currentPlayer,
-      equippedItems: {
-        ...currentPlayer.equippedItems,
-        [itemToEquip.slot]: [itemToEquip],
-      },
-    };
+const updatePlayerData = (updatedPlayer: PlayerInfo) => {
+  // Define updatedPlayers outside of the setGameState call
+  let updatedPlayers: PlayerInfo[] = [];
 
-    // Update the players array with the updated player
-    const updatedPlayers = gameState.players.map((player) =>
+  setGameState((prevState) => {
+    if (!prevState) {
+      // If the previous state is undefined, you may need to handle this case appropriately.
+      return prevState;
+    }
+
+    const updatedPlayers = prevState.players.map(player =>
       player.username === updatedPlayer.username ? updatedPlayer : player
     );
 
-    // Update the gameState with the new players array
-    const updatedGameState = { ...gameState, players: updatedPlayers };
-    setGameState(updatedGameState);
+    return {
+      ...prevState,
+      players: updatedPlayers,
+      // Other properties of GameSessionInfo remain unchanged
+      sessionId: prevState.sessionId,
+      gameState: prevState.gameState,
+    };
+  });
 
-    // Emit the updated state to the server
-    updateGame({ players: updatedPlayers });
+  // Emit the updated state to the server
+  if (gameState) {
+    const updatedState = {
+      sessionId: gameState.sessionId,
+      newState: {
+        ...gameState,
+        players: updatedPlayers,
+      },
+    };
+    socket.emit("updateGameState", updatedState);
   }
 };
+
 
   return (
     <IonPage>
@@ -172,7 +184,7 @@ const equipItem = (itemToEquip: EquipmentItem) => {
           onClose={() => setIsPlayerMenuOpen(false)}
           player={currentPlayer}
           gameState={gameState}
-          onEquipItem={equipItem}
+          updatePlayerData={updatePlayerData}
         />
       <IonContent>
         {/* Floating player menu */}
