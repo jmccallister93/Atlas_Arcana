@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IonModal, IonButton, IonIcon } from "@ionic/react";
+import { IonModal, IonButton, IonIcon, IonAlert } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
 import { EquipmentItem, PlayerInfo } from "./Interfaces";
@@ -31,6 +31,10 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     "Missing Whetsone, or Forge and Resources"
   );
   const [rankUpPrereq, setRankUpPrereq] = useState<boolean>(false);
+
+  // State for the confirmation modal
+const [showRankUpConfirmation, setShowRankUpConfirmation] = useState<boolean>(false);
+const [selectedItemForRankUp, setSelectedItemForRankUp] = useState<EquipmentItem | null>(null);
 
   //   Attunement variables
   const [hasEmber, setHasEmber] = useState<boolean>(false);
@@ -114,7 +118,49 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     // Use updatePlayerData to update the player's data
     updatePlayerData(updatedPlayer);
   };
+// Updated handleRankUpGear to work with a specific item
+const handleRankUpGear = (event: React.MouseEvent<HTMLIonButtonElement>, item: EquipmentItem) => {
+    // Check prerequisites
+    if (rankUpPrereq) {
+      // Set the selected item
+      setSelectedItemForRankUp(item);
+      // Show confirmation modal
+      setShowRankUpConfirmation(true);
+    } else {
+      alert('Cannot rank up: ' + missingRankUp);
+    }
+  };
+  // Function to actually perform the rank up
+  const confirmRankUp = () => {
+    if (selectedItemForRankUp && player) {
+      // 1. Remove Whetstone from inventory
+      const whetstoneIndex = player.inventory.treasures.indexOf('Whetstone');
+      if (whetstoneIndex > -1) {
+        player.inventory.treasures.splice(whetstoneIndex, 1);
+      } else {
+        alert('No Whetstone available for rank up.');
+        return; // Exit if no Whetstone is found
+      }
+  
+      // 2. Upgrade the selected item to Rank 2
+      // Assuming you want to update the rank of the item in the player's equipment array
+      const itemIndex = player.inventory.equipment.findIndex(
+        (item) => item.equipmentName === selectedItemForRankUp.equipmentName
+      );
+      if (itemIndex > -1) {
+        player.inventory.equipment[itemIndex].rank = 2; // Set rank to 2
+      }
+  
+      // 3. Update the player data
+      updatePlayerData(player);
+  
+      // Close the confirmation modal
+      setShowRankUpConfirmation(false);
+    }
+  };
+  
   return (
+    <>
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <div className="playerMenuContainer">
         <div className="backButton">
@@ -140,7 +186,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                   <p>
                     <strong>Name:</strong> {item.equipmentName}
                     {isEquipped ? (
-                      <IonButton>Equipped</IonButton>
+                      <IonButton color="warning">Equipped</IonButton>
                     ) : (
                       <IonButton
                         onClick={() => equipItem(item)}
@@ -153,7 +199,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                   <p>
                     <strong>Rank:</strong> {item.rank}
                     {rankUpPrereq ? (
-                      <IonButton color="tertiary">Rank Up</IonButton>
+                      <IonButton color="tertiary" onClick={(e) => handleRankUpGear(e, item)}>Rank Up</IonButton>
                     ) : (
                       <IonButton color="medium" title={missingRankUp}>
                         Rank Up
@@ -169,7 +215,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
                   <p>
                     <strong>Element:</strong> {item.element}
                     {attunementPrereq ? (
-                      <IonButton color="tertiary">Attune</IonButton>
+                      <IonButton color="tertiary" >Attune</IonButton>
                     ) : (
                       <IonButton color="medium" title={missingAttunement}>
                         Attune
@@ -186,6 +232,25 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
         )}
       </div>
     </IonModal>
+     <IonAlert
+     isOpen={showRankUpConfirmation}
+     onDidDismiss={() => setShowRankUpConfirmation(false)}
+     header={'Rank Up Gear'}
+     message={`Use ${hasWhetstone ? 'Whetstone' : 'Forge'} for rank up? This will remove necessary resources.`}
+     buttons={[
+       {
+         text: 'Cancel',
+         role: 'cancel',
+         cssClass: 'secondary',
+         handler: () => setShowRankUpConfirmation(false)
+       },
+       {
+         text: 'Confirm',
+         handler: () => confirmRankUp()
+       }
+     ]}
+   />
+   </>
   );
 };
 

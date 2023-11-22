@@ -115,25 +115,6 @@ const MultiPlayerGamePage = () => {
   };
  
 
-  // Function to handle the rank update
-  const updatePlayerRank = () => {
-    if (gameState && gameState.players && gameState.players.length > 0) {
-      const updatedPlayers = gameState.players.map((player, index) => {
-        if (index === 0) {
-          // Assuming player 1 is at index 0
-          return { ...player, rank: 2 };
-        }
-        return player;
-      });
-
-      // Update the gameState with the new players array
-      const updatedGameState = { ...gameState, players: updatedPlayers };
-      setGameState(updatedGameState);
-
-      // Emit the updated state to the server
-      updateGame({ players: updatedPlayers });
-    }
-  };
 
 const updatePlayerData = (updatedPlayer: PlayerInfo) => {
   // Define updatedPlayers outside of the setGameState call
@@ -206,7 +187,6 @@ const updatePlayerData = (updatedPlayer: PlayerInfo) => {
             </div>
           ))}
         </div>
-        <IonButton onClick={updatePlayerRank}>Rank up</IonButton>
         <h4 className="pageHeader">Player Turn: </h4>
         <h4 className="pageHeader">Game Phase: </h4>
         <h4 className="pageHeader">Turn Number: </h4>
