@@ -28,11 +28,34 @@ export interface PlayerInfo {
     gloves: any[]
   }
   buildings: {
-    defense: any[],
-    equipment: any[],
-    quest: any[],
-    resource: any[],
-    movement:any[],
+    defense: {
+        outpost: any[],
+        fortification: any[],
+        archerTower: any[],
+        battlement: any[]
+      },
+      equipment: {
+        armory: any[],
+        forge: any[],
+        attunementShrine:any[],
+        warehouse:any[],
+      },
+      quest: {
+        tavern: any[],
+        guildHall: any[],
+        library: any[],
+        oracleHut: any[],
+      },
+      resource: {
+        farm: any[],
+        ranch: any[],
+        plantation: any[],
+      },
+      movement: {
+        portal: 0,
+        road: 0,
+        humanCatapult:0,
+      },
   },
   inventory: {
     resources: any; // Update the type based on your actual data structure

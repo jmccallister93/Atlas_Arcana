@@ -108,7 +108,7 @@ function initializePlayers(playerData) {
     build: 1,
     buildings: {
       defense: {
-        outpost: 0,
+        outpost: 1,
         fortification: 0,
         archerTower: 0,
         battlement: 0

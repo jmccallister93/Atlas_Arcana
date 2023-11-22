@@ -43,7 +43,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         ))
       : "None";
   };
-  //Conditional if inventory item is empty
+  //Conditional if equipment card item is empty
   const renderEquipmentCardDescription = (equipment: any) => {
     return equipment && equipment.length > 0
       ? equipment.map((equipment: any, index: any) => (
@@ -58,10 +58,49 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         ))
       : "None";
   };
+    //Conditional if inventory item is empty
+    const renderQuestCardDescription = (equipment: any) => {
+        return equipment && equipment.length > 0
+          ? equipment.map((equipment: any, index: any) => (
+              <div className="namedCard" key={index}>
+                <div> Name: {equipment.equipmentName}</div>
+                <div> Slot: {equipment.slot}</div>
+                <div>Set: {equipment.set}</div>
+                <div>Element: {equipment.element}</div>
+                <div>Bonus: {equipment.bonus}</div>
+                <div>-------------------------------------</div>
+              </div>
+            ))
+          : "None";
+      };
   //Conditional if building item is empty
-  const renderBuildingItem = (item: any) => {
-    return item && item.length > 0 ? item : "None";
+  const renderBuildingItem = (buildings: any) => {
+    const buildingArray = [];
+  
+    // Loop through the properties of player.buildings
+    for (const buildingName in buildings) {
+      if (buildings.hasOwnProperty(buildingName)) {
+        // Create an object for each building with name and value
+        const buildingValue = buildings[buildingName];
+        buildingArray.push({
+          name: buildingName,
+          value: buildingValue,
+        });
+      }
+    }
+  
+    if (buildingArray.length > 0) {
+      // If there are buildings, display them as a list
+      return buildingArray.map((building, index) => (
+        <div className="namedCard" key={index}>
+          {building.name}: {building.value}
+        </div>
+      ));
+    } else {
+      return "None";
+    }
   };
+  
 
   //   },[player])
   // Get and display stats
