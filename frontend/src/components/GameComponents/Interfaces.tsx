@@ -10,6 +10,14 @@ export interface LocationState {
   gameSessionInfo?: GameSessionInfo;
 }
 
+export interface EquipmentItem {
+    equipmentName: string;
+    slot: string;
+    set: string;
+    element: string;
+    bonus: string;
+  }
+
 export interface PlayerInfo {
   username: string;
   victoryPoints: number;
@@ -58,16 +66,10 @@ export interface PlayerInfo {
       },
   },
   inventory: {
-    resources: any; // Update the type based on your actual data structure
-    equipment: {
-        equipmentName: any[],
-        slot: any[],
-        set: any[],
-        element: any[],
-        bonus: any[],
-    }; // Same as above
-    treasures: any[]; // Same as above
-    quests: any[]; // Same as above
+    resources: any; 
+    equipment:EquipmentItem[]
+    treasures: any[]; 
+    quests: any[]; 
   };
 }
 

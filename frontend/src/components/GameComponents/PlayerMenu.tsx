@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { IonModal, IonButton, IonList, IonItem, IonLabel } from "@ionic/react";
-import { GameSessionInfo, GameState, PlayerInfo } from "./Interfaces"; // Adjust the path as needed
+import {
+  EquipmentItem,
+  GameSessionInfo,
+  GameState,
+  PlayerInfo,
+} from "./Interfaces"; // Adjust the path as needed
 import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
@@ -17,6 +22,9 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");
   const [currentDetailContent, setCurrentDetailContent] = useState<string>("");
+  const [currentEquipableItems, setCurrentEquipableItems] = useState<
+  EquipmentItem[]
+>([]);
 
   // Need to verify player exists
   if (!player) {
@@ -31,7 +39,6 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     return item && item.length > 0 ? item : "None";
   };
 
-  //   Test on click
 
   //Conditional if equipment item is empty
   const renderEquipmentCardItem = (equipment: any) => {
@@ -44,12 +51,28 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
       : "None";
   };
   //Conditional if equipment card item is empty
-  const renderEquipmentCardDescription = (equipment: any) => {
+//   const renderEquipmentCardDescription = (equipment: any) => {
+//     // return equipment && equipment.length > 0
+//     //   ? equipment.map((equipment: any, index: any) => (
+//     //       <div className="namedCard" key={index}>
+//     //         <div>Name: {equipment.equipmentName}</div>
+//     //         <div>Slot: {equipment.slot}</div>
+//     //         <div>Set: {equipment.set}</div>
+//     //         <div>Element: {equipment.element}</div>
+//     //         <div>Bonus: {equipment.bonus}</div>
+//     //         <hr />
+//     //       </div>
+//     //     ))
+//     //   : "None";
+//     return 
+//   };
+  //Conditional if inventory item is empty
+  const renderQuestCardDescription = (equipment: any) => {
     return equipment && equipment.length > 0
       ? equipment.map((equipment: any, index: any) => (
           <div className="namedCard" key={index}>
-            <div> Name: {equipment.equipmentName}</div>
-            <div> Slot: {equipment.slot}</div>
+            <div>Name: {equipment.equipmentName}</div>
+            <div>Slot: {equipment.slot}</div>
             <div>Set: {equipment.set}</div>
             <div>Element: {equipment.element}</div>
             <div>Bonus: {equipment.bonus}</div>
@@ -58,37 +81,34 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         ))
       : "None";
   };
-    //Conditional if inventory item is empty
-    const renderQuestCardDescription = (equipment: any) => {
-        return equipment && equipment.length > 0
-          ? equipment.map((equipment: any, index: any) => (
-              <div className="namedCard" key={index}>
-                <div> Name: {equipment.equipmentName}</div>
-                <div> Slot: {equipment.slot}</div>
-                <div>Set: {equipment.set}</div>
-                <div>Element: {equipment.element}</div>
-                <div>Bonus: {equipment.bonus}</div>
-                <div>-------------------------------------</div>
-              </div>
-            ))
-          : "None";
-      };
+
+  //   Format building keys
+  const formatBuildingKey = (key: any) => {
+    if (!key) return "";
+
+    // Capitalize the first letter
+    let formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
+
+    // Insert space before capital letters and capitalize them
+    return formattedKey.replace(/([A-Z])/g, " $1").trim();
+  };
+
   //Conditional if building item is empty
   const renderBuildingItem = (buildings: any) => {
     const buildingArray = [];
-  
+
     // Loop through the properties of player.buildings
     for (const buildingName in buildings) {
       if (buildings.hasOwnProperty(buildingName)) {
         // Create an object for each building with name and value
         const buildingValue = buildings[buildingName];
         buildingArray.push({
-          name: buildingName,
+          name: formatBuildingKey(buildingName),
           value: buildingValue,
         });
       }
     }
-  
+
     if (buildingArray.length > 0) {
       // If there are buildings, display them as a list
       return buildingArray.map((building, index) => (
@@ -100,7 +120,6 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
       return "None";
     }
   };
-  
 
   //   },[player])
   // Get and display stats
@@ -200,7 +219,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     {
       label: "Equipment Cards",
       value: renderEquipmentCardItem(player.inventory.equipment),
-      description: renderEquipmentCardDescription(player.inventory.equipment),
+      description: (player.inventory.equipment),
     },
     {
       label: "Treasures",
@@ -260,12 +279,30 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
     </div>
   ));
 
+
+
   // Handling click to call details on item
-  const handleItemClick = (type: string, content: string) => {
+  const handleItemClick = (type: string, content: string | EquipmentItem[]) => {
     setCurrentDetailType(type);
-    setCurrentDetailContent(content);
+  
+    // Only set content if it's a string, otherwise clear it
+    if (typeof content === 'string') {
+      setCurrentDetailContent(content);
+    } else {
+      setCurrentDetailContent('');
+    }
+  
     setShowDetails(true);
+  
+    // Fetch equipable items if the clicked type is an equipment category
+    if (["Weapon", "Armor", "Amulet", "Boots", "Gloves"].includes(type)) {
+      const equipableItems = player.inventory.equipment.filter(
+        (item) => item.slot.toLowerCase() === type.toLowerCase()
+      );
+      setCurrentEquipableItems(equipableItems);
+    }
   };
+  
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
@@ -274,6 +311,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         onClose={() => setShowDetails(false)}
         detailType={currentDetailType}
         detailContent={currentDetailContent}
+        equipableItems={currentEquipableItems}
+        // onEquipItem={handleEquipItem}
       />
       <div className="playerMenuContainer">
         <div className="modalHeader">
@@ -285,26 +324,35 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose, player }) => {
         <IonList>
           <IonItem>
             <div className="victoryPointsCards">
-              <div className="victoryPointsCard">
-                Victory Points <div>{player?.victoryPoints}</div>
-              </div>
+              <h3 className="victoryPointsCard">
+                Victory Points {player?.victoryPoints}
+              </h3>
             </div>
           </IonItem>
           <IonItem slot="center">
-            <h3>Player Stats</h3>
-            <div className="statsCards">{statsCards}</div>
+            <div className="statsCards">
+              <h3>Player Stats</h3>
+              {statsCards}
+            </div>
           </IonItem>
           <IonItem slot="center">
-            <h3>Equipped Gear</h3>
-            <div className="statsCards">{equippedItemsCards}</div>
+            <div className="statsCards">
+              <h3>Equipped Gear</h3>
+              {equippedItemsCards}
+            </div>
           </IonItem>
           <IonItem slot="center">
-            <h3>Inventory</h3>
-            <div className="inventoryCards">{inventoryCards}</div>
+            <div className="inventoryCards">
+              {" "}
+              <h3>Inventory</h3>
+              {inventoryCards}
+            </div>
           </IonItem>
           <IonItem slot="center">
-            <h3>Buildings</h3>
-            <div className="buildingCards">{buildingCards}</div>
+            <div className="buildingCards">
+              <h3>Buildings</h3>
+              {buildingCards}
+            </div>
           </IonItem>
         </IonList>
         <IonButton onClick={onClose}>Close Menu</IonButton>
