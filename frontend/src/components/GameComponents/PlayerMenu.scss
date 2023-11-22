@@ -85,3 +85,12 @@
       background-color: grey;
     }
   }
+
+  ion-button{
+    font-size: .9rem;
+    --padding-top: 0.5rem;
+    --padding-bottom: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    min-height: 0;
+  }

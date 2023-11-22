@@ -115,7 +115,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     }
   };
 
-  //   },[player])
+ 
   // Get and display stats
   const stats = [
     {
