@@ -117,10 +117,11 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
       ...player,
       equippedItems: updatedEquippedItems,
     };
-
+    console.log("From player menu details", updatedPlayer)
     // Use updatePlayerData to update the player's data
     updatePlayerData(updatedPlayer);
   };
+  
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,

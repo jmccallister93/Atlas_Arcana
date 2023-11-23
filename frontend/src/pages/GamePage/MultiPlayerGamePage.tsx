@@ -30,7 +30,7 @@ const MultiPlayerGamePage = () => {
   // Game State
   const [gameState, setGameState] = useState<GameSessionInfo>();
   const location = useLocation<LocationState>();
-  const { gameSessionInfo, sessionId } = location.state;
+  const { gameSessionInfo, sessionId } = location?.state;
   // Player State
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   // Show Welcome Modal
@@ -47,20 +47,19 @@ const MultiPlayerGamePage = () => {
   useEffect(() => {
     socket.emit("joinGame", { sessionId });
   }, [sessionId]);
+  const handleGameStateUpdate = (updatedGameState: any) => {
+    console.log("Received updated game state:", updatedGameState);
 
+    // Update the entire game state
+    setGameState(updatedGameState);
+
+    // Check if the updated game state contains player information and update accordingly
+    if (updatedGameState && updatedGameState.players) {
+      setPlayers(updatedGameState.players);
+    }
+  };
   // Handle game stateupdate
   useEffect(() => {
-    const handleGameStateUpdate = (updatedGameState: any) => {
-      console.log("Received updated game state:", updatedGameState);
-
-      // Update the entire game state
-      setGameState(updatedGameState);
-
-      // Check if the updated game state contains player information and update accordingly
-      if (updatedGameState && updatedGameState.players) {
-        setPlayers(updatedGameState.players);
-      }
-    };
 
     // Register the event listener
     socket.on("updateGameState", handleGameStateUpdate);
