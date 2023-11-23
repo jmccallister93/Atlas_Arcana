@@ -47,20 +47,34 @@ const MultiPlayerGamePage = () => {
   useEffect(() => {
     socket.emit("joinGame", { sessionId });
   }, [sessionId]);
-  const handleGameStateUpdate = (updatedGameState: any) => {
-    console.log("Received updated game state:", updatedGameState);
 
-    // Update the entire game state
-    setGameState(updatedGameState);
-
-    // Check if the updated game state contains player information and update accordingly
-    if (updatedGameState && updatedGameState.players) {
-      setPlayers(updatedGameState.players);
-    }
-  };
+ // Centralized function to emit game state updates
+ const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
+  if (gameState) {
+    const updatedState = {
+      sessionId: gameState.sessionId,
+      newState: {
+        ...gameState,
+        ...updatedData,
+      },
+    };
+    socket.emit("updateGameState", updatedState);
+  }
+};
+  
   // Handle game stateupdate
   useEffect(() => {
-
+    const handleGameStateUpdate = (updatedGameState: any) => {
+      console.log("Received updated game state:", updatedGameState);
+  
+      // Update the entire game state
+      setGameState(updatedGameState);
+  
+      // Check if the updated game state contains player information and update accordingly
+      if (updatedGameState && updatedGameState.players) {
+        setPlayers(updatedGameState.players);
+      }
+    };
     // Register the event listener
     socket.on("updateGameState", handleGameStateUpdate);
 
@@ -89,23 +103,6 @@ const MultiPlayerGamePage = () => {
     players
   }, [gameState])
 
-  // Example function to update a part of the game state
-  const updateGame = (newData: any) => {
-    // Update the local game state
-    setGameState((prevState) => ({
-      ...prevState,
-      ...newData,
-    }));
-
-    // Prepare data to send to the backend
-    const updatedState = {
-      sessionId: gameState?.sessionId,
-      newState: newData,
-    };
-    console.log("Multiplayer  updatedState from updateGame: ", updatedState);
-    // Emit the updated state to the server
-    socket.emit("updateGameState", updatedState);
-  };
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
@@ -113,46 +110,33 @@ const MultiPlayerGamePage = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
  
-const updatePlayerData = (updatedPlayer: PlayerInfo) => {
-  // Define updatedPlayers outside of the setGameState call
-  let updatedPlayers: PlayerInfo[] = [];
-
-  console.log("From multi player page updatedPlayer: ", updatedPlayer)
-  
+ // Function to update player data
+ const updatePlayerData = (updatedPlayer: PlayerInfo) => {
   setGameState((prevState) => {
     if (!prevState) {
-      console.log("From multi player page gamestate undefined.")
       return prevState;
     }
 
     const updatedPlayers = prevState.players.map(player =>
       player.username === updatedPlayer.username ? updatedPlayer : player
     );
-    console.log("From multi player page updatedPlayers: ", updatedPlayers)
 
-    return {
+    // Update the game state with the new players array
+    const newState: GameSessionInfo = {
       ...prevState,
       players: updatedPlayers,
-      // Other properties of GameSessionInfo remain unchanged
-      sessionId: prevState.sessionId,
-      gameState: prevState.gameState,
     };
+
+    return newState;
   });
 
-  // Emit the updated state to the server
+  // Emit updated player data after state update
   if (gameState) {
-    const updatedState = {
-      sessionId: gameState.sessionId,
-      newState: {
-        ...gameState,
-        players: updatedPlayers,
-      },
-    };
-    socket.emit("updateGameState", updatedState);
+    emitGameStateUpdate({ players: gameState.players.map(player =>
+      player.username === updatedPlayer.username ? updatedPlayer : player
+    ) });
   }
 };
-
-
   return (
     <IonPage>
       {/* <WelcomeModal
