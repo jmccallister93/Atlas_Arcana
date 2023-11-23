@@ -38,32 +38,32 @@ export interface PlayerInfo {
   }
   buildings: {
     defense: {
-        outpost: any[],
-        fortification: any[],
-        archerTower: any[],
-        battlement: any[]
+        outpost: number,
+        fortification: number,
+        archerTower: number,
+        battlement: number
       },
       equipment: {
-        armory: any[],
-        forge: any[],
-        attunementShrine:any[],
-        warehouse:any[],
+        armory: number,
+        forge: number,
+        attunementShrine:number,
+        warehouse:number,
       },
       quest: {
-        tavern: any[],
-        guildHall: any[],
-        library: any[],
-        oracleHut: any[],
+        tavern: number,
+        guildHall: number,
+        library: number,
+        oracleHut: number,
       },
       resource: {
-        farm: any[],
-        ranch: any[],
-        plantation: any[],
+        farm: number,
+        ranch: number,
+        plantation: number,
       },
       movement: {
-        portal:  any[],
-        road:  any[],
-        humanCatapult: any[],
+        portal:  number,
+        road:  number,
+        humanCatapult: number,
       },
       equipmentCardCapacity: number,
       treasureCardCapacity: number,
