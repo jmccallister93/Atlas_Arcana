@@ -115,7 +115,7 @@ function initializePlayers(playerData) {
       },
       equipment: {
         armory: 0,
-        forge: 0,
+        forge: 1,
         attunementShrine:0,
         warehouse:0,
       },
@@ -215,7 +215,7 @@ function determineStartingCards(players) {
   players.forEach((player) => {
     // Allocate 3 resources
     for (let i = 0; i < 1; i++) {
-      player.inventory.resources.push(3);
+      player.inventory.resources.push(4);
     }
 
     // Allocate 1 random equipment card

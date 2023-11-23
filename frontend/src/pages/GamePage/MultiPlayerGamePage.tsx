@@ -114,21 +114,22 @@ const MultiPlayerGamePage = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
  
-
-
 const updatePlayerData = (updatedPlayer: PlayerInfo) => {
   // Define updatedPlayers outside of the setGameState call
   let updatedPlayers: PlayerInfo[] = [];
 
+  console.log("From multi player page updatedPlayer: ", updatedPlayer)
+  
   setGameState((prevState) => {
     if (!prevState) {
-      // If the previous state is undefined, you may need to handle this case appropriately.
+      console.log("From multi player page gamestate undefined.")
       return prevState;
     }
 
     const updatedPlayers = prevState.players.map(player =>
       player.username === updatedPlayer.username ? updatedPlayer : player
     );
+    console.log("From multi player page updatedPlayers: ", updatedPlayers)
 
     return {
       ...prevState,

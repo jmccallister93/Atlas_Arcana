@@ -21,7 +21,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   detailContent,
   equipableItems,
   player,
-  updatePlayerData
+  updatePlayerData,
 }) => {
   // Rank up variables
   const [hasWhetstone, setHasWhetstone] = useState<boolean>(false);
@@ -33,8 +33,11 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   const [rankUpPrereq, setRankUpPrereq] = useState<boolean>(false);
 
   // State for the confirmation modal
-const [showRankUpConfirmation, setShowRankUpConfirmation] = useState<boolean>(false);
-const [selectedItemForRankUp, setSelectedItemForRankUp] = useState<EquipmentItem | null>(null);
+  const [showRankUpConfirmation, setShowRankUpConfirmation] =
+    useState<boolean>(false);
+  const [selectedItemForRankUp, setSelectedItemForRankUp] =
+    useState<EquipmentItem | null>(null);
+  const [rankUpButtons, setRankUpButtons] = useState();
 
   //   Attunement variables
   const [hasEmber, setHasEmber] = useState<boolean>(false);
@@ -70,7 +73,7 @@ const [selectedItemForRankUp, setSelectedItemForRankUp] = useState<EquipmentItem
       setRankUpPrereq(true);
       setMissingRankUp("Requirements Met");
     }
-  }, [player]);
+  }, [player.inventory.treasures, player.inventory.resources]);
 
   // attunement check
   useEffect(() => {
@@ -112,14 +115,17 @@ const [selectedItemForRankUp, setSelectedItemForRankUp] = useState<EquipmentItem
     // Create an updated player object
     const updatedPlayer = {
       ...player,
-      equippedItems: updatedEquippedItems
+      equippedItems: updatedEquippedItems,
     };
 
     // Use updatePlayerData to update the player's data
     updatePlayerData(updatedPlayer);
   };
-// Updated handleRankUpGear to work with a specific item
-const handleRankUpGear = (event: React.MouseEvent<HTMLIonButtonElement>, item: EquipmentItem) => {
+  // Updated handleRankUpGear to work with a specific item
+  const handleRankUpGear = (
+    event: React.MouseEvent<HTMLIonButtonElement>,
+    item: EquipmentItem
+  ) => {
     // Check prerequisites
     if (rankUpPrereq) {
       // Set the selected item
@@ -127,130 +133,185 @@ const handleRankUpGear = (event: React.MouseEvent<HTMLIonButtonElement>, item: E
       // Show confirmation modal
       setShowRankUpConfirmation(true);
     } else {
-      alert('Cannot rank up: ' + missingRankUp);
+      alert("Cannot rank up: " + missingRankUp);
     }
   };
   // Function to actually perform the rank up
-  const confirmRankUp = () => {
+  const confirmRankUp = (useResources: boolean) => {
     if (selectedItemForRankUp && player) {
-      // 1. Remove Whetstone from inventory
-      const whetstoneIndex = player.inventory.treasures.indexOf('Whetstone');
-      if (whetstoneIndex > -1) {
-        player.inventory.treasures.splice(whetstoneIndex, 1);
+      if (useResources) {
+        // Check if the player has enough resources
+        if (player.inventory.resources >= 4) {
+          // Deduct the resources
+          player.inventory.resources -= 4;
+        } else {
+          alert("Not enough resources for rank up.");
+          return; // Exit if not enough resources
+        }
       } else {
-        alert('No Whetstone available for rank up.');
-        return; // Exit if no Whetstone is found
+        // Remove Whetstone from inventory
+        const whetstoneIndex = player.inventory.treasures.indexOf("Whetstone");
+        if (whetstoneIndex > -1) {
+          player.inventory.treasures.splice(whetstoneIndex, 1);
+        } else {
+          alert("No Whetstone available for rank up.");
+          return; // Exit if no Whetstone is found
+        }
       }
-  
-      // 2. Upgrade the selected item to Rank 2
-      // Assuming you want to update the rank of the item in the player's equipment array
+
+      // Upgrade the selected item to Rank 2
       const itemIndex = player.inventory.equipment.findIndex(
         (item) => item.equipmentName === selectedItemForRankUp.equipmentName
       );
       if (itemIndex > -1) {
         player.inventory.equipment[itemIndex].rank = 2; // Set rank to 2
       }
-  
-      // 3. Update the player data
+
+      // Update the player data
       updatePlayerData(player);
-  
+
       // Close the confirmation modal
       setShowRankUpConfirmation(false);
     }
   };
+
+  const generateRankUpButtons = () => {
+    let buttons = [
+      {
+        text: "Cancel",
+        role: "cancel",
+        cssClass: "secondary",
+        handler: () => setShowRankUpConfirmation(false),
+      },
+    ];
   
+    // Show both options if all prerequisites are met
+    if (rankUpPrereq) {
+      buttons.push({
+        text: "Use and lose Whetstone",
+        role: "confirm",
+        cssClass: "primary",
+        handler: () => confirmRankUp(true),
+      });
+      buttons.push({
+        text: "Use and lose 4 Resources",
+        role: "confirm",
+        cssClass: "primary",
+        handler: () => confirmRankUp(true),
+      });
+    } else {
+      // Show Whetstone option if available
+      if (hasWhetstone) {
+        buttons.push({
+          text: "Use and lose Whetstone",
+          role: "confirm",
+          cssClass: "primary",
+          handler: () => confirmRankUp(true),
+        });
+      }
+  
+      // Show Resources option if available
+      if (hasForge && hasRankUpResources) {
+        buttons.push({
+          text: "Use and lose 4 Resources",
+          role: "confirm",
+          cssClass: "primary",
+          handler: () => confirmRankUp(true),
+        });
+      }
+    }
+  
+    return buttons;
+  };
+  
+
   return (
     <>
-    <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-      <div className="playerMenuContainer">
-        <div className="backButton">
-          <IonIcon icon={arrowBack} onClick={onClose} />
-        </div>
-        <h3>{detailType}</h3>
-        <p>{detailContent}</p>
-        {equipableItems && equipableItems.length > 0 && (
-          <div>
-            <h4>Equipable Items</h4>
-            {equipableItems.map((item: any, index: any) => {
-              // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
-              const slot = item.slot as keyof PlayerInfo["equippedItems"];
-
-              // Check if the item is equipped
-              const isEquipped = player.equippedItems[slot]?.some(
-                (equippedItem) =>
-                  equippedItem.equipmentName === item.equipmentName
-              );
-
-              return (
-                <div key={index} className='equipmentDetails'>
-                  <p>
-                    <strong>Name:</strong> {item.equipmentName}
-                    {isEquipped ? (
-                      <IonButton color="warning">Equipped</IonButton>
-                    ) : (
-                      <IonButton
-                        onClick={() => equipItem(item)}
-                        color="success"
-                      >
-                        Equip
-                      </IonButton>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Rank:</strong> {item.rank}
-                    {rankUpPrereq ? (
-                      <IonButton color="tertiary" onClick={(e) => handleRankUpGear(e, item)}>Rank Up</IonButton>
-                    ) : (
-                      <IonButton color="medium" title={missingRankUp}>
-                        Rank Up
-                      </IonButton>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Slot:</strong> {item.slot}
-                  </p>
-                  <p>
-                    <strong>Set:</strong> {item.set}
-                  </p>
-                  <p>
-                    <strong>Element:</strong> {item.element}
-                    {attunementPrereq ? (
-                      <IonButton color="tertiary" >Attune</IonButton>
-                    ) : (
-                      <IonButton color="medium" title={missingAttunement}>
-                        Attune
-                      </IonButton>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Bonus:</strong> {item.bonus}
-                  </p>
-                </div>
-              );
-            })}
+      <IonModal isOpen={isOpen} onDidDismiss={onClose}>
+        <div className="playerMenuContainer">
+          <div className="backButton">
+            <IonIcon icon={arrowBack} onClick={onClose} />
           </div>
-        )}
-      </div>
-    </IonModal>
-     <IonAlert
-     isOpen={showRankUpConfirmation}
-     onDidDismiss={() => setShowRankUpConfirmation(false)}
-     header={'Rank Up Gear'}
-     message={`Use ${hasWhetstone ? 'Whetstone' : 'Forge'} for rank up? This will remove necessary resources.`}
-     buttons={[
-       {
-         text: 'Cancel',
-         role: 'cancel',
-         cssClass: 'secondary',
-         handler: () => setShowRankUpConfirmation(false)
-       },
-       {
-         text: 'Confirm',
-         handler: () => confirmRankUp()
-       }
-     ]}
-   />
-   </>
+          <h3>{detailType}</h3>
+          <p>{detailContent}</p>
+          {equipableItems && equipableItems.length > 0 && (
+            <div>
+              <h4>Equipable Items</h4>
+              {equipableItems.map((item: any, index: any) => {
+                // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
+                const slot = item.slot as keyof PlayerInfo["equippedItems"];
+
+                // Check if the item is equipped
+                const isEquipped = player.equippedItems[slot]?.some(
+                  (equippedItem) =>
+                    equippedItem.equipmentName === item.equipmentName
+                );
+
+                return (
+                  <div key={index} className="equipmentDetails">
+                    <p>
+                      <strong>Name:</strong> {item.equipmentName}
+                      {isEquipped ? (
+                        <IonButton color="warning">Equipped</IonButton>
+                      ) : (
+                        <IonButton
+                          onClick={() => equipItem(item)}
+                          color="success"
+                        >
+                          Equip
+                        </IonButton>
+                      )}
+                    </p>
+                    <p>
+                      <strong>Rank:</strong> {item.rank}
+                      {rankUpPrereq ? (
+                        <IonButton
+                          color="tertiary"
+                          onClick={(e) => handleRankUpGear(e, item)}
+                        >
+                          Rank Up
+                        </IonButton>
+                      ) : (
+                        <IonButton color="medium" title={missingRankUp}>
+                          Rank Up
+                        </IonButton>
+                      )}
+                    </p>
+                    <p>
+                      <strong>Slot:</strong> {item.slot}
+                    </p>
+                    <p>
+                      <strong>Set:</strong> {item.set}
+                    </p>
+                    <p>
+                      <strong>Element:</strong> {item.element}
+                      {attunementPrereq ? (
+                        <IonButton color="tertiary">Attune</IonButton>
+                      ) : (
+                        <IonButton color="medium" title={missingAttunement}>
+                          Attune
+                        </IonButton>
+                      )}
+                    </p>
+                    <p>
+                      <strong>Bonus:</strong> {item.bonus}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </IonModal>
+
+      <IonAlert
+        isOpen={showRankUpConfirmation}
+        onDidDismiss={() => setShowRankUpConfirmation(false)}
+        header={"Rank Up Gear"}
+        message={"Choose your rank up method:"}
+        buttons={generateRankUpButtons()}
+      />
+    </>
   );
 };
 
