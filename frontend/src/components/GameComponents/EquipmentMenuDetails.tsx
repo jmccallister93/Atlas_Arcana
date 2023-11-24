@@ -28,48 +28,67 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   const elementTypes = ["Fire", "Water", "Wind", "Stone"];
 
   // Function to equip up an item
-  const equipItem = (itemToEquip: EquipmentItem) => {
-    // Check if the item to equip is a weapon
-    if (itemToEquip.slot === 'weapon') {
-      // Increment the player's offense stat by 1
-      const newOffense = player.offense + 1;
-  
-      // Update the player's offense stat
-      const updatedPlayerStats = {
+
+  // EquipmentSlot type
+  type EquipmentSlot = "weapon" | "armor" | "amulet" | "boots" | "gloves";
+
+  // StatUpdate type
+  type StatUpdate = {
+    stat: keyof PlayerInfo;
+    increment: number;
+  };
+
+  // Mapping from slot to stat update
+  const statUpdateMap: Record<EquipmentSlot, StatUpdate> = {
+    weapon: { stat: "offense", increment: 1 },
+    armor: { stat: "defense", increment: 1 },
+    amulet: { stat: "health", increment: 1 },
+    boots: { stat: "movement", increment: 1 },
+    gloves: { stat: "build", increment: 1 },
+  };
+
+  const equipItem = (
+    itemToEquip: EquipmentItem,
+    player: PlayerInfo,
+    updatePlayerData: (player: PlayerInfo) => void
+  ) => {
+    const slot = itemToEquip.slot as EquipmentSlot;
+
+    if (Object.keys(statUpdateMap).includes(slot)) {
+      const update = statUpdateMap[slot];
+      const statKey = update.stat;
+
+      // Here we assert that player[statKey] is a number.
+      const currentStatValue = player[statKey] as number;
+
+      // Update the stat value
+      const newStatValue = currentStatValue + update.increment;
+
+      // Create an updated player object with the new stat and equipped item
+      const updatedPlayer: PlayerInfo = {
         ...player,
-        offense: newOffense,
+        [statKey]: newStatValue,
+        equippedItems: {
+          ...player.equippedItems,
+          [slot]: [itemToEquip],
+        },
       };
-  
-      // Update the equipped items for the current player
-      const updatedEquippedItems = {
-        ...updatedPlayerStats.equippedItems,
-        [itemToEquip.slot]: [itemToEquip],
-      };
-  
-      // Create an updated player object
-      const updatedPlayer = {
-        ...updatedPlayerStats,
-        equippedItems: updatedEquippedItems,
-      };
-  
-      // Use updatePlayerData to update the player's data
+
       updatePlayerData(updatedPlayer);
     } else {
-      // If the item is not a weapon, proceed with the regular equipment process
-      const updatedEquippedItems = {
-        ...player.equippedItems,
-        [itemToEquip.slot]: [itemToEquip],
-      };
-  
-      const updatedPlayer = {
+      // If the item's slot does not match, update only the equipped item
+      const updatedPlayer: PlayerInfo = {
         ...player,
-        equippedItems: updatedEquippedItems,
+        equippedItems: {
+          ...player.equippedItems,
+          [slot]: [itemToEquip],
+        },
       };
-  
+
       updatePlayerData(updatedPlayer);
     }
   };
-  
+
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,
@@ -327,7 +346,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
                   {isEquipped ? (
                     <IonButton color="warning">Equipped</IonButton>
                   ) : (
-                    <IonButton onClick={() => equipItem(item)} color="success">
+                    <IonButton
+                      onClick={() => equipItem(item, player, updatePlayerData)}
+                      color="success"
+                    >
                       Equip
                     </IonButton>
                   )}
