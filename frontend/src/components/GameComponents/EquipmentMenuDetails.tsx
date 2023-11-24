@@ -19,8 +19,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     useState<boolean>(false);
   const [selectedItemForRankUp, setSelectedItemForRankUp] =
     useState<EquipmentItem | null>(null);
-
-    console.log("consider me rendered")
+    const [showAttuneConfirmation, setShowAttuneConfirmation] =
+    useState<boolean>(false);
+  const [selectedItemForAttune, setSelectedItemForAttune] =
+    useState<EquipmentItem | null>(null);
 
   // Function to equip up an item
   const equipItem = (itemToEquip: EquipmentItem) => {
@@ -111,9 +113,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     const hasWhetstone = player.inventory.treasures.includes("Whetstone");
     const hasForge = player.buildings.equipment.forge !== 0;
     const hasResources = player.inventory.resources >= 4;
-    console.log("hasWhetstone", hasWhetstone);
-    console.log("hasForge", player.buildings.equipment.forge);
-    console.log("hasResources", hasResources);
     // Show both options if all prerequisites are met
     if (hasWhetstone && hasForge && hasResources) {
       buttons.push({
@@ -146,6 +145,118 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           role: "confirm",
           cssClass: "primary",
           handler: () => confirmRankUp(true),
+        });
+      }
+    }
+
+    return buttons;
+  };
+
+  // Updated handleRankUpGear to work with a specific item
+  const handleAttuneGear = (
+    event: React.MouseEvent<HTMLIonButtonElement>,
+    item: EquipmentItem
+  ) => {
+    // Directly check prerequisites
+    const hasEmber = player.inventory.treasures.includes("Ember");
+    const hasShrine = player.buildings.equipment.attunementShrine !== 0;
+    const hasResources = player.inventory.resources > 3;
+    const attunePrereq = hasEmber || (hasShrine && hasResources);
+    // Check prerequisites
+    if (attunePrereq) {
+      // Set the selected item
+      setSelectedItemForAttune(item);
+      // Show confirmation modal
+      setShowAttuneConfirmation(true);
+    } else {
+      alert("Cannot Attune. Missing prerequisites");
+    }
+  };
+  // Function to actually perform the rank up
+  const confirmAttune = (useResources: boolean) => {
+    if (selectedItemForAttune && player) {
+      if (useResources) {
+        // Check if the player has enough resources
+        if (player.inventory.resources >= 4) {
+          // Deduct the resources
+          player.inventory.resources -= 4;
+        } else {
+          alert("Not enough resources for attunement.");
+          return; // Exit if not enough resources
+        }
+      } else {
+        // Remove Whetstone from inventory
+        const emberIndex = player.inventory.treasures.indexOf("Ember");
+        if (emberIndex > -1) {
+          player.inventory.treasures.splice(emberIndex, 1);
+        } else {
+          alert("No Ember available for rank up.");
+          return; // Exit if no Whetstone is found
+        }
+      }
+
+      // Upgrade the selected item to Rank 2
+      const itemIndex = player.inventory.equipment.findIndex(
+        (item) => item.equipmentName === selectedItemForAttune.equipmentName
+      );
+      if (itemIndex > -1) {
+        player.inventory.equipment[itemIndex].rank = 2; // Set rank to 2
+      }
+
+      // Update the player data
+      updatePlayerData(player);
+
+      // Close the confirmation modal
+      setShowAttuneConfirmation(false);
+    }
+  };
+  //Generate rank up buttons
+  const generateAttuneButtons = () => {
+    let buttons = [
+      {
+        text: "Cancel",
+        role: "cancel",
+        cssClass: "secondary",
+        handler: () => setShowAttuneConfirmation(false),
+      },
+    ];
+
+    const hasEmber = player.inventory.treasures.includes("Ember");
+    const hasShrine = player.buildings.equipment.attunementShrine !== 0;
+    const hasResources = player.inventory.resources > 3;
+   
+    // Show both options if all prerequisites are met
+    if (hasEmber && hasShrine && hasResources) {
+      buttons.push({
+        text: "Use and lose Ember",
+        role: "confirm",
+        cssClass: "primary",
+        handler: () => confirmAttune(false),
+      });
+      buttons.push({
+        text: "Use and lose 4 Resources",
+        role: "confirm",
+        cssClass: "primary",
+        handler: () => confirmAttune(true),
+      });
+    } else {
+      // Show Whetstone option if available
+      if (hasEmber) {
+        buttons.push({
+          text: "Use and lose Ember",
+          role: "confirm",
+          cssClass: "primary",
+          handler: () => confirmAttune(false),
+        });
+      }
+
+      // Show Resources option if available
+      if (hasShrine && hasResources) {
+        buttons.push({
+          text: "Use and lose 4 Resources",
+          role: "confirm",
+          cssClass: "primary",
+          handler: () => confirmAttune(true),
         });
       }
     }
@@ -203,13 +314,17 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
                 </p>
                 <p>
                   <strong>Element:</strong> {item.element}
-                  {/* {attunementPrereq ? (
-                <IonButton color="tertiary">Attune</IonButton>
-              ) : (
-                <IonButton color="medium" title={missingAttunement}>
-                  Attune
-                </IonButton>
-              )} */}
+                  <IonButton
+                    color={
+                      player.inventory.treasures.includes("Ember")
+                        ? "tertiary"
+                        : "medium"
+                    }
+                    onClick={(e) => handleAttuneGear(e, item)}
+                    disabled={!player.inventory.treasures.includes("Ember")}
+                  >
+                    Attune
+                  </IonButton>
                 </p>
                 <p>
                   <strong>Bonus:</strong> {item.bonus}
@@ -225,6 +340,13 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         header={"Rank Up Gear"}
         message={"Choose your rank up method:"}
         buttons={generateRankUpButtons()}
+      />
+        <IonAlert
+        isOpen={showAttuneConfirmation}
+        onDidDismiss={() => setShowAttuneConfirmation(false)}
+        header={"Attune Gear"}
+        message={"Choose your attunement method:"}
+        buttons={generateAttuneButtons()}
       />
     </>
   );
