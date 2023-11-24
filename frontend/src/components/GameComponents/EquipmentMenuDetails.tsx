@@ -189,22 +189,22 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       alert("Cannot Attune. Missing prerequisites");
     }
   };
-  
-// Attune with Ember
+
+  // Attune with Ember
   const confirmAttuneWithEmber = (emberType: string) => {
     if (selectedItemForAttune && player) {
       const emberIndex = player.inventory.treasures.indexOf(emberType);
       if (emberIndex > -1) {
         player.inventory.treasures.splice(emberIndex, 1);
         const element = emberType.split(" ")[1]; // Extracts the element type from Ember type
-  
+
         const itemIndex = player.inventory.equipment.findIndex(
           (item) => item.equipmentName === selectedItemForAttune.equipmentName
         );
         if (itemIndex > -1) {
           player.inventory.equipment[itemIndex].element = element;
         }
-  
+
         updatePlayerData(player);
         setShowAttuneConfirmation(false);
       } else {
@@ -212,19 +212,19 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       }
     }
   };
-//   Attune with Shrine
+  //   Attune with Shrine
   const confirmAttuneWithShrine = (selectedElement: string) => {
     if (selectedItemForAttune && player) {
       if (player.inventory.resources >= 4) {
         player.inventory.resources -= 4;
-  
+
         const itemIndex = player.inventory.equipment.findIndex(
           (item) => item.equipmentName === selectedItemForAttune.equipmentName
         );
         if (itemIndex > -1) {
           player.inventory.equipment[itemIndex].element = selectedElement;
         }
-  
+
         updatePlayerData(player);
         setShowAttuneConfirmation(false);
         setShowElementSelection(false); // Also close the element selection alert
@@ -233,7 +233,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       }
     }
   };
-  
+
   //Generate rank up buttons
   const generateAttuneButtons = () => {
     let buttons = [
@@ -365,7 +365,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           type: "radio",
           label: element,
           value: element,
-          checked: selectedElementForAttune === element,
         }))}
         buttons={[
           {
@@ -378,10 +377,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
             handler: (element) => {
               // 'data' is an object with keys as the name of the inputs
               console.log(element); // Debugging
-             
+
               confirmAttuneWithShrine(element); // Proceed with attunement using resources
-            }
-          }
+            },
+          },
         ]}
       />
     </>
