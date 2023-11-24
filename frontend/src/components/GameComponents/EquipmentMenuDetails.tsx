@@ -23,31 +23,53 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     useState<boolean>(false);
   const [selectedItemForAttune, setSelectedItemForAttune] =
     useState<EquipmentItem | null>(null);
-
-  const [selectedElementForAttune, setSelectedElementForAttune] = useState<
-    string | null
-  >(null);
   const [showElementSelection, setShowElementSelection] =
     useState<boolean>(false);
   const elementTypes = ["Fire", "Water", "Wind", "Stone"];
 
   // Function to equip up an item
   const equipItem = (itemToEquip: EquipmentItem) => {
-    // Update the equipped items for the current player
-    const updatedEquippedItems = {
-      ...player.equippedItems,
-      [itemToEquip.slot]: [itemToEquip], // Assuming you want to replace the item in the slot
-    };
-
-    // Create an updated player object
-    const updatedPlayer = {
-      ...player,
-      equippedItems: updatedEquippedItems,
-    };
-
-    // Use updatePlayerData to update the player's data
-    updatePlayerData(updatedPlayer);
+    // Check if the item to equip is a weapon
+    if (itemToEquip.slot === 'weapon') {
+      // Increment the player's offense stat by 1
+      const newOffense = player.offense + 1;
+  
+      // Update the player's offense stat
+      const updatedPlayerStats = {
+        ...player,
+        offense: newOffense,
+      };
+  
+      // Update the equipped items for the current player
+      const updatedEquippedItems = {
+        ...updatedPlayerStats.equippedItems,
+        [itemToEquip.slot]: [itemToEquip],
+      };
+  
+      // Create an updated player object
+      const updatedPlayer = {
+        ...updatedPlayerStats,
+        equippedItems: updatedEquippedItems,
+      };
+  
+      // Use updatePlayerData to update the player's data
+      updatePlayerData(updatedPlayer);
+    } else {
+      // If the item is not a weapon, proceed with the regular equipment process
+      const updatedEquippedItems = {
+        ...player.equippedItems,
+        [itemToEquip.slot]: [itemToEquip],
+      };
+  
+      const updatedPlayer = {
+        ...player,
+        equippedItems: updatedEquippedItems,
+      };
+  
+      updatePlayerData(updatedPlayer);
+    }
   };
+  
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,
