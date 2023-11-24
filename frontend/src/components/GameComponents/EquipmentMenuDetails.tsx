@@ -28,6 +28,23 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   const elementTypes = ["Fire", "Water", "Wind", "Stone"];
 
   // Function to equip up an item
+  // Map for rank-based multipliers
+  const rankBonusMap: Record<number, number> = {
+    1: 1,
+    2: 2,
+    3: 3,
+  };
+  // Map for element-based stat bonuses
+  type ElementName = "Fire" | "Water" | "Wind" | "Stone";
+  const elementBonusMap: Record<
+    ElementName,
+    { stat: keyof PlayerInfo; increment: number }
+  > = {
+    Fire: { stat: "offense", increment: 1 },
+    Water: { stat: "health", increment: 1 },
+    Wind: { stat: "movement", increment: 1 },
+    Stone: { stat: "defense", increment: 1 },
+  };
 
   // EquipmentSlot type
   type EquipmentSlot = "weapon" | "armor" | "amulet" | "boots" | "gloves";
@@ -46,25 +63,31 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     boots: { stat: "movement", increment: 1 },
     gloves: { stat: "build", increment: 1 },
   };
-
+  // Equip Item
   const equipItem = (
     itemToEquip: EquipmentItem,
     player: PlayerInfo,
     updatePlayerData: (player: PlayerInfo) => void
   ) => {
     const slot = itemToEquip.slot as EquipmentSlot;
+    const rankMultiplier = rankBonusMap[itemToEquip.rank] || 1;
 
     if (Object.keys(statUpdateMap).includes(slot)) {
       const update = statUpdateMap[slot];
       const statKey = update.stat;
+      const baseIncrement = update.increment * rankMultiplier;
 
-      // Here we assert that player[statKey] is a number.
-      const currentStatValue = player[statKey] as number;
+      let elementIncrement = 0;
+      if (itemToEquip.element in elementBonusMap) {
+        const elementKey = itemToEquip.element as ElementName;
+        const elementUpdate = elementBonusMap[elementKey];
+        elementIncrement =
+          (player[elementUpdate.stat] as number) + elementUpdate.increment;
+      }
 
-      // Update the stat value
-      const newStatValue = currentStatValue + update.increment;
+      const newStatValue =
+        (player[statKey] as number) + baseIncrement + elementIncrement;
 
-      // Create an updated player object with the new stat and equipped item
       const updatedPlayer: PlayerInfo = {
         ...player,
         [statKey]: newStatValue,
@@ -76,7 +99,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
 
       updatePlayerData(updatedPlayer);
     } else {
-      // If the item's slot does not match, update only the equipped item
       const updatedPlayer: PlayerInfo = {
         ...player,
         equippedItems: {
@@ -88,6 +110,49 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       updatePlayerData(updatedPlayer);
     }
   };
+
+  const adjustStatsForEquippedItems = (player: PlayerInfo) => {
+    let adjustedPlayer = { ...player };
+  
+    // Reset stats to base values
+    adjustedPlayer.offense = player.offense;
+    adjustedPlayer.defense = player.defense;
+    adjustedPlayer.health = player.health;
+    adjustedPlayer.movement = player.movement;
+    adjustedPlayer.build = player.build;
+  
+    Object.keys(player.equippedItems).forEach((slotKey) => {
+      const slot = slotKey as keyof PlayerInfo["equippedItems"];
+      const equippedItem = player.equippedItems[slot][0];
+  
+      if (equippedItem) {
+        const rankMultiplier = rankBonusMap[equippedItem.rank] || 1;
+        const update = statUpdateMap[slot as EquipmentSlot];
+  
+        if (update) {
+          const baseIncrement = update.increment * rankMultiplier;
+          // Safely increment the player stats
+          incrementPlayerStat(adjustedPlayer, update.stat, baseIncrement);
+  
+          if (equippedItem.element in elementBonusMap) {
+            const elementUpdate = elementBonusMap[equippedItem.element as ElementName];
+            incrementPlayerStat(adjustedPlayer, elementUpdate.stat, elementUpdate.increment);
+          }
+        }
+      }
+    });
+  
+    return adjustedPlayer;
+  };
+  
+  // Helper function to safely increment player stats
+  function incrementPlayerStat(player: PlayerInfo, stat: keyof PlayerInfo, increment: number) {
+    // Check if the stat is a number and increment it
+    if (typeof player[stat] === 'number') {
+      player[stat] += increment;
+    }
+  }
+  
 
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
@@ -138,6 +203,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       );
       if (itemIndex > -1) {
         player.inventory.equipment[itemIndex].rank = 2; // Set rank to 2
+        // Adjust stats if the item is equipped
+        const updatedPlayer = adjustStatsForEquippedItems(player);
+        updatePlayerData(updatedPlayer);
       }
 
       // Update the player data
@@ -244,6 +312,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         );
         if (itemIndex > -1) {
           player.inventory.equipment[itemIndex].element = element;
+          // Adjust stats if the item is equipped
+          const updatedPlayer = adjustStatsForEquippedItems(player);
+          updatePlayerData(updatedPlayer);
         }
 
         updatePlayerData(player);
@@ -264,6 +335,8 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         );
         if (itemIndex > -1) {
           player.inventory.equipment[itemIndex].element = selectedElement;
+          const updatedPlayer = adjustStatsForEquippedItems(player);
+          updatePlayerData(updatedPlayer);
         }
 
         updatePlayerData(player);

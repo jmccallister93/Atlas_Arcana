@@ -219,7 +219,7 @@ function determineStartingCards(players) {
     }
 
     // Allocate 1 random equipment card
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 1; i++) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     player.inventory.equipment.push(equipmentCards[randomIndex]);
     }
