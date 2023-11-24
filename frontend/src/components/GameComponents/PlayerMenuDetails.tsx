@@ -159,8 +159,6 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
 
     return buttons;
   };
-  console.log("From playermenudetails type:", detailType);
-  console.log("From playermenudetails content:", detailContent);
 
   return (
     <>

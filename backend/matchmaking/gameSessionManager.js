@@ -116,7 +116,7 @@ function initializePlayers(playerData) {
       equipment: {
         armory: 0,
         forge: 1,
-        attunementShrine:0,
+        attunementShrine:1,
         warehouse:0,
       },
       quest: {

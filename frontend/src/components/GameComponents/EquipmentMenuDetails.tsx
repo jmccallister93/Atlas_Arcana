@@ -24,6 +24,13 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   const [selectedItemForAttune, setSelectedItemForAttune] =
     useState<EquipmentItem | null>(null);
 
+  const [selectedElementForAttune, setSelectedElementForAttune] = useState<
+    string | null
+  >(null);
+  const [showElementSelection, setShowElementSelection] =
+    useState<boolean>(false);
+  const elementTypes = ["Fire", "Water", "Wind", "Stone"];
+
   // Function to equip up an item
   const equipItem = (itemToEquip: EquipmentItem) => {
     // Update the equipped items for the current player
@@ -141,7 +148,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       // Show Resources option if available
       if (hasForge && hasResources) {
         buttons.push({
-          text: "Use and lose 4 Resources",
+          text: "Use Forge and lose 4 Resources",
           role: "confirm",
           cssClass: "primary",
           handler: () => confirmRankUp(true),
@@ -182,46 +189,51 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       alert("Cannot Attune. Missing prerequisites");
     }
   };
-  // Function to actually perform the rank up
-  const confirmAttune = (useResources: boolean, emberType?: string) => {
+  
+// Attune with Ember
+  const confirmAttuneWithEmber = (emberType: string) => {
     if (selectedItemForAttune && player) {
-      if (useResources) {
-        // Check if the player has enough resources
-        if (player.inventory.resources >= 4) {
-          // Deduct the resources
-          player.inventory.resources -= 4;
-        } else {
-          alert("Not enough resources for attunement.");
-          return; // Exit if not enough resources
+      const emberIndex = player.inventory.treasures.indexOf(emberType);
+      if (emberIndex > -1) {
+        player.inventory.treasures.splice(emberIndex, 1);
+        const element = emberType.split(" ")[1]; // Extracts the element type from Ember type
+  
+        const itemIndex = player.inventory.equipment.findIndex(
+          (item) => item.equipmentName === selectedItemForAttune.equipmentName
+        );
+        if (itemIndex > -1) {
+          player.inventory.equipment[itemIndex].element = element;
         }
+  
+        updatePlayerData(player);
+        setShowAttuneConfirmation(false);
       } else {
-        // Remove the specific Ember from inventory if used
-        if (emberType) {
-          const emberIndex = player.inventory.treasures.indexOf(emberType);
-          if (emberIndex > -1) {
-            player.inventory.treasures.splice(emberIndex, 1);
-          } else {
-            alert(`No Ember available for attunement.`);
-            return;
-          }
-        }
+        alert(`No ${emberType} available for attunement.`);
       }
-
-      // Upgrade Item to attune
-      const itemIndex = player.inventory.equipment.findIndex(
-        (item) => item.equipmentName === selectedItemForAttune.equipmentName
-      );
-      if (itemIndex > -1) {
-        player.inventory.equipment[itemIndex].rank = 2; // Set rank to 2
-      }
-
-      // Update the player data
-      updatePlayerData(player);
-
-      // Close the confirmation modal
-      setShowAttuneConfirmation(false);
     }
   };
+//   Attune with Shrine
+  const confirmAttuneWithShrine = (selectedElement: string) => {
+    if (selectedItemForAttune && player) {
+      if (player.inventory.resources >= 4) {
+        player.inventory.resources -= 4;
+  
+        const itemIndex = player.inventory.equipment.findIndex(
+          (item) => item.equipmentName === selectedItemForAttune.equipmentName
+        );
+        if (itemIndex > -1) {
+          player.inventory.equipment[itemIndex].element = selectedElement;
+        }
+  
+        updatePlayerData(player);
+        setShowAttuneConfirmation(false);
+        setShowElementSelection(false); // Also close the element selection alert
+      } else {
+        alert("Not enough resources for attunement.");
+      }
+    }
+  };
+  
   //Generate rank up buttons
   const generateAttuneButtons = () => {
     let buttons = [
@@ -251,17 +263,19 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         text: `Use and lose ${emberType}`,
         role: "confirm",
         cssClass: "primary",
-        handler: () => confirmAttune(false, emberType),
+        handler: () => confirmAttuneWithEmber(emberType),
       });
     });
 
-    // Add the option to use resources if available
+    // Add the option to choose an element for attunement
     if (hasShrine && hasResources) {
       buttons.push({
-        text: "Use and lose 4 Resources",
+        text: "Use Attunement Shrine and lose 4 Resources",
         role: "confirm",
         cssClass: "primary",
-        handler: () => confirmAttune(true),
+        handler: () => {
+          setShowElementSelection(true); // Show a new modal for element selection
+        },
       });
     }
 
@@ -314,7 +328,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
                 <p>
                   <strong>Element:</strong> {item.element}
                   <IonButton
-                     color={"tertiary"}
+                    color={"tertiary"}
                     onClick={(e) => handleAttuneGear(e, item)}
                   >
                     Attune
@@ -341,6 +355,34 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         header={"Attune Gear"}
         message={"Choose your attunement method:"}
         buttons={generateAttuneButtons()}
+      />
+      <IonAlert
+        isOpen={showElementSelection}
+        onDidDismiss={() => setShowElementSelection(false)}
+        header={"Select Attunement Element"}
+        inputs={elementTypes.map((element) => ({
+          name: "element",
+          type: "radio",
+          label: element,
+          value: element,
+          checked: selectedElementForAttune === element,
+        }))}
+        buttons={[
+          {
+            text: "Cancel",
+            role: "cancel",
+            handler: () => setShowElementSelection(false),
+          },
+          {
+            text: "OK",
+            handler: (element) => {
+              // 'data' is an object with keys as the name of the inputs
+              console.log(element); // Debugging
+             
+              confirmAttuneWithShrine(element); // Proceed with attunement using resources
+            }
+          }
+        ]}
       />
     </>
   );
