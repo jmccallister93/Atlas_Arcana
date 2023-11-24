@@ -148,7 +148,7 @@ function initializePlayers(playerData) {
     inventory: {
       resources: [],
       equipment: [],
-      treasures: ["Whetstone", "Ember"],
+      treasures: ["Whetstone", "Ember Fire"],
       quests: [],
     },
   }));
