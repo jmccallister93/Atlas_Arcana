@@ -3,23 +3,13 @@ import { IonModal, IonButton, IonIcon, IonAlert } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
 import { EquipmentItem, PlayerInfo } from "./Interfaces";
-import EquipmentMenuDetails from "./EquipmentMenuDetails";
 
-interface PlayerMenuDetailsProps {
-  isOpen: boolean;
-  onClose: () => void;
-  detailType: string;
-  detailContent: string;
+interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
-
-const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
-  isOpen,
-  onClose,
-  detailType,
-  detailContent,
+const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   equipableItems,
   player,
   updatePlayerData,
@@ -29,7 +19,8 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     useState<boolean>(false);
   const [selectedItemForRankUp, setSelectedItemForRankUp] =
     useState<EquipmentItem | null>(null);
-  const [rankUpButtons, setRankUpButtons] = useState();
+
+    console.log("consider me rendered")
 
   // Function to equip up an item
   const equipItem = (itemToEquip: EquipmentItem) => {
@@ -48,7 +39,6 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     // Use updatePlayerData to update the player's data
     updatePlayerData(updatedPlayer);
   };
-
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,
@@ -121,6 +111,9 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
     const hasWhetstone = player.inventory.treasures.includes("Whetstone");
     const hasForge = player.buildings.equipment.forge !== 0;
     const hasResources = player.inventory.resources >= 4;
+    console.log("hasWhetstone", hasWhetstone);
+    console.log("hasForge", player.buildings.equipment.forge);
+    console.log("hasResources", hasResources);
     // Show both options if all prerequisites are met
     if (hasWhetstone && hasForge && hasResources) {
       buttons.push({
@@ -159,42 +152,82 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
 
     return buttons;
   };
-  console.log("From playermenudetails type:", detailType);
-  console.log("From playermenudetails content:", detailContent);
 
   return (
     <>
-      {detailType !== "Equipment Cards" &&
-      detailType !== "Weapon" &&
-      detailType !== "Armor" &&
-      detailType !== "Amulet" &&
-      detailType !== "Boots" &&
-      detailType !== "Gloves" ? (
-        <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-          <div className="playerMenuContainer">
-            <div className="backButton">
-              <IonIcon icon={arrowBack} onClick={onClose} />
-            </div>
-            <h3>{detailType}</h3>
-            <p>{detailContent}</p>
-          </div>
-        </IonModal>
-      ) : (
-        <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-          <div className="playerMenuContainer">
-            <div className="backButton">
-              <IonIcon icon={arrowBack} onClick={onClose} />
-            </div>
-            <EquipmentMenuDetails
-              equipableItems={equipableItems}
-              player={player}
-              updatePlayerData={updatePlayerData}
-            />
-          </div>
-        </IonModal>
-      )}
+      {" "}
+      {equipableItems && equipableItems.length > 0 && (
+        <div>
+          <h4>Equipable Items</h4>
+          {equipableItems.map((item: any, index: any) => {
+            // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
+            const slot = item.slot as keyof PlayerInfo["equippedItems"];
+
+            // Check if the item is equipped
+            const isEquipped = player.equippedItems[slot]?.some(
+              (equippedItem) =>
+                equippedItem.equipmentName === item.equipmentName
+            );
+
+            return (
+              <div key={index} className="equipmentDetails">
+                <p>
+                  <strong>Name:</strong> {item.equipmentName}
+                  {isEquipped ? (
+                    <IonButton color="warning">Equipped</IonButton>
+                  ) : (
+                    <IonButton onClick={() => equipItem(item)} color="success">
+                      Equip
+                    </IonButton>
+                  )}
+                </p>
+                <p>
+                  <strong>Rank:</strong> {item.rank}
+                  <IonButton
+                    color={
+                      player.inventory.treasures.includes("Whetstone")
+                        ? "tertiary"
+                        : "medium"
+                    }
+                    onClick={(e) => handleRankUpGear(e, item)}
+                    disabled={!player.inventory.treasures.includes("Whetstone")}
+                  >
+                    Rank Up
+                  </IonButton>
+                </p>
+                <p>
+                  <strong>Slot:</strong> {item.slot}
+                </p>
+                <p>
+                  <strong>Set:</strong> {item.set}
+                </p>
+                <p>
+                  <strong>Element:</strong> {item.element}
+                  {/* {attunementPrereq ? (
+                <IonButton color="tertiary">Attune</IonButton>
+              ) : (
+                <IonButton color="medium" title={missingAttunement}>
+                  Attune
+                </IonButton>
+              )} */}
+                </p>
+                <p>
+                  <strong>Bonus:</strong> {item.bonus}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}{" "}
+      <IonAlert
+        isOpen={showRankUpConfirmation}
+        onDidDismiss={() => setShowRankUpConfirmation(false)}
+        header={"Rank Up Gear"}
+        message={"Choose your rank up method:"}
+        buttons={generateRankUpButtons()}
+      />
     </>
   );
 };
 
-export default PlayerMenuDetails;
+export default EquipmentMenuDetails;
