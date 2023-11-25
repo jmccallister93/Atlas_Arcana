@@ -63,56 +63,61 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     player: PlayerInfo,
     updatePlayerData: (player: PlayerInfo) => void
   ) => {
+    let updatedPlayer = player;
     const slot = itemToEquip.slot as EquipmentSlot;
 
     if (Object.keys(statUpdateMap).includes(slot)) {
       const update = statUpdateMap[slot];
-      if (itemToEquip.rank > 1) {
+      if (itemToEquip.rank == 2) {
         update.increment = 2;
-      } else if (itemToEquip.rank > 2) {
+      } else if (itemToEquip.rank == 3) {
         update.increment = 3;
       }
+      //   Check which stat to increase based on item type
       const statKey = update.stat;
-      // Here we assert that player[statKey] is a number.
       const currentStatValue = player[statKey] as number;
+      const newStatValue = currentStatValue 
 
-      // Update the stat value
-      const newStatValue = currentStatValue + update.increment;
-
-      // Create an updated player object with the new stat and equipped item
-      const updatedPlayer: PlayerInfo = {
-        ...player,
-        [statKey]: newStatValue,
-        equippedItems: {
-          ...player.equippedItems,
-          [slot]: [itemToEquip],
-        },
-      };
-      updatePlayerData(updatedPlayer);
-    } 
-    // Check and update stats based on the item's element
-    const element = itemToEquip.element;
-    console.log("From equipitem element:", element);
-    if (element && element in elementUpdateMap) {
-      const elementUpdate = elementUpdateMap[element];
-      console.log("From equipitem elementUpdate:", elementUpdate);
-      const elementStatKey = elementUpdate.stat;
-      console.log("From equipitem elementStatKey:", elementStatKey);
-      const currentElementStatValue = player[elementStatKey] as number;
-      console.log(
-        "From equipitem currentElementStatValue:",
-        currentElementStatValue
-      );
-      const newElementStatValue =
-        currentElementStatValue + elementUpdate.increment;
-      console.log("From equipitem newElementStatValue:", newElementStatValue);
-      // Update the player object with the new element-based stat
-      const updatedPlayer: PlayerInfo = {
-        ...player,
-        [elementStatKey]: newElementStatValue,
-      };
-      updatePlayerData(updatedPlayer);
+      if (itemToEquip.element != 'none') {
+        const element = itemToEquip.element;
+        const elementUpdate = elementUpdateMap[element];
+        const elementStatKey = elementUpdate.stat;
+        const elementStatIncrement = elementUpdate.increment;
+        if (statKey === elementStatKey) {
+          const combinedIncrement = newStatValue + elementStatIncrement;
+          updatedPlayer = {
+            ...player,
+            [statKey]: combinedIncrement,
+            equippedItems: {
+              ...player.equippedItems,
+              [slot]: [itemToEquip],
+            },
+          };
+        } else {
+          updatedPlayer = {
+            ...player,
+            [statKey]: newStatValue,
+            [elementStatKey]: elementStatIncrement,
+            equippedItems: {
+              ...player.equippedItems,
+              [slot]: [itemToEquip],
+            },
+          };
+        }
+      } else {
+        updatedPlayer = {
+          ...player,
+          [statKey]: newStatValue,
+          equippedItems: {
+            ...player.equippedItems,
+            [slot]: [itemToEquip],
+          },
+        };
+      }
+      // Check and update stats based on the item's element
     }
+
+    updatePlayerData(updatedPlayer);
   };
   // Unequip Item
   const unequipItem = (
@@ -137,17 +142,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       const updatedPlayer: PlayerInfo = {
         ...player,
         [statKey]: newStatValue,
-        equippedItems: {
-          ...player.equippedItems,
-          [slot]: [],
-        },
-      };
-
-      updatePlayerData(updatedPlayer);
-    } else {
-      // If the item's slot does not affect stats, update only the equipped items
-      const updatedPlayer: PlayerInfo = {
-        ...player,
         equippedItems: {
           ...player.equippedItems,
           [slot]: [],
