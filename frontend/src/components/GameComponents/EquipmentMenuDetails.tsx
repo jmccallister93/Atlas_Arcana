@@ -44,13 +44,13 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     boots: { stat: "movement", increment: 1 },
     gloves: { stat: "build", increment: 1 },
   };
-//   element update type
+  //   element update type
   type ElementUpdate = {
     stat: keyof PlayerInfo;
     increment: number;
   };
-   // Mapping from slot to stat update
-   const elementUpdateMap: Record<string, ElementUpdate> = {
+  // Mapping from slot to stat update
+  const elementUpdateMap: Record<string, ElementUpdate> = {
     Fire: { stat: "offense", increment: 1 },
     Water: { stat: "health", increment: 1 },
     Wind: { stat: "movement", increment: 1 },
@@ -67,18 +67,18 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
 
     if (Object.keys(statUpdateMap).includes(slot)) {
       const update = statUpdateMap[slot];
-      if(itemToEquip.rank > 1){
-        update.increment = 2
-      } else if (itemToEquip.rank > 2){
-        update.increment = 3
+      if (itemToEquip.rank > 1) {
+        update.increment = 2;
+      } else if (itemToEquip.rank > 2) {
+        update.increment = 3;
       }
       const statKey = update.stat;
       // Here we assert that player[statKey] is a number.
       const currentStatValue = player[statKey] as number;
-      
+
       // Update the stat value
       const newStatValue = currentStatValue + update.increment;
-      
+
       // Create an updated player object with the new stat and equipped item
       const updatedPlayer: PlayerInfo = {
         ...player,
@@ -88,31 +88,29 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           [slot]: [itemToEquip],
         },
       };
-
       updatePlayerData(updatedPlayer);
-    } else {
-      // If the item's slot does not match, update only the equipped item
+    } 
+    // Check and update stats based on the item's element
+    const element = itemToEquip.element;
+    console.log("From equipitem element:", element);
+    if (element && element in elementUpdateMap) {
+      const elementUpdate = elementUpdateMap[element];
+      console.log("From equipitem elementUpdate:", elementUpdate);
+      const elementStatKey = elementUpdate.stat;
+      console.log("From equipitem elementStatKey:", elementStatKey);
+      const currentElementStatValue = player[elementStatKey] as number;
+      console.log(
+        "From equipitem currentElementStatValue:",
+        currentElementStatValue
+      );
+      const newElementStatValue =
+        currentElementStatValue + elementUpdate.increment;
+      console.log("From equipitem newElementStatValue:", newElementStatValue);
+      // Update the player object with the new element-based stat
       const updatedPlayer: PlayerInfo = {
         ...player,
-        equippedItems: {
-          ...player.equippedItems,
-          [slot]: [itemToEquip],
-        },
+        [elementStatKey]: newElementStatValue,
       };
-  // Check and update stats based on the item's element
-  const element = itemToEquip.element;
-  if (element && element in elementUpdateMap) {
-    const elementUpdate = elementUpdateMap[element];
-    const elementStatKey = elementUpdate.stat;
-    const currentElementStatValue = player[elementStatKey] as number;
-    const newElementStatValue = currentElementStatValue + elementUpdate.increment;
-
-    // Update the player object with the new element-based stat
-    player = {
-      ...player,
-      [elementStatKey]: newElementStatValue,
-    };
-  }
       updatePlayerData(updatedPlayer);
     }
   };
@@ -209,7 +207,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       );
       if (itemIndex > -1) {
         const currentItem = player.inventory.equipment[itemIndex];
-  
+
         // Ensure the rank is treated as a number and increment it if less than 3
         const currentRank = Number(currentItem.rank);
         if (currentRank < 3) {
