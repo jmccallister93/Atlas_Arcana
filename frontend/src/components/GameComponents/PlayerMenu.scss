@@ -46,13 +46,7 @@
           transition: all 0.3s ease;
         }
   
-        .namedCard {
-          display: flex;
-          background-color: #222222; // Different background for namedCard
-          border-radius: 4px; // Optional: different radius for namedCard
-          padding: 10px;
-          margin-top: 10px; // Space above namedCard
-        }
+ 
       }
   
       .statsCards, .inventoryCards, .buildingCards {
@@ -103,4 +97,15 @@
   .equipmentDetails{
     border: white;
     font-size: 1rem;
+  }
+
+  .namedCard {
+    display: flex;
+    background-color: #222222; // Different background for namedCard
+    border-radius: 4px; // Optional: different radius for namedCard
+    padding: 10px;
+    margin-top: 10px; // Space above namedCard
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }

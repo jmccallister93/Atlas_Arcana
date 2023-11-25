@@ -48,6 +48,20 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const renderInventoryItem = (item: any) => {
     return item && item.length > 0 ? item : "None";
   };
+//   Render treasure cards TO DO 
+  const renderTreasureItem = (items: string[]) => {
+    if (items && items.length > 0) {
+      return items.map((item, index) => (
+        <div className="namedCard" key={index}>
+          {item}
+        </div>
+      ));
+    } else {
+      return <div className="namedCard">None</div>;
+    }
+  };
+  
+  
 
   //Conditional if equipment item is empty
   const renderEquipmentCardItem = (equipment: any) => {
@@ -115,7 +129,6 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     }
   };
 
- 
   // Get and display stats
   const stats = [
     {
@@ -161,7 +174,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       key={item.label}
       onClick={() => handleItemClick(item.label, item.description)}
     >
-      {item.label} <div>{item.value}</div>
+      {item.label} <div className="namedCard">{item.value}</div>
     </div>
   ));
   //   Get and display equipped items
@@ -223,7 +236,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     },
     {
       label: "Treasures",
-      value: renderInventoryItem(player.inventory.treasures),
+      value: renderTreasureItem(player.inventory.treasures),
       description: "Used to alter game situations.",
     },
     {
@@ -238,7 +251,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       key={item.label}
       onClick={() => handleItemClick(item.label, item.description)}
     >
-      {item.label} <div>{item.value}</div>
+      {item.label} <div className="namedCard">{item.value}</div>
     </div>
   ));
   //Get and display buildings

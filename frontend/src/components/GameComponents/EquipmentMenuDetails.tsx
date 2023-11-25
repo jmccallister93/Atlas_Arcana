@@ -56,7 +56,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     Wind: { stat: "movement", increment: 1 },
     Stone: { stat: "defense", increment: 1 },
   };
-
+  // Equip item
   const equipItem = (
     itemToEquip: EquipmentItem,
     player: PlayerInfo,
@@ -64,11 +64,11 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   ) => {
     let updatedPlayer = player;
     const slot = itemToEquip.slot as EquipmentSlot;
-  
+
     if (Object.keys(statUpdateMap).includes(slot)) {
       const update = statUpdateMap[slot];
       let increment = update.increment;
-  
+
       if (itemToEquip.rank == 2) {
         increment = 2;
       } else if (itemToEquip.rank == 3) {
@@ -77,72 +77,72 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       const statKey = update.stat;
       const currentStatValue = player[statKey] as number;
       let newStatValue = currentStatValue + increment;
-  
-      if (itemToEquip.element !== 'none') {
+
+      if (itemToEquip.element !== "none") {
         const element = itemToEquip.element;
         const elementUpdate = elementUpdateMap[element];
         const elementStatKey = elementUpdate.stat;
         const elementStatIncrement = elementUpdate.increment;
-  
+
         if (statKey === elementStatKey) {
           newStatValue += elementStatIncrement;
         } else {
-          (updatedPlayer[elementStatKey] as number) = 
+          (updatedPlayer[elementStatKey] as number) =
             (player[elementStatKey] as number) + elementStatIncrement;
         }
       }
-  
+
       (updatedPlayer[statKey] as number) = newStatValue;
-  
+
       updatedPlayer.equippedItems[slot] = [itemToEquip];
-  
+
       updatePlayerData(updatedPlayer);
     }
   };
-  
+  //   Unequip item
   const unequipItem = (
     itemToUnequip: EquipmentItem,
     player: PlayerInfo,
     updatePlayerData: (player: PlayerInfo) => void
   ) => {
     const slot = itemToUnequip.slot as EquipmentSlot;
-  
+
     if (Object.keys(statUpdateMap).includes(slot)) {
       const update = statUpdateMap[slot];
       let decrement = update.increment;
-  
+
       if (itemToUnequip.rank == 2) {
         decrement += 1;
       } else if (itemToUnequip.rank == 3) {
         decrement += 2;
       }
-  
+
       const statKey = update.stat;
       const currentStatValue = player[statKey] as number;
       let newStatValue = Math.max(currentStatValue - decrement, 0); // Prevent negative values
-  
-      if (itemToUnequip.element !== 'none') {
+
+      if (itemToUnequip.element !== "none") {
         const elementUpdate = elementUpdateMap[itemToUnequip.element];
         const elementStatKey = elementUpdate.stat;
         const elementStatIncrement = elementUpdate.increment;
-  
+
         if (statKey === elementStatKey) {
           newStatValue = Math.max(newStatValue - elementStatIncrement, 0);
         } else {
           (player[elementStatKey] as number) = Math.max(
-            (player[elementStatKey] as number) - elementStatIncrement, 0);
+            (player[elementStatKey] as number) - elementStatIncrement,
+            0
+          );
         }
       }
-  
+
       (player[statKey] as number) = newStatValue;
-  
+
       player.equippedItems[slot] = [];
-  
+
       updatePlayerData(player);
     }
   };
-  
-  
 
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
