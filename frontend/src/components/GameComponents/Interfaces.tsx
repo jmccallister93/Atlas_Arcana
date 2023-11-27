@@ -19,6 +19,16 @@ export interface EquipmentItem {
     bonus: string;
   }
 
+  export interface TreasureItem {
+    treasureName: string;
+    description: string;
+  }
+
+  export interface QuestItem {
+    questName: string;
+    description: string;
+  }
+
 export interface PlayerInfo {
   username: string;
   victoryPoints: number;
@@ -70,9 +80,9 @@ export interface PlayerInfo {
   },
   inventory: {
     resources: any; 
-    equipment:EquipmentItem[]
-    treasures: any[]; 
-    quests: any[]; 
+    equipment:EquipmentItem[];
+    treasures: TreasureItem[]; 
+    quests: QuestItem[]; 
   };
 }
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { IonModal, IonButton, IonList, IonItem, IonLabel } from "@ionic/react";
 import {
   EquipmentItem,
+  QuestItem,
+  TreasureItem,
   GameSessionInfo,
   GameState,
   PlayerInfo,
@@ -32,6 +34,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const [currentEquipableItems, setCurrentEquipableItems] = useState<
     EquipmentItem[]
   >([]);
+  const [currentQuestItem, setCurrentQuestItem] = useState<any>(null);
+  const [currentTreasureItem, setCurrentTreasureItem] = useState<any>(null);
 
   // Need to verify player exists
   if (!player) {
@@ -48,20 +52,16 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const renderInventoryItem = (item: any) => {
     return item && item.length > 0 ? item : "None";
   };
-//   Render treasure cards TO DO 
-  const renderTreasureItem = (items: string[]) => {
-    if (items && items.length > 0) {
-      return items.map((item, index) => (
-        <div key={index}  className="namedCard">
-          {item}
-        </div>
-      ));
-    } else {
-      return <div >None</div>;
-    }
+  //   Render treasure cards TO DO
+  const renderTreasureCardItem = (treasure: any) => {
+    return treasure && treasure.length > 0
+      ? treasure.map((treasure: any, index: any) => (
+          <div className="namedCard" key={index}>
+            {treasure.treasureName}
+          </div>
+        ))
+      : "None";
   };
-  
-  
 
   //Conditional if equipment item is empty
   const renderEquipmentCardItem = (equipment: any) => {
@@ -75,16 +75,11 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   };
 
   //Conditional if inventory item is empty
-  const renderQuestCardDescription = (equipment: any) => {
-    return equipment && equipment.length > 0
-      ? equipment.map((equipment: any, index: any) => (
+  const renderQuestCardItem = (quest: any) => {
+    return quest && quest.length > 0
+      ? quest.map((quest: any, index: any) => (
           <div className="namedCard" key={index}>
-            <div>Name: {equipment.equipmentName}</div>
-            <div>Slot: {equipment.slot}</div>
-            <div>Set: {equipment.set}</div>
-            <div>Element: {equipment.element}</div>
-            <div>Bonus: {equipment.bonus}</div>
-            <div>-------------------------------------</div>
+            {quest.questName}
           </div>
         ))
       : "None";
@@ -236,13 +231,13 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     },
     {
       label: "Treasures",
-      value: renderTreasureItem(player.inventory.treasures),
-      description: "Used to alter game situations.",
+      value: renderTreasureCardItem(player.inventory.treasures),
+      description: player.inventory.treasures,
     },
     {
       label: "Quests",
-      value: renderInventoryItem(player.inventory.quests),
-      description: "Used to gain victory points.",
+      value: renderQuestCardItem(player.inventory.quests),
+      description: player.inventory.quests,
     },
   ];
   const inventoryCards = inventory.map((item) => (
@@ -251,7 +246,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       key={item.label}
       onClick={() => handleItemClick(item.label, item.description)}
     >
-      {item.label} <div >{item.value}</div>
+      {item.label} <div>{item.value}</div>
     </div>
   ));
   //Get and display buildings
@@ -293,11 +288,18 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   ));
 
   // Handling click to call details on item
-  const handleItemClick = (type: string, content: string | EquipmentItem[]) => {
+  const handleItemClick = (
+    type: string,
+    content: string | EquipmentItem[] | any
+  ) => {
     setCurrentDetailType(type);
+   
 
-    // Check if content is an array of EquipmentItem, if so, handle it as equipable items
-    if (
+    if (type === "Quests") {
+      setCurrentQuestItem(content);
+    } else if (type === "Treasures") {
+      setCurrentTreasureItem(content);
+    } else if (
       Array.isArray(content) &&
       content[0] &&
       content[0].hasOwnProperty("equipmentName")
@@ -343,9 +345,12 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         detailType={currentDetailType}
         detailContent={currentDetailContent}
         equipableItems={currentEquipableItems}
+        questItem={currentQuestItem}
+        treasureItem={currentTreasureItem}
         player={player}
         updatePlayerData={updatePlayerData}
       />
+
       <div className="playerMenuContainer">
         <div className="modalHeader">
           <h2>{player?.username}'s Menu</h2>

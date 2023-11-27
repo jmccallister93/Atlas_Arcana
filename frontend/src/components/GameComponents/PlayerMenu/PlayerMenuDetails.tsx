@@ -13,7 +13,8 @@ interface PlayerMenuDetailsProps {
   detailType: string;
   detailContent: string;
   equipableItems?: any[];
-  usableTreasure?: any[];
+  treasureItem?: any[];  // Object for a specific treasure item
+  questItem?: any[];       // Object for a specific quest item
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
@@ -24,36 +25,41 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   detailType,
   detailContent,
   equipableItems,
+  treasureItem,
+  questItem,
   player,
   updatePlayerData,
-  usableTreasure
 }) => {
+
+  console.log("DetailType from pmdetails:",detailType)
+  console.log("treasure from pmdetails:",treasureItem)
+
   return (
     <>
-      {detailType === "Treasure" ? (
+      {detailType === "Treasures" ? (
         <IonModal isOpen={isOpen} onDidDismiss={onClose}>
           <div className="playerMenuContainer">
             <div className="backButton">
               <IonIcon icon={arrowBack} onClick={onClose} />
             </div>
             <TreasureMenuDetails
-              usableTreasure={usableTreasure}
+              treasureItem={treasureItem}
               player={player}
               updatePlayerData={updatePlayerData}
             />
           </div>
         </IonModal>
-      ) : detailType === "Quest" ? (
+      ) : detailType === "Quests" ? (
         <IonModal isOpen={isOpen} onDidDismiss={onClose}>
           <div className="playerMenuContainer">
             <div className="backButton">
               <IonIcon icon={arrowBack} onClick={onClose} />
             </div>
-            {/* <QuestMenuDetails
-             questItems={questItems}
-             player={player}
-             updatePlayerData={updatePlayerData}
-            /> */}
+            <QuestMenuDetails
+              questItem={questItem}
+              player={player}
+              updatePlayerData={updatePlayerData}
+            />
           </div>
         </IonModal>
       ) : detailType !== "Equipment Cards" &&

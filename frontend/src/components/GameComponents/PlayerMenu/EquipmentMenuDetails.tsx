@@ -150,7 +150,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     item: EquipmentItem
   ) => {
     // Directly check prerequisites
-    const hasWhetstone = player.inventory.treasures.includes("Whetstone");
+    const hasWhetstone = player.inventory.treasures.some(
+      (treasure) => treasure.treasureName === "Whetstone"
+    );
     const hasForge = player.buildings.equipment.forge !== 0;
     const hasResources = player.inventory.resources > 3;
     const rankUpPrereq = hasWhetstone || (hasForge && hasResources);
@@ -178,13 +180,16 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         }
       } else {
         // Remove Whetstone from inventory
-        const whetstoneIndex = player.inventory.treasures.indexOf("Whetstone");
+        const whetstoneIndex = player.inventory.treasures.findIndex(
+          (treasure) => treasure.treasureName === "Whetstone"
+        );
         if (whetstoneIndex > -1) {
           player.inventory.treasures.splice(whetstoneIndex, 1);
         } else {
           alert("No Whetstone available for rank up.");
           return; // Exit if no Whetstone is found
         }
+        
       }
 
       // Upgrade the selected item to Rank 2
@@ -222,7 +227,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       },
     ];
 
-    const hasWhetstone = player.inventory.treasures.includes("Whetstone");
+    const hasWhetstone = player.inventory.treasures.some(
+      (treasure) => treasure.treasureName === "Whetstone"
+    );
     const hasForge = player.buildings.equipment.forge !== 0;
     const hasResources = player.inventory.resources >= 4;
     // Show both options if all prerequisites are met
@@ -276,9 +283,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       "Ember Wind",
       "Ember Stone",
     ];
-    const availableEmbers = emberTypes.filter((ember) =>
-      player.inventory.treasures.includes(ember)
-    );
+    const availableEmbers = player.inventory.treasures.filter((treasure) =>
+  emberTypes.includes(treasure.treasureName)
+);
 
     const hasShrine = player.buildings.equipment.attunementShrine !== 0;
     const hasResources = player.inventory.resources > 3;
@@ -298,7 +305,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   // Attune with Ember
   const confirmAttuneWithEmber = (emberType: string) => {
     if (selectedItemForAttune && player) {
-      const emberIndex = player.inventory.treasures.indexOf(emberType);
+      const emberIndex = player.inventory.treasures.findIndex(
+        (treasure) => treasure.treasureName === emberType
+      );
       if (emberIndex > -1) {
         player.inventory.treasures.splice(emberIndex, 1);
         const element = emberType.split(" ")[1]; // Extracts the element type from Ember type
@@ -356,19 +365,21 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       "Ember Wind",
       "Ember Stone",
     ];
-    const availableEmbers = emberTypes.filter((ember) =>
-      player.inventory.treasures.includes(ember)
-    );
+// This is the same as the second scenario, so the same logic applies.
+const availableEmbers = player.inventory.treasures.filter((treasure) =>
+  emberTypes.includes(treasure.treasureName)
+);
+
     const hasShrine = player.buildings.equipment.attunementShrine !== 0;
     const hasResources = player.inventory.resources > 3;
 
     // Add a button for each available Ember type
     availableEmbers.forEach((emberType) => {
       buttons.push({
-        text: `Use and lose ${emberType}`,
+        text: `Use and lose ${emberType.treasureName}`,
         role: "confirm",
         cssClass: "primary",
-        handler: () => confirmAttuneWithEmber(emberType),
+        handler: () => confirmAttuneWithEmber(emberType.treasureName),
       });
     });
 
