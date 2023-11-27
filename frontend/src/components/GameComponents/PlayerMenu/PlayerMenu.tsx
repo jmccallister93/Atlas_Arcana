@@ -5,7 +5,7 @@ import {
   GameSessionInfo,
   GameState,
   PlayerInfo,
-} from "./Interfaces"; // Adjust the path as needed
+} from "../Interfaces"; // Adjust the path as needed
 import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
@@ -52,12 +52,12 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const renderTreasureItem = (items: string[]) => {
     if (items && items.length > 0) {
       return items.map((item, index) => (
-        <div className="namedCard" key={index}>
+        <div key={index}  className="namedCard">
           {item}
         </div>
       ));
     } else {
-      return <div className="namedCard">None</div>;
+      return <div >None</div>;
     }
   };
   
@@ -251,7 +251,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
       key={item.label}
       onClick={() => handleItemClick(item.label, item.description)}
     >
-      {item.label} <div className="namedCard">{item.value}</div>
+      {item.label} <div >{item.value}</div>
     </div>
   ));
   //Get and display buildings

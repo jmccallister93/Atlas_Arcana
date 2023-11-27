@@ -23,7 +23,7 @@ import {
   GameState,
   EquipmentItem
 } from "../../components/GameComponents/Interfaces";
-import PlayerMenu from "../../components/GameComponents/PlayerMenu";
+import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const MultiPlayerGamePage = () => {

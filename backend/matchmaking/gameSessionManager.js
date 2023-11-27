@@ -111,13 +111,13 @@ function initializePlayers(playerData) {
         outpost: 1,
         fortification: 0,
         archerTower: 0,
-        battlement: 0
+        battlement: 0,
       },
       equipment: {
         armory: 0,
         forge: 1,
-        attunementShrine:1,
-        warehouse:0,
+        attunementShrine: 1,
+        warehouse: 0,
       },
       quest: {
         tavern: 0,
@@ -133,7 +133,7 @@ function initializePlayers(playerData) {
       movement: {
         portal: 0,
         road: 0,
-        humanCatapult:0,
+        humanCatapult: 0,
       },
     },
     equippedItems: {
@@ -148,8 +148,17 @@ function initializePlayers(playerData) {
     inventory: {
       resources: [],
       equipment: [],
-      treasures: ["Whetstone", "Ember Fire"],
-      quests: [],
+      treasures: [
+        {
+          treasureName: "Whetstone",
+          description: "Rank up 1 piece of equipment.",
+        },
+        {
+          treasureName: "Ember Fire",
+          description: "Attune 1 piece of equipment to the Fire element.",
+        },
+      ],
+      quests: [{ questName: "Test quest", description: "Here is your quest." }],
     },
   }));
 }
@@ -173,7 +182,7 @@ const equipmentCards = [
     slot: "weapon",
     set: "Slayer",
     element: "none",
-    bonus: "monsters"
+    bonus: "monsters",
   },
   {
     equipmentName: "Duelist's Edge",
@@ -181,7 +190,7 @@ const equipmentCards = [
     slot: "weapon",
     set: "Duelist",
     element: "none",
-    bonus: "players"
+    bonus: "players",
   },
   {
     equipmentName: "Doom Blade",
@@ -189,7 +198,7 @@ const equipmentCards = [
     slot: "weapon",
     set: "Conquerer",
     element: "none",
-    bonus: "titans"
+    bonus: "titans",
   },
   {
     equipmentName: "Guardian's Defender",
@@ -197,7 +206,7 @@ const equipmentCards = [
     slot: "weapon",
     set: "Guardian",
     element: "none",
-    bonus: "defending"
+    bonus: "defending",
   },
   {
     equipmentName: "Striker's Fury",
@@ -205,7 +214,7 @@ const equipmentCards = [
     slot: "weapon",
     set: "Berserker",
     element: "none",
-    bonus: "attacking"
+    bonus: "attacking",
   },
 ];
 // Draw Cards
@@ -220,8 +229,8 @@ function determineStartingCards(players) {
 
     // Allocate 1 random equipment card
     for (let i = 0; i < 1; i++) {
-    const randomIndex = Math.floor(Math.random() * equipmentCards.length);
-    player.inventory.equipment.push(equipmentCards[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * equipmentCards.length);
+      player.inventory.equipment.push(equipmentCards[randomIndex]);
     }
   });
 

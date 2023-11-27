@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonModal, IonButton, IonIcon, IonAlert } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
-import { EquipmentItem, PlayerInfo } from "./Interfaces";
+import { EquipmentItem, PlayerInfo } from "../Interfaces";
 
 interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
