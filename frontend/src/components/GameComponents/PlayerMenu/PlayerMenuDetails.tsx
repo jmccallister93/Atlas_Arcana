@@ -13,8 +13,8 @@ interface PlayerMenuDetailsProps {
   detailType: string;
   detailContent: string;
   equipableItems?: any[];
-  treasureItem?: any[];  // Object for a specific treasure item
-  questItem?: any[];       // Object for a specific quest item
+  treasureItems?: any[];  // Object for a specific treasure item
+  questItems?: any[];       // Object for a specific quest item
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
@@ -25,14 +25,11 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   detailType,
   detailContent,
   equipableItems,
-  treasureItem,
-  questItem,
+  treasureItems,
+  questItems,
   player,
   updatePlayerData,
 }) => {
-
-  console.log("DetailType from pmdetails:",detailType)
-  console.log("treasure from pmdetails:",treasureItem)
 
   return (
     <>
@@ -43,7 +40,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
               <IonIcon icon={arrowBack} onClick={onClose} />
             </div>
             <TreasureMenuDetails
-              treasureItem={treasureItem}
+              treasureItems={treasureItems}
               player={player}
               updatePlayerData={updatePlayerData}
             />
@@ -56,7 +53,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
               <IonIcon icon={arrowBack} onClick={onClose} />
             </div>
             <QuestMenuDetails
-              questItem={questItem}
+              questItems={questItems}
               player={player}
               updatePlayerData={updatePlayerData}
             />

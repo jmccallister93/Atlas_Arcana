@@ -1,25 +1,32 @@
-import { PlayerInfo } from "../Interfaces";
+import { PlayerInfo, QuestItem } from "../Interfaces"; // Assuming QuestItem is the interface for your quest items
 
 interface QuestMenuDetailsProps {
-  questItem?: any;
+  questItems?: any[]; 
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
 const QuestMenuDetails: React.FC<QuestMenuDetailsProps> = ({
-  questItem,
+  questItems,
   player,
   updatePlayerData,
 }) => {
- console.log("From quest item details",questItem)
+  console.log("From quest item details", questItems);
+
   return (
     <>
-      {" "}
       <div>
         <h3>Quest Details</h3>
-        <p><b>{questItem?.questName}</b></p>
-        <p>{questItem?.description}</p>
-        {/* Additional logic for interacting with quests can be added here */}
+        {questItems && questItems.length > 0 ? (
+          questItems.map((item, index) => (
+            <div key={index}>
+              <p><b>{item.questName}</b></p>
+              <p>{item.description}</p>
+            </div>
+          ))
+        ) : (
+          <p>No quests available.</p>
+        )}
       </div>
     </>
   );

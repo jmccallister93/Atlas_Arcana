@@ -34,8 +34,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   const [currentEquipableItems, setCurrentEquipableItems] = useState<
     EquipmentItem[]
   >([]);
-  const [currentQuestItem, setCurrentQuestItem] = useState<any>(null);
-  const [currentTreasureItem, setCurrentTreasureItem] = useState<any>(null);
+  const [currentQuestItem, setCurrentQuestItem] = useState<QuestItem[]>([]);
+  const [currentTreasureItem, setCurrentTreasureItem] = useState<TreasureItem[]>([]);
 
   // Need to verify player exists
   if (!player) {
@@ -296,9 +296,9 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
    
 
     if (type === "Quests") {
-      setCurrentQuestItem(content);
+      setCurrentQuestItem(content as QuestItem[]);
     } else if (type === "Treasures") {
-      setCurrentTreasureItem(content);
+      setCurrentTreasureItem(content as TreasureItem[]);
     } else if (
       Array.isArray(content) &&
       content[0] &&
@@ -345,8 +345,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
         detailType={currentDetailType}
         detailContent={currentDetailContent}
         equipableItems={currentEquipableItems}
-        questItem={currentQuestItem}
-        treasureItem={currentTreasureItem}
+        questItems={currentQuestItem}
+        treasureItems={currentTreasureItem}
         player={player}
         updatePlayerData={updatePlayerData}
       />
