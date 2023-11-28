@@ -1,4 +1,11 @@
 //GAME SESSION MANAGER
+const equipmentCards = require('../gameCards/equipmentCards');
+const elementalCards = require('../gameCards/elementalCards');
+const questCards = require('../gameCards/questCards');
+const titanCards = require('../gameCards/titanCards');
+const treasureCards = require('../gameCards/treasureCards');
+const worldEventCards = require('../gameCards/worldEventCards');
+
 
 const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
@@ -148,17 +155,8 @@ function initializePlayers(playerData) {
     inventory: {
       resources: [],
       equipment: [],
-      treasures: [
-        {
-          treasureName: "Whetstone",
-          description: "Rank up 1 piece of equipment.",
-        },
-        {
-          treasureName: "Ember Fire",
-          description: "Attune 1 piece of equipment to the Fire element.",
-        },
-      ],
-      quests: [{ questName: "Test quest", description: "Here is your quest." }],
+      treasures: [],
+      quests: [],
     },
   }));
 }
@@ -174,52 +172,9 @@ function determineTurnOrder(players) {
   return players;
 }
 
-// equipment cards
-const equipmentCards = [
-  {
-    equipmentName: "Monster's Bane",
-    rank: "1",
-    slot: "weapon",
-    set: "Slayer",
-    element: "none",
-    bonus: "monsters",
-  },
-  {
-    equipmentName: "Duelist's Edge",
-    rank: "1",
-    slot: "weapon",
-    set: "Duelist",
-    element: "none",
-    bonus: "players",
-  },
-  {
-    equipmentName: "Doom Blade",
-    rank: "1",
-    slot: "weapon",
-    set: "Conquerer",
-    element: "none",
-    bonus: "titans",
-  },
-  {
-    equipmentName: "Guardian's Defender",
-    rank: "1",
-    slot: "weapon",
-    set: "Guardian",
-    element: "none",
-    bonus: "defending",
-  },
-  {
-    equipmentName: "Striker's Fury",
-    rank: "1",
-    slot: "weapon",
-    set: "Berserker",
-    element: "none",
-    bonus: "attacking",
-  },
-];
 // Draw Cards
 function determineStartingCards(players) {
-  console.log("from determineStartingCards: ");
+  console.log("from determineStartingCards: ", equipmentCards);
 
   players.forEach((player) => {
     // Allocate 3 resources

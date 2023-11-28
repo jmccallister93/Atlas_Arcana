@@ -32,3 +32,4 @@ const titanCards = [
     stamina: 2,
   },
 ];
+module.exports = titanCards

@@ -170,3 +170,5 @@ const treasureCards = [
     reaction: false
   },
 ];
+
+module.exports = treasureCards

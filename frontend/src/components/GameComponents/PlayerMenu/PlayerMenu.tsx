@@ -66,13 +66,18 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
   //Conditional if equipment item is empty
   const renderEquipmentCardItem = (equipment: any) => {
     return equipment && equipment.length > 0
-      ? equipment.map((equipment: any, index: any) => (
-          <div className="namedCard" key={index}>
-            {equipment.equipmentName}
-          </div>
+      ? equipment.map((equipmentItem: any, index: any) => (
+          equipmentItem ? (
+            <div className="namedCard" key={index}>
+              {equipmentItem.equipmentName}
+            </div>
+          ) : (
+            <div className="namedCard" key={index}>Item Missing</div>
+          )
         ))
       : "None";
   };
+  
 
   //Conditional if inventory item is empty
   const renderQuestCardItem = (quest: any) => {

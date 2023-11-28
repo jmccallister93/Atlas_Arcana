@@ -64,3 +64,5 @@ const worldEventCards = [
     description: "All Tile bonuses provided to Buildings are negated.",
   },
 ];
+
+module.exports = worldEventCards

@@ -100,3 +100,5 @@ const questCards = [
     description: "Use 3 Treasure cards to negatively effect any Player.",
   },
 ];
+
+module.exports = questCards
