@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import p5, { Renderer, Image } from "p5";
 
-import desert from "../../assets/images/GameTiles/desertTile.png";
-import forest from "../../assets/images/GameTiles/forestTile.png";
-import grassland from "../../assets/images/GameTiles/grasslandTile.png";
-import tundra from "../../assets/images/GameTiles/tundraTile.png";
-import oasis from "../../assets/images/GameTiles/oasisTile.png";
+import desert from "../../../assets/images/GameTiles/desertTile.png";
+import forest from "../../../assets/images/GameTiles/forestTile.png";
+import grassland from "../../../assets/images/GameTiles/grasslandTile.png";
+import tundra from "../../../assets/images/GameTiles/tundraTile.png";
+import oasis from "../../../assets/images/GameTiles/oasisTile.png";
 
 const GameBoard: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null);

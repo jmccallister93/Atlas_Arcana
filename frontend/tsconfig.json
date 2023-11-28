@@ -16,6 +16,6 @@
     "noEmit": false,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "../backend/gameBoard/GameBoard.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
