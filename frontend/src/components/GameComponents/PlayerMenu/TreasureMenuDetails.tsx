@@ -1,26 +1,36 @@
+import { IonButton } from "@ionic/react";
 import { PlayerInfo } from "../Interfaces";
 
 interface TreasureMenuDetailsProps {
-    treasureItems?: any;
+  treasureItems?: any;
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
 const TreasureMenuDetails: React.FC<TreasureMenuDetailsProps> = ({
-    treasureItems,
+  treasureItems,
   player,
   updatePlayerData,
 }) => {
-    console.log("From treasue detes:", treasureItems)
+ 
   return (
     <>
-         <div>
+      <div>
         <h3>Treasure Details</h3>
         {treasureItems && treasureItems.length > 0 ? (
-          treasureItems.map((item:any, index:any) => (
+          treasureItems.map((item: any, index: any) => (
             <div key={index}>
-              <p><b>{item.treasureName}</b></p>
+              <p>
+                <b>{item.treasureName}</b>
+              </p>
               <p>{item.description}</p>
+              {item.reaction ? (
+                <p>
+                  Usable as reaction. <IonButton>Use?</IonButton>
+                </p>
+              ) : (
+                <p>Usable on turn.</p>
+              )}
             </div>
           ))
         ) : (

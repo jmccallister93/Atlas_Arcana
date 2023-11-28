@@ -11,7 +11,6 @@ const QuestMenuDetails: React.FC<QuestMenuDetailsProps> = ({
   player,
   updatePlayerData,
 }) => {
-  console.log("From quest item details", questItems);
 
   return (
     <>

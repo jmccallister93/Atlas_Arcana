@@ -1,11 +1,10 @@
 //GAME SESSION MANAGER
-const equipmentCards = require('../gameCards/equipmentCards');
-const elementalCards = require('../gameCards/elementalCards');
-const questCards = require('../gameCards/questCards');
-const titanCards = require('../gameCards/titanCards');
-const treasureCards = require('../gameCards/treasureCards');
-const worldEventCards = require('../gameCards/worldEventCards');
-
+const equipmentCards = require("../gameCards/equipmentCards");
+const elementalCards = require("../gameCards/elementalCards");
+const questCards = require("../gameCards/questCards");
+const titanCards = require("../gameCards/titanCards");
+const treasureCards = require("../gameCards/treasureCards");
+const worldEventCards = require("../gameCards/worldEventCards");
 
 const redis = require("redis");
 const sessionClient = redis.createClient(); // You can use a separate client for session management
@@ -174,8 +173,6 @@ function determineTurnOrder(players) {
 
 // Draw Cards
 function determineStartingCards(players) {
-  console.log("from determineStartingCards: ", equipmentCards);
-
   players.forEach((player) => {
     // Allocate 3 resources
     for (let i = 0; i < 1; i++) {
@@ -186,6 +183,18 @@ function determineStartingCards(players) {
     for (let i = 0; i < 1; i++) {
       const randomIndex = Math.floor(Math.random() * equipmentCards.length);
       player.inventory.equipment.push(equipmentCards[randomIndex]);
+    }
+
+    // Allocate 1 random equipment card
+    for (let i = 0; i < 1; i++) {
+      const randomIndex = Math.floor(Math.random() * questCards.length);
+      player.inventory.quests.push(questCards[randomIndex]);
+    }
+
+    // Allocate 1 random equipment card
+    for (let i = 0; i < 1; i++) {
+      const randomIndex = Math.floor(Math.random() * treasureCards.length);
+      player.inventory.treasures.push(treasureCards[randomIndex]);
     }
   });
 
