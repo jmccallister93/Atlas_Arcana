@@ -149,6 +149,15 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
+      // Check if the item is equipped
+  const isEquipped = Object.values(player.equippedItems).flat().some(
+    equippedItem => equippedItem.equipmentName === item.equipmentName
+  );
+
+  if (isEquipped) {
+    alert("Item must be unequipped to rank up.");
+    return; // Exit the function if the item is equipped
+  }
     // Directly check prerequisites
     const hasWhetstone = player.inventory.treasures.some(
       (treasure) => treasure.treasureName === "Whetstone"
@@ -276,6 +285,15 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
+      // Check if the item is equipped
+  const isEquipped = Object.values(player.equippedItems).flat().some(
+    equippedItem => equippedItem.equipmentName === item.equipmentName
+  );
+
+  if (isEquipped) {
+    alert("Item must be unequipped to attune.");
+    return; // Exit the function if the item is equipped
+  }
     // Directly check prerequisites
     const emberTypes = [
       "Ember Fire",
