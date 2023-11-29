@@ -17,28 +17,22 @@ import oasis from "./GameTiles/oasisTile.png";
 
 interface GameBoardProps {
   gameSessionInfo?: GameSessionInfo;
-  handleTileGridUpdate: any;
+
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo, handleTileGridUpdate }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
   const [width, setWidth] = useState(1080);
   const [height, setHeight] = useState(1080);
   const [tileSizing, setTileSizing] = useState(60);
-  const [tileGrid, setTileGrid] = useState<string[][]>(Array(18).fill(Array(18).fill('')));
 
 
-  // Update seed when gameSessionInfo changes
-  useEffect(() => {
-    if (gameSessionInfo?.gameState.gameBoardSeed !== undefined) {
-      setSeed(gameSessionInfo.gameState.gameBoardSeed);
-    }
-  }, [gameSessionInfo]);
+
 
   // Main UseEffect
   useEffect(() => {
-    if (seed === null) return;
+    if (!gameSessionInfo || !gameSessionInfo.gameState.tileGrid) return;
     const sketch = (p: p5) => {
       let desertImg: Image,
         forestImg: Image,
@@ -59,7 +53,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo, handleTileGridUp
       p.setup = () => {
         p.createCanvas(width, height);
         p.noLoop();
-        p.noiseSeed(seed);
+   
       };
 
       // Draw everything
@@ -67,74 +61,35 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo, handleTileGridUp
         p.background(255);
 
         const tileSize = tileSizing;
-        const tempTileGrid = Array(18)
-          .fill(null)
-          .map(() => Array(18).fill(""));
-        let sequenceIndex = 0; // Index to track the current position in the random sequence
-        const randomSequence = gameSessionInfo?.gameState.randomSequence ?? [];
-        const sequenceLength = randomSequence.length;
+        const tileGrid = gameSessionInfo.gameState.tileGrid;
 
-        for (let x = 0; x * tileSize < width; x++) {
-          for (let y = 0; y * tileSize < height; y++) {
-            if (sequenceIndex >= sequenceLength) {
-              sequenceIndex = 0; // Reset the index if it goes beyond the array length
-            }
+        for (let x = 0; x < 18; x++) {
+          for (let y = 0; y < 18; y++) {
+            let tileType = tileGrid[x + y * 18]; // Calculate the index correctly
 
-            const noiseValue = randomSequence[sequenceIndex++];
-            let tileType = "";
-            if (noiseValue < 0.05) {
-              tileType = "oasis";
-            } else if (noiseValue < 0.25) {
-              tileType = "desert";
-            } else if (noiseValue < 0.5) {
-              tileType = "grassland";
-            } else if (noiseValue < 0.75) {
-              tileType = "tundra";
-            } else {
-              tileType = "forest";
-            }
-            // Update the temporary grid
-            tempTileGrid[x][y] = tileType;
-
-            if (noiseValue < 0.05) {
-              p.image(oasisImg, x * tileSize, y * tileSize, tileSize, tileSize);
-            } else if (noiseValue < 0.25) {
-              p.image(
-                desertImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-              );
-            } else if (noiseValue < 0.5) {
-              p.image(
-                grasslandImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-              );
-            } else if (noiseValue < 0.75) {
-              p.image(
-                tundraImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-              );
-            } else if (noiseValue < 1) {
-              p.image(
-                forestImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-              );
+            switch (tileType) {
+              case 'oasis':
+                p.image(oasisImg, x * tileSize, y * tileSize, tileSize, tileSize);
+                break;
+              case 'desert':
+                p.image(desertImg, x * tileSize, y * tileSize, tileSize, tileSize);
+                break;
+              case 'forest':
+                p.image(forestImg, x * tileSize, y * tileSize, tileSize, tileSize);
+                break;
+              case 'grassland':
+                p.image(grasslandImg, x * tileSize, y * tileSize, tileSize, tileSize);
+                break;
+              case 'tundra':
+                p.image(tundraImg, x * tileSize, y * tileSize, tileSize, tileSize);
+                break;
+              default:
+                // Handle unknown tile types if necessary
+                break;
             }
           }
         }
-        // Update the state outside the drawing loop
-        setTileGrid(tempTileGrid);
+
       };
     };
 
@@ -147,11 +102,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo, handleTileGridUp
         myp5.remove();
       }
     };
-  }, [seed]);
+  }, [gameSessionInfo]);
 
-  useEffect(() => {
-    handleTileGridUpdate(tileGrid)
-  },[tileGrid])
+
 
   return (
     <div className="canvasWrapper">

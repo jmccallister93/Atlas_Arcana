@@ -33,16 +33,46 @@ async function createGameSession(playerOneData, playerTwoData) {
   // Create random seed to be passed
   const gameBoardSeed = Math.floor(Math.random() * 10000);
   // In your createGameSession function or similar place
-function createRandomSequence(length) {
-  const sequence = [];
-  for (let i = 0; i < length; i++) {
-    sequence.push(Math.random()); // Generates a number between 0 and 1
+  function createRandomSequence(length) {
+    const sequence = [];
+    for (let i = 0; i < length; i++) {
+      sequence.push(Math.random()); // Generates a number between 0 and 1
+    }
+    return sequence;
   }
-  return sequence;
-}
 
-// When creating a new game session
-const randomSequence = createRandomSequence(576);
+  // When creating a new game session
+  const randomSequence = createRandomSequence(576);
+
+  // Create tile grid to be sent to the front end
+  
+  const createTileGrid = () => {
+    let gridSize = 576;
+    const tileGrid = [];
+    // Define tile types and their cumulative distribution probabilities
+    const tileTypes = [
+      { type: "oasis", probability: 0.05 },
+      { type: "desert", probability: 0.25 }, // 0.05 + 0.20
+      { type: "forest", probability: 0.50 }, // 0.25 + 0.25
+      { type: "grassland", probability: 0.75 }, // 0.50 + 0.25
+      { type: "tundra", probability: 1.00 } // 0.75 + 0.25
+    ];
+  
+    for (let i = 0; i < gridSize; i++) {
+      // Generate a random number between 0 and 1
+      let randomNum = Math.random();
+      // Determine the tile type based on the random number
+      let tileType = tileTypes.find(tile => randomNum <= tile.probability).type;
+      // Add the determined tile type to the grid
+      tileGrid.push(tileType);
+    }
+  
+    return tileGrid;
+  };
+  
+  const tileGrid = createTileGrid();
+  
+
 
   // NewSession to pass
   const newSession = {
@@ -50,8 +80,9 @@ const randomSequence = createRandomSequence(576);
     players,
     gameState: {
       turnOrder,
-      gameBoardSeed,
-      randomSequence
+      // gameBoardSeed,
+      // randomSequence,
+      tileGrid,
     },
   };
   console.log(

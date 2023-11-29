@@ -107,7 +107,6 @@ const MultiPlayerGamePage = () => {
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
-    console.log(currentPlayer);
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
 
@@ -141,14 +140,10 @@ const MultiPlayerGamePage = () => {
     }
   };
 
-  // Gameboard
-  // Inside MultiPlayerGamePage component
-  const handleTileGridUpdate = (tileGrid: any) => {
-    // Code to send tileGrid to the server
-    // For example, using a WebSocket or HTTP request
-    console.log("Tile grid from multiplayer page:", tileGrid)
-    socket.emit("updateTileGrid", { sessionId, tileGrid });
-  };
+
+
+  console.log(gameState?.gameState.tileGrid)
+  
 
   return (
     <IonPage>
@@ -189,7 +184,6 @@ const MultiPlayerGamePage = () => {
           {" "}
           <GameBoard
             gameSessionInfo={gameState}
-            handleTileGridUpdate={handleTileGridUpdate}
           />
         </div>
         <h4 className="pageHeader">
