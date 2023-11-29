@@ -25,8 +25,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
   const [width, setWidth] = useState(1080);
   const [height, setHeight] = useState(1080);
   const [tileSizing, setTileSizing] = useState(60);
+  const [tileGrid, setTileGrid] = useState<string[][]>(Array(18).fill(Array(18).fill('')));
 
-  console.log("From Game board seed:", seed);
+
   // Update seed when gameSessionInfo changes
   useEffect(() => {
     if (gameSessionInfo?.gameState.gameBoardSeed !== undefined) {
@@ -65,11 +66,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
         p.background(255);
 
         const tileSize = tileSizing;
-
+        const tempTileGrid = Array(18)
+          .fill(null)
+          .map(() => Array(18).fill(""));
         let sequenceIndex = 0; // Index to track the current position in the random sequence
         const randomSequence = gameSessionInfo?.gameState.randomSequence ?? [];
         const sequenceLength = randomSequence.length;
-        console.log(randomSequence)
+
         for (let x = 0; x * tileSize < width; x++) {
           for (let y = 0; y * tileSize < height; y++) {
             if (sequenceIndex >= sequenceLength) {
@@ -77,6 +80,20 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
             }
 
             const noiseValue = randomSequence[sequenceIndex++];
+            let tileType = "";
+            if (noiseValue < 0.05) {
+              tileType = "oasis";
+            } else if (noiseValue < 0.25) {
+              tileType = "desert";
+            } else if (noiseValue < 0.5) {
+              tileType = "grassland";
+            } else if (noiseValue < 0.75) {
+              tileType = "tundra";
+            } else {
+              tileType = "forest";
+            }
+            // Update the temporary grid
+            tempTileGrid[x][y] = tileType;
 
             if (noiseValue < 0.05) {
               p.image(oasisImg, x * tileSize, y * tileSize, tileSize, tileSize);
@@ -115,6 +132,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
             }
           }
         }
+        // Update the state outside the drawing loop
+        setTileGrid(tempTileGrid);
+        console.log(tileGrid);
       };
     };
 
@@ -128,6 +148,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
       }
     };
   }, [seed]);
+
+  console.log(tileGrid);
 
   return (
     <div className="canvasWrapper">
