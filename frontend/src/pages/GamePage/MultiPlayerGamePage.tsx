@@ -45,6 +45,10 @@ const MultiPlayerGamePage = () => {
   );
   const [currentPlayerData, setCurrentPlayerData] = useState<PlayerInfo[]>([]);
 
+  // Turn order and state
+  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(null);
+  const [currentPhase, setCurrentPhase] = useState<string | null>(null);
+
   // Join the game session
   useEffect(() => {
     socket.emit("joinGame", { sessionId });
@@ -140,8 +144,31 @@ const MultiPlayerGamePage = () => {
     }
   };
 
+  // Turn order
+  useEffect(() => {
+    console.log("Game State turn:", gameState?.gameState.turnOrder[0]);
+    setCurrentPlayerTurn(gameState?.gameState.turnOrder[0] ?? null)
+  }, [gameState]);
+  const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
+  // const advancePhase = () => {
+  //   const currentPhaseIndex = phaseOrder.indexOf(gameState.currentPhase);
+  //   const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
 
-  
+  //   const nextPhase = phaseOrder[nextPhaseIndex];
+  //   const isEndOfTurn = nextPhase === phaseOrder[0];
+
+  //   const newState: Partial<GameSessionInfo> = {
+  //     currentPhase: nextPhase,
+  //   };
+
+  //   if (isEndOfTurn) {
+  //     // Logic for end of turn, like advancing the player's turn
+  //     newState.currentTurn = // new current player's turn
+  //   }
+
+  //   // Emit updated state
+  //   emitGameStateUpdate(newState);
+  // };
 
   return (
     <IonPage>
@@ -173,16 +200,14 @@ const MultiPlayerGamePage = () => {
             </div>
           ))}
         </div>
-        <h4 className="pageHeader">Player Turn: </h4>
+        <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
         <h4 className="pageHeader">Game Phase: </h4>
         <h4 className="pageHeader">Turn Number: </h4>
         <h4 className="pageHeader">VP Counts: </h4>
         <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}
-          <GameBoard
-            gameSessionInfo={gameState}
-          />
+          <GameBoard gameSessionInfo={gameState} />
         </div>
         <h4 className="pageHeader">
           Next Phase{" "}

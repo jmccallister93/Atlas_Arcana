@@ -2,9 +2,10 @@ export interface GameSessionInfo {
   sessionId: string;
   gameState: {
     turnOrder: string[];
-    // gameBoardSeed: number;
-    // randomSequence: number[];
     tileGrid: [];
+    currentTurn: string;
+    currentPhase: string;
+    turnsCompleted: number;
   };
   players: PlayerInfo[];
 }

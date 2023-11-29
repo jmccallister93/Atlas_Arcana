@@ -30,22 +30,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   const startingCards = determineStartingCards(players);
 
   // GameBoard
-  // Create random seed to be passed
-  const gameBoardSeed = Math.floor(Math.random() * 10000);
-  // In your createGameSession function or similar place
-  function createRandomSequence(length) {
-    const sequence = [];
-    for (let i = 0; i < length; i++) {
-      sequence.push(Math.random()); // Generates a number between 0 and 1
-    }
-    return sequence;
-  }
-
-  // When creating a new game session
-  const randomSequence = createRandomSequence(576);
-
   // Create tile grid to be sent to the front end
-  
   const createTileGrid = () => {
     let gridSize = 576;
     const tileGrid = [];
@@ -73,16 +58,16 @@ async function createGameSession(playerOneData, playerTwoData) {
   const tileGrid = createTileGrid();
   
 
-
   // NewSession to pass
   const newSession = {
     sessionId,
     players,
     gameState: {
       turnOrder,
-      // gameBoardSeed,
-      // randomSequence,
       tileGrid,
+      currentTurn,
+      currentPhase,
+      turnsCompleted: 0,
     },
   };
   console.log(
