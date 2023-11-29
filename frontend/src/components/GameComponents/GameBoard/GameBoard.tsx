@@ -17,9 +17,10 @@ import oasis from "./GameTiles/oasisTile.png";
 
 interface GameBoardProps {
   gameSessionInfo?: GameSessionInfo;
+  handleTileGridUpdate: any;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo, handleTileGridUpdate }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
   const [width, setWidth] = useState(1080);
@@ -134,7 +135,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
         }
         // Update the state outside the drawing loop
         setTileGrid(tempTileGrid);
-        console.log(tileGrid);
       };
     };
 
@@ -149,7 +149,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
     };
   }, [seed]);
 
-  console.log(tileGrid);
+  useEffect(() => {
+    handleTileGridUpdate(tileGrid)
+  },[tileGrid])
 
   return (
     <div className="canvasWrapper">

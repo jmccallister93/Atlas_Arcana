@@ -21,7 +21,7 @@ import {
   PlayerInfo,
   GameSessionInfo,
   GameState,
-  EquipmentItem
+  EquipmentItem,
 } from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
@@ -40,7 +40,9 @@ const MultiPlayerGamePage = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
   const auth = useAuth();
   // Set the current player based on authxontext
-  const currentPlayer = players.find(player => player.username === auth.username);
+  const currentPlayer = players.find(
+    (player) => player.username === auth.username
+  );
   const [currentPlayerData, setCurrentPlayerData] = useState<PlayerInfo[]>([]);
 
   // Join the game session
@@ -48,28 +50,28 @@ const MultiPlayerGamePage = () => {
     socket.emit("joinGame", { sessionId });
   }, [sessionId]);
 
- // Centralized function to emit game state updates
- const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
-  if (gameState) {
-    const updatedState = {
-      sessionId: gameState.sessionId,
-      newState: {
-        ...gameState,
-        ...updatedData,
-      },
-    };
-    socket.emit("updateGameState", updatedState);
-  }
-};
-  
+  // Centralized function to emit game state updates
+  const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updateGameState", updatedState);
+    }
+  };
+
   // Handle game stateupdate
   useEffect(() => {
     const handleGameStateUpdate = (updatedGameState: any) => {
       console.log("Received updated game state:", updatedGameState);
-  
+
       // Update the entire game state
       setGameState(updatedGameState);
-  
+
       // Check if the updated game state contains player information and update accordingly
       if (updatedGameState && updatedGameState.players) {
         setPlayers(updatedGameState.players);
@@ -100,43 +102,54 @@ const MultiPlayerGamePage = () => {
 
   //Display all players Victory Points
   useEffect(() => {
-    players
-  }, [gameState])
-
+    players;
+  }, [gameState]);
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
-    console.log(currentPlayer)
+    console.log(currentPlayer);
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
- 
- // Function to update player data
- const updatePlayerData = (updatedPlayer: PlayerInfo) => {
-  setGameState((prevState) => {
-    if (!prevState) {
-      return prevState;
+
+  // Function to update player data
+  const updatePlayerData = (updatedPlayer: PlayerInfo) => {
+    setGameState((prevState) => {
+      if (!prevState) {
+        return prevState;
+      }
+
+      const updatedPlayers = prevState.players.map((player) =>
+        player.username === updatedPlayer.username ? updatedPlayer : player
+      );
+
+      // Update the game state with the new players array
+      const newState: GameSessionInfo = {
+        ...prevState,
+        players: updatedPlayers,
+      };
+
+      return newState;
+    });
+
+    // Emit updated player data after state update
+    if (gameState) {
+      emitGameStateUpdate({
+        players: gameState.players.map((player) =>
+          player.username === updatedPlayer.username ? updatedPlayer : player
+        ),
+      });
     }
+  };
 
-    const updatedPlayers = prevState.players.map(player =>
-      player.username === updatedPlayer.username ? updatedPlayer : player
-    );
+  // Gameboard
+  // Inside MultiPlayerGamePage component
+  const handleTileGridUpdate = (tileGrid: any) => {
+    // Code to send tileGrid to the server
+    // For example, using a WebSocket or HTTP request
+    console.log("Tile grid from multiplayer page:", tileGrid)
+    socket.emit("updateTileGrid", { sessionId, tileGrid });
+  };
 
-    // Update the game state with the new players array
-    const newState: GameSessionInfo = {
-      ...prevState,
-      players: updatedPlayers,
-    };
-
-    return newState;
-  });
-
-  // Emit updated player data after state update
-  if (gameState) {
-    emitGameStateUpdate({ players: gameState.players.map(player =>
-      player.username === updatedPlayer.username ? updatedPlayer : player
-    ) });
-  }
-};
   return (
     <IonPage>
       {/* <WelcomeModal
@@ -144,22 +157,18 @@ const MultiPlayerGamePage = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
       /> */}
-        <PlayerMenu
-          isOpen={isPlayerMenuOpen}
-          onClose={() => setIsPlayerMenuOpen(false)}
-          player={currentPlayer}
-          gameState={gameState}
-          updatePlayerData={updatePlayerData}
-        />
+      <PlayerMenu
+        isOpen={isPlayerMenuOpen}
+        onClose={() => setIsPlayerMenuOpen(false)}
+        player={currentPlayer}
+        gameState={gameState}
+        updatePlayerData={updatePlayerData}
+      />
       <IonContent>
         {/* Floating player menu */}
         <div className="actionsMenu">
           <button className="actionsIcon" onClick={togglePlayerMenu}>
-            <IonIcon
-              icon={addCircleOutline}
-              size="large"
-              color="success"
-            />
+            <IonIcon icon={addCircleOutline} size="large" color="success" />
           </button>
         </div>
         <h1 className="pageHeader">Multiplayer Game</h1>
@@ -178,7 +187,10 @@ const MultiPlayerGamePage = () => {
         <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}
-          <GameBoard gameSessionInfo={gameState} />
+          <GameBoard
+            gameSessionInfo={gameState}
+            handleTileGridUpdate={handleTileGridUpdate}
+          />
         </div>
         <h4 className="pageHeader">
           Next Phase{" "}
