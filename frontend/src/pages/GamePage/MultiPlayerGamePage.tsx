@@ -141,8 +141,6 @@ const MultiPlayerGamePage = () => {
   };
 
 
-
-  console.log(gameState?.gameState.tileGrid)
   
 
   return (
