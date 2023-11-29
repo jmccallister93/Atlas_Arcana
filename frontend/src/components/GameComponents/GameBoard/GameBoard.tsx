@@ -14,7 +14,10 @@ import forest from "./GameTiles/forestTile.png";
 import grassland from "./GameTiles/grasslandTile.png";
 import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
-import { IonButton, IonContent, IonModal } from "@ionic/react";
+import { IonButton, IonContent, IonIcon, IonModal } from "@ionic/react";
+import { closeOutline } from "ionicons/icons";
+
+import "./GameBoard.scss";
 
 interface GameBoardProps {
   gameSessionInfo?: GameSessionInfo;
@@ -30,6 +33,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
     type: string;
     x: number;
     y: number;
+    image: string;
+    monsterBonuses: string;
+    buildingBonuses: string;
+    // buildings: string[];
+    // players: string[];
+    // titans: string[];
   }
 
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
@@ -125,6 +134,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
       // Inside your sketch function
 
       p.mousePressed = () => {
+        if (showTileDetails) {
+          // If the modal is open, don't register new clicks
+          return;
+        }
+
         let xIndex = Math.floor(p.mouseX / tileSize);
         let yIndex = Math.floor(p.mouseY / tileSize);
         if (xIndex < 18 && yIndex < 18) {
@@ -145,10 +159,52 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
         myp5.remove();
       }
     };
-  }, [gameSessionInfo]);
+  }, [gameSessionInfo, showTileDetails]);
 
   const onTileSelect = (tileType: string, x: number, y: number) => {
-    setSelectedTile({ type: tileType, x, y });
+    let imageSrc = "";
+    let buildingBonuses = "";
+    let monsterBonuses = "";
+    switch (tileType) {
+      case "oasis":
+        imageSrc = oasis;
+        buildingBonuses = "All tile type bonuses ";
+        monsterBonuses = "+1 All Stats";
+        break;
+      case "desert":
+        imageSrc = desert;
+        buildingBonuses = "None.";
+        monsterBonuses = "+1 Offense";
+        break;
+      case "forest":
+        imageSrc = forest;
+        buildingBonuses = "All buildings cost 1 less Resource to build.";
+        monsterBonuses = "+1 Defense";
+        break;
+      case "grassland":
+        imageSrc = grassland;
+        buildingBonuses = "Resource buildings produce 1 additional Resrouce.";
+        monsterBonuses = "+1 Stamina";
+        break;
+      case "tundra":
+        imageSrc = tundra;
+        buildingBonuses = "All Buildings have +1 Offense & +1 Defense.";
+        monsterBonuses = "+1 Health";
+        break;
+      default:
+        imageSrc = ""; // Default image or leave blank
+        buildingBonuses = "";
+        monsterBonuses = "";
+        break;
+    }
+    setSelectedTile({
+      type: tileType,
+      x,
+      y,
+      image: imageSrc,
+      monsterBonuses: monsterBonuses,
+      buildingBonuses: buildingBonuses,
+    });
     setShowTileDetails(true);
   };
 
@@ -164,14 +220,35 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
         onDidDismiss={() => setShowTileDetails(false)}
       >
         <IonContent>
-          <h2>Tile Details</h2>
+          <div className="modalHeader">
+            <h2>Tile Details</h2>
+            <button
+              className="closeButton"
+              onClick={() => setShowTileDetails(false)}
+            >
+              <IonIcon icon={closeOutline} />
+            </button>
+          </div>
           {selectedTile && (
             <>
-              <p>Type: {selectedTile.type}</p>
+              <img
+                src={selectedTile.image}
+                alt={selectedTile.type}
+                style={{ maxWidth: "45%" }}
+              />
               <p>
-                Coordinates: ({selectedTile.x}, {selectedTile.y})
+                <b>Type:</b> {selectedTile.type}
               </p>
-              {/* Display additional details like bonuses here */}
+
+              <p>
+                <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
+              </p>
+              <p>
+                <b>Building Bonuses:</b> {selectedTile.buildingBonuses}
+              </p>
+              <p>
+                <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
+              </p>
             </>
           )}
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

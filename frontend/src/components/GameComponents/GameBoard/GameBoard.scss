@@ -1,0 +1,19 @@
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    flex-direction: row;
+
+    .closeButton {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ffffff; // Change as needed
+      font-size: 1.5em; // Adjust size as needed
+
+      &:hover {
+        color: #666; // Change as needed
+      }
+    }
+  }
