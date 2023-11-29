@@ -5,9 +5,8 @@ import {
   QuestItem,
   TreasureItem,
   GameSessionInfo,
-  GameState,
   PlayerInfo,
-} from "../Interfaces"; // Adjust the path as needed
+} from "../Interfaces"; 
 import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";

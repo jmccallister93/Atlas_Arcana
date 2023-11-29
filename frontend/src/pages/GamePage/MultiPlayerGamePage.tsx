@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
 import { useLocation } from "react-router";
 
-import GameBoard from "../../../../backend/gameBoard/GameBoard";
+import GameBoard from "../../components/GameComponents/GameBoard/GameBoard";
 import "./MultiPlayerGamePage.scss";
 import { addCircleOutline, arrowForwardCircleOutline } from "ionicons/icons";
 import WelcomeModal from "../../components/GameComponents/WelcomeModal";
@@ -178,7 +178,7 @@ const MultiPlayerGamePage = () => {
         <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}
-          {/* <GameBoard /> */}
+          <GameBoard gameSessionInfo={gameState} />
         </div>
         <h4 className="pageHeader">
           Next Phase{" "}

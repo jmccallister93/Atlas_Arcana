@@ -9,7 +9,7 @@ Windows search Ubuntu
 open terminal - redis-server to start service
 
 # Express Server running in server.js
-To start cd to backend/database
+To start cd to backend/server
 In terminal run node server.js
 
 # Automated testing

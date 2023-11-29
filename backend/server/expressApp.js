@@ -73,4 +73,5 @@ app.get('/getUserId', authMiddleware, async (req, res) => {
   res.json({ userId: req.user._id });
 });
 
+
 module.exports = app;

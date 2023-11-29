@@ -1,7 +1,7 @@
 
 export interface GameSessionInfo {
     sessionId: string;
-    gameState: {  turnOrder: string[] };
+    gameState: {  turnOrder: string[], gameBoardSeed: number };
     players: PlayerInfo[];
   }
 

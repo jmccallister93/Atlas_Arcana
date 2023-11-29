@@ -20,36 +20,26 @@ sessionClient.connect();
 
 // Create a game session
 async function createGameSession(playerOneData, playerTwoData) {
-  // console.log(
-  //   "createGameSession - playerOneId:",
-  //   playerOneData,
-  //   "playerTwoId:",
-  //   playerTwoData
-  // );
   const sessionId = uuidv4();
-  // console.log("Before calling initializePlayers - player IDs:", [
-  //   playerOneData.username,
-  //   playerTwoData.username,
-  // ]);
-  // const players = [playerOneData.username, playerTwoData.username]
-
   // Initialize players with more detailed data
   const players = initializePlayers([playerOneData, playerTwoData]);
-  // console.log("createGameSession - Players array:", players);
-
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
 
   //Determine starting cards
   const startingCards = determineStartingCards(players);
-  // const gameMap = createMap();
-  // const turnOrder = determineTurnOrder(players.map((p) => p.id));
 
+  // GameBoard
+  // Create random seed to be passed
+  const gameBoardSeed = Math.floor(Math.random() * 10000);
+
+  // NewSession to pass
   const newSession = {
     sessionId,
     players,
     gameState: {
       turnOrder,
+      gameBoardSeed,
     },
   };
   console.log(
