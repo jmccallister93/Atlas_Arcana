@@ -32,6 +32,17 @@ async function createGameSession(playerOneData, playerTwoData) {
   // GameBoard
   // Create random seed to be passed
   const gameBoardSeed = Math.floor(Math.random() * 10000);
+  // In your createGameSession function or similar place
+function createRandomSequence(length) {
+  const sequence = [];
+  for (let i = 0; i < length; i++) {
+    sequence.push(Math.random()); // Generates a number between 0 and 1
+  }
+  return sequence;
+}
+
+// When creating a new game session
+const randomSequence = createRandomSequence(576);
 
   // NewSession to pass
   const newSession = {
@@ -40,6 +51,7 @@ async function createGameSession(playerOneData, playerTwoData) {
     gameState: {
       turnOrder,
       gameBoardSeed,
+      randomSequence
     },
   };
   console.log(
