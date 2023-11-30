@@ -2,7 +2,10 @@
 import { IonModal, IonButton, IonContent } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import "./WelcomeModal.scss";
-import { GameSessionInfo, GameState } from '../../components/GameComponents/Interfaces';
+import {
+  GameSessionInfo,
+  GameState,
+} from "../../components/GameComponents/Interfaces";
 
 interface WelcomeModalProps {
   gameState?: GameSessionInfo;
@@ -47,6 +50,15 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({
       })
     );
 
+    const distributingCardsMessage = [
+      {
+        message: "Allocating Resources",
+        delay: 1000,
+      },
+      { message: "Drawing Equipment Cards", delay: 1000 },
+      { message: "Drawing Titan Cards", delay: 1000 },
+    ];
+
     const messageGroups = [
       {
         title: "Welcome to the game",
@@ -55,6 +67,10 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({
       {
         title: "Rolling for turn order...",
         content: turnOrderMessages,
+      },
+      {
+        title: "Distributing Starting Cards...",
+        content: distributingCardsMessage,
       },
       {
         title: "Let's Play!",

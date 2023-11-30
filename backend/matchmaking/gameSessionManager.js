@@ -26,14 +26,14 @@ async function createGameSession(playerOneData, playerTwoData) {
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
   const setCurrentPlayerTurn = (turnOrder) => {
-    return turnOrder[0]
-  }
-  const currentPlayerTurn = setCurrentPlayerTurn(turnOrder)
+    return turnOrder[0];
+  };
+  const currentPlayerTurn = setCurrentPlayerTurn(turnOrder);
 
   // Set starting phase of the game
-  const currentPhase = "Draw"
+  const currentPhase = "Draw";
   //Determine starting cards
-  const startingCards = determineStartingCards(players);
+  const startingEquipmentCards = determineStartingCards(players);
 
   // GameBoard
   // Create tile grid to be sent to the front end
@@ -44,25 +44,28 @@ async function createGameSession(playerOneData, playerTwoData) {
     const tileTypes = [
       { type: "oasis", probability: 0.05 },
       { type: "desert", probability: 0.25 }, // 0.05 + 0.20
-      { type: "forest", probability: 0.50 }, // 0.25 + 0.25
+      { type: "forest", probability: 0.5 }, // 0.25 + 0.25
       { type: "grassland", probability: 0.75 }, // 0.50 + 0.25
-      { type: "tundra", probability: 1.00 } // 0.75 + 0.25
+      { type: "tundra", probability: 1.0 }, // 0.75 + 0.25
     ];
-  
+
     for (let i = 0; i < gridSize; i++) {
       // Generate a random number between 0 and 1
       let randomNum = Math.random();
       // Determine the tile type based on the random number
-      let tileType = tileTypes.find(tile => randomNum <= tile.probability).type;
+      let tileType = tileTypes.find(
+        (tile) => randomNum <= tile.probability
+      ).type;
       // Add the determined tile type to the grid
       tileGrid.push(tileType);
     }
-  
+
     return tileGrid;
   };
-  
   const tileGrid = createTileGrid();
-  
+
+  //Titans
+  const titans = determineStartingTitans(titanCards, players.length);
 
   // NewSession to pass
   const newSession = {
@@ -74,6 +77,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       tileGrid,
       currentPhase,
       turnsCompleted: 0,
+      titans,
     },
   };
   console.log(
@@ -209,21 +213,55 @@ function determineStartingCards(players) {
       player.inventory.equipment.push(equipmentCards[randomIndex]);
     }
 
-    // Allocate 1 random equipment card
-    for (let i = 0; i < 1; i++) {
-      const randomIndex = Math.floor(Math.random() * questCards.length);
-      player.inventory.quests.push(questCards[randomIndex]);
-    }
+    // // Allocate 1 random quest card
+    // for (let i = 0; i < 1; i++) {
+    //   const randomIndex = Math.floor(Math.random() * questCards.length);
+    //   player.inventory.quests.push(questCards[randomIndex]);
+    // }
 
-    // Allocate 1 random equipment card
-    for (let i = 0; i < 1; i++) {
-      const randomIndex = Math.floor(Math.random() * treasureCards.length);
-      player.inventory.treasures.push(treasureCards[randomIndex]);
-    }
+    // // Allocate 1 random treasure card
+    // for (let i = 0; i < 1; i++) {
+    //   const randomIndex = Math.floor(Math.random() * treasureCards.length);
+    //   player.inventory.treasures.push(treasureCards[randomIndex]);
+    // }
+
   });
 
   return players;
 }
+
+//Set Titans to start
+// Set Titans to start
+function determineStartingTitans(titanCards, numberOfPlayers) {
+  // Initialize an empty array to hold the selected titan cards
+  const selectedTitans = [];
+
+  // Determine the number of titan cards to allocate based on the number of players
+  const numberOfTitansToAllocate = determineNumberOfTitans(numberOfPlayers);
+
+  // Allocate random titan cards
+  for (let i = 0; i < numberOfTitansToAllocate; i++) {
+    const randomIndex = Math.floor(Math.random() * titanCards.length);
+    selectedTitans.push(titanCards[randomIndex]);
+    titanCards.splice(randomIndex, 1);
+  }
+
+  return selectedTitans;
+}
+
+// Function to determine the number of titans based on the number of players
+function determineNumberOfTitans(numberOfPlayers) {
+  // Define the logic to determine the number of titans based on players
+  // This is an example, adjust the logic based on your game rules
+  if (numberOfPlayers <= 2) {
+    return 2; // If 2 or fewer players, allocate 1 titan
+  } else if (numberOfPlayers <= 3) {
+    return 3; // If 3 or 4 players, allocate 2 titans
+  } else {
+    return 4; // If more than 4 players, allocate 3 titans
+  }
+}
+
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));

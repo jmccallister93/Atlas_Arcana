@@ -25,7 +25,7 @@ import {
 } from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
-import GameTurnManager from "../../components/GameComponents/GameTurnManager/GameTurnManager";
+import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 
 const MultiPlayerGamePage = () => {
   // Game State

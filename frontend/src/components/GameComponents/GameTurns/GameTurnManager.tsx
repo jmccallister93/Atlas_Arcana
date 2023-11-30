@@ -30,10 +30,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   // Render advance phase for player who's turn it is
   useEffect(() => {
     if (currentPlayer?.username === currentPlayerTurn) {
-      console.log(
-        "Currentplayer turn from render buttons:",
-        currentPlayer.username
-      );
+
       const gamePhaseButtonRender = (
         <h4 className="pageHeader">
           Next Phase{" "}
@@ -115,7 +112,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
 
   return (
     <>
-           <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
+      <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
       <h4 className="pageHeader">
         Game Phase: {gameState?.gameState.currentPhase}
       </h4>
