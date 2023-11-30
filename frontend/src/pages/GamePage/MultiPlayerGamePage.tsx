@@ -25,6 +25,7 @@ import {
 } from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
+import GameTurnManager from "../../components/GameComponents/GameTurnManager/GameTurnManager";
 
 const MultiPlayerGamePage = () => {
   // Game State
@@ -43,14 +44,6 @@ const MultiPlayerGamePage = () => {
   const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
-  const [currentPlayerData, setCurrentPlayerData] = useState<PlayerInfo[]>([]);
-
-  // Turn order and state
-  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(
-    null
-  );
-  const [currentPhase, setCurrentPhase] = useState<string | null>(null);
-  const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
 
   // Join the game session
   useEffect(() => {
@@ -147,99 +140,6 @@ const MultiPlayerGamePage = () => {
     }
   };
 
-  // Turn order
-  useEffect(() => {
-    setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
-
-    
-  }, [gameState]);
-
-  // Render advance phase for player who's turn it is
-  useEffect(() => {
-    if (currentPlayer?.username === currentPlayerTurn) {
-      console.log(
-        "Currentplayer turn from render buttons:",
-        currentPlayer.username
-      );
-      const gamePhaseButtonRender = (
-        <h4 className="pageHeader">
-          Next Phase{" "}
-          <IonIcon
-            icon={arrowForwardCircleOutline}
-            size="large"
-            color="success"
-            onClick={advancePhase}
-          />
-        </h4>
-      );
-      setGamePhaseButton(gamePhaseButtonRender);
-    } else {
-      setGamePhaseButton(null);
-    }
-  }, [currentPlayerTurn, gameState]);
-
-  // Set initial phase
-  useEffect(() => {
-    if (gameSessionInfo && gameSessionInfo.gameState) {
-      setCurrentPhase(gameSessionInfo.gameState.currentPhase);
-    }
-  }, [gameSessionInfo]);
-
-  // Phase order
-  const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
-  const advancePhase = () => {
-    const currentPhaseIndex = phaseOrder.indexOf(
-      gameState?.gameState?.currentPhase ?? phaseOrder[0]
-    );
-    const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
-    const nextPhase = phaseOrder[nextPhaseIndex];
-
-    if (gameState && gameState.gameState) {
-      let nextPlayerTurn = gameState.gameState.currentPlayerTurn;
-
-      // Check if we need to move to the next player
-      if (nextPhase === phaseOrder[0]) {
-        console.log(
-          "Current Player Turn:",
-          gameState.gameState.currentPlayerTurn
-        );
-        console.log("Turn Order:", gameState.gameState.turnOrder);
-
-        const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-          (player) => player === gameState.gameState.currentPlayerTurn
-        );
-
-        // Debugging logs
-        console.log("Current playerindex:", currentPlayerIndex);
-
-        // Handle the case where the current player index is not found
-        if (currentPlayerIndex === -1) {
-          console.error("Current player turn not found in turn order.");
-          // Optionally set a default player or handle this error appropriately
-          return;
-        }
-
-        const nextPlayerIndex =
-          (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-        console.log("Current nextPlayerIndex:", nextPlayerIndex);
-
-        nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
-        console.log("Current nextPlayerTurn:", nextPlayerTurn);
-      }
-
-      const newState = {
-        gameState: {
-          ...gameState.gameState,
-          currentPhase: nextPhase,
-          currentPlayerTurn: nextPlayerTurn, // Ensured to be a string
-        },
-      };
-
-      // Emit updated state
-      emitGameStateUpdate(newState);
-    }
-  };
-
   return (
     <IonPage>
       {/* <WelcomeModal
@@ -270,15 +170,16 @@ const MultiPlayerGamePage = () => {
             </div>
           ))}
         </div>
-        <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
-        <h4 className="pageHeader">
-          Game Phase: {gameState?.gameState.currentPhase}
-        </h4>
-        {gamePhaseButton}
+   
+        <GameTurnManager
+          gameState={gameState}
+          players={players}
+          emitGameStateUpdate={emitGameStateUpdate}
+          currentPlayer={currentPlayer}
+        />
         <h4 className="pageHeader">Turn Number: </h4>
         <h4 className="pageHeader">VP Counts: </h4>
         <h4 className="pageHeader">Timer: </h4>
-
         <div className="gameBoardContainer">
           {" "}
           <GameBoard tileGrid={gameState?.gameState.tileGrid} />
