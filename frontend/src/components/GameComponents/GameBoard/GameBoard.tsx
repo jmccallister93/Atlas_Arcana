@@ -24,6 +24,7 @@ interface GameBoardProps {
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
+  const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
   const [width, setWidth] = useState(1080);
@@ -43,6 +44,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
 
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
+
 
   // Main UseEffect
   useEffect(() => {
@@ -65,14 +67,26 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
 
       // Setup canvas
       p.setup = () => {
-        p.createCanvas(width, height);
+        let canvas = p.createCanvas(width, height); // Create the P5 canvas
         p.noLoop();
+        if (canvasRef.current) {
+          canvas.parent(canvasRef.current); // Assign P5 canvas to the div
+        }
       };
+
+      // Attach a mouse click event listener to the canvas
+      // p.canvas.addEventListener("click", (e) => {
+      //   const rect = p.canvas.getBoundingClientRect();
+      //   mouseCoords.current = {
+      //     x: e.clientX - rect.left,
+      //     y: e.clientY - rect.top,
+      //   };
+      //   handleTileSelection();
+      // });
 
       // Draw everything
       p.draw = () => {
         p.background(255);
-        
 
         for (let x = 0; x < 18; x++) {
           for (let y = 0; y < 18; y++) {
@@ -131,45 +145,49 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
           }
         }
       };
-      // Inside your sketch function
-
-      p.mousePressed = () => {
-        if (showTileDetails) {
-          // If the modal is open, don't register new clicks
-          return;
-        }
-
-        // Check if the click is within the game board boundaries
-        if (
-          p.mouseX >= 0 &&
-          p.mouseX <= width &&
-          p.mouseY >= 0 &&
-          p.mouseY <= height
-        ) {
-          let xIndex = Math.floor(p.mouseX / tileSize);
-          let yIndex = Math.floor(p.mouseY / tileSize);
-          if (xIndex < 18 && yIndex < 18) {
-            const tileIndex = xIndex + yIndex * 18;
-            const tileType = tileGrid[tileIndex];
-            // Function to set the state in React component
-            onTileSelect(tileType, xIndex, yIndex);
-          }
-        }
-      };
     };
 
-    let myp5: p5 | null = null;
+    let myp5 = new p5(sketch);
+    // Attach the click event listener to the div (canvas container)
+    const handleClick = (e: MouseEvent) => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        mouseCoords.current = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        };
+        handleTileSelection();
+      }
+    };
     if (canvasRef.current) {
-      myp5 = new p5(sketch, canvasRef.current);
+      canvasRef.current.addEventListener('click', handleClick);
     }
+
     return () => {
       if (myp5) {
         myp5.remove();
       }
+      if (canvasRef.current) {
+        // Remove the event listener when the component unmounts
+        canvasRef.current.removeEventListener('click', handleTileSelection);
+      }
     };
   }, [tileGrid, showTileDetails]);
+  const handleTileSelection = () => {
+    if (!tileGrid) return
+    const xIndex = Math.floor(mouseCoords.current.x / tileSize);
+    const yIndex = Math.floor(mouseCoords.current.y / tileSize);
 
+    if (xIndex < 18 && yIndex < 18) {
+      const tileIndex = xIndex + yIndex * 18;
+      const tileType = tileGrid[tileIndex];
+      onTileSelect(tileType, xIndex, yIndex);
+    }
+  };
   const onTileSelect = (tileType: string, x: number, y: number) => {
+    // console.log("From on tileSelect tileGrid:", tileGrid)
+    console.log("From on tileSelect x:", x);
+    console.log("From on tileSelect y:", y);
     let imageSrc = "";
     let buildingBonuses = "";
     let monsterBonuses = "";
