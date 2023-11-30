@@ -37,35 +37,36 @@ async function createGameSession(playerOneData, playerTwoData) {
 
   // GameBoard
   // Create tile grid to be sent to the front end
-  const createTileGrid = () => {
-    let gridSize = 576;
-    const tileGrid = [];
-    // Define tile types and their cumulative distribution probabilities
-    const tileTypes = [
-      { type: "oasis", probability: 0.05 },
-      { type: "desert", probability: 0.25 }, // 0.05 + 0.20
-      { type: "forest", probability: 0.5 }, // 0.25 + 0.25
-      { type: "grassland", probability: 0.75 }, // 0.50 + 0.25
-      { type: "tundra", probability: 1.0 }, // 0.75 + 0.25
-    ];
+// Create tile grid to be sent to the front end
+const createTileGrid = () => {
+  let gridSize = 18; // 18x18 grid
+  const tileGrid = new Array(gridSize).fill(null).map(() => new Array(gridSize).fill(null));
+  // Define tile types and their cumulative distribution probabilities
+  const tileTypes = [
+    { type: "oasis", probability: 0.05 },
+    { type: "desert", probability: 0.25 },
+    { type: "forest", probability: 0.5 },
+    { type: "grassland", probability: 0.75 },
+    { type: "tundra", probability: 1.0 },
+  ];
 
-    for (let i = 0; i < gridSize; i++) {
-      // Generate a random number between 0 and 1
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
       let randomNum = Math.random();
-      // Determine the tile type based on the random number
-      let tileType = tileTypes.find(
-        (tile) => randomNum <= tile.probability
-      ).type;
-      // Add the determined tile type to the grid
-      tileGrid.push(tileType);
+      let tileType = tileTypes.find((tile) => randomNum <= tile.probability).type;
+      tileGrid[i][j] = tileType;
     }
+  }
 
-    return tileGrid;
-  };
+  return tileGrid;
+};
+
   const tileGrid = createTileGrid();
+
 
   //Titans
   const titans = determineStartingTitans(titanCards, players.length);
+  const { tileGridWithTitans, titanPositions } = placeTitansOnGrid(tileGrid, titans);
 
   // NewSession to pass
   const newSession = {
@@ -78,6 +79,8 @@ async function createGameSession(playerOneData, playerTwoData) {
       currentPhase,
       turnsCompleted: 0,
       titans,
+      titanPositions,
+      tileGridWithTitans,
     },
   };
   console.log(
@@ -230,7 +233,6 @@ function determineStartingCards(players) {
   return players;
 }
 
-//Set Titans to start
 // Set Titans to start
 function determineStartingTitans(titanCards, numberOfPlayers) {
   // Initialize an empty array to hold the selected titan cards
@@ -260,6 +262,45 @@ function determineNumberOfTitans(numberOfPlayers) {
   } else {
     return 4; // If more than 4 players, allocate 3 titans
   }
+}
+
+// Function to place Titans on the grid
+function placeTitansOnGrid(tileGrid, titans) {
+  const gridSize = tileGrid.length;
+  const titanPositions = [];
+
+  for (const titan of titans) {
+    let positionFound = false;
+    while (!positionFound) {
+      let row = getRandomInt(3, gridSize - 4); // Avoid edges
+      let col = getRandomInt(3, gridSize - 4); // Avoid edges
+
+      if (isPositionValid(tileGrid, row, col, titanPositions)) {
+        titanPositions.push({ titan, row, col });
+        tileGrid[row][col] = 'Titan'; // Or any identifier for Titan
+        positionFound = true;
+      }
+    }
+  }
+
+  return { tileGrid, titanPositions };
+}
+
+// Helper function to get random integer within range
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Function to check if the position is valid
+function isPositionValid(tileGrid, row, col, titanPositions) {
+  // Check proximity to other titans
+  for (const pos of titanPositions) {
+    if (Math.abs(pos.row - row) <= 6 && Math.abs(pos.col - col) <= 6) {
+      return false; // Too close to another titan
+    }
+  }
+  // Add any other validation checks as needed
+  return true;
 }
 
 // Function to handle player disconnection

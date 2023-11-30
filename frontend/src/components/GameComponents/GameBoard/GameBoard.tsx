@@ -1,14 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import p5, { Image } from "p5";
-
-import {
-  EquipmentItem,
-  QuestItem,
-  TreasureItem,
-  GameSessionInfo,
-  PlayerInfo,
-} from "../Interfaces";
-
 import desert from "./GameTiles/desertTile.png";
 import forest from "./GameTiles/forestTile.png";
 import grassland from "./GameTiles/grasslandTile.png";
@@ -20,7 +11,7 @@ import { closeOutline } from "ionicons/icons";
 import "./GameBoard.scss";
 
 interface GameBoardProps {
-  tileGrid?: string[];
+  tileGrid?: string[][];
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
@@ -88,9 +79,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
       p.draw = () => {
         p.background(255);
 
-        for (let x = 0; x < 18; x++) {
-          for (let y = 0; y < 18; y++) {
-            let tileType = tileGrid[x + y * 18]; // Calculate the index correctly
+        for (let x = 0; x < tileGrid.length; x++) {
+          for (let y = 0; y < tileGrid[x].length; y++) {
+            let tileType = tileGrid[x][y]; 
 
             switch (tileType) {
               case "oasis":
@@ -173,17 +164,30 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
       }
     };
   }, [tileGrid, showTileDetails]);
+
+  // Handle tile selection
+  // const handleTileSelection = () => {
+  //   if (!tileGrid) return
+  //   const xIndex = Math.floor(mouseCoords.current.x / tileSize);
+  //   const yIndex = Math.floor(mouseCoords.current.y / tileSize);
+
+  //   if (xIndex < 18 && yIndex < 18) {
+  //     const tileIndex = xIndex + yIndex * 18;
+  //     const tileType = tileGrid[tileIndex];
+  //     onTileSelect(tileType, xIndex, yIndex);
+  //   }
+  // };
   const handleTileSelection = () => {
-    if (!tileGrid) return
+    if (!tileGrid) return;
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
     const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-
-    if (xIndex < 18 && yIndex < 18) {
-      const tileIndex = xIndex + yIndex * 18;
-      const tileType = tileGrid[tileIndex];
+  
+    if (xIndex < tileGrid.length && yIndex < tileGrid[0].length) {
+      const tileType = tileGrid[xIndex][yIndex];
       onTileSelect(tileType, xIndex, yIndex);
     }
   };
+  
   const onTileSelect = (tileType: string, x: number, y: number) => {
     let imageSrc = "";
     let buildingBonuses = "";
