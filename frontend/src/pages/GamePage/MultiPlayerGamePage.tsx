@@ -236,7 +236,7 @@ const MultiPlayerGamePage = () => {
    
         <div className="gameBoardContainer">
           {" "}
-          <GameBoard gameSessionInfo={gameState} />
+          <GameBoard tileGrid={gameState?.gameState.tileGrid} />
         </div>
       </IonContent>
     </IonPage>

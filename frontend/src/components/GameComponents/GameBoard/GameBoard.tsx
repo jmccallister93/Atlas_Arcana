@@ -20,10 +20,10 @@ import { closeOutline } from "ionicons/icons";
 import "./GameBoard.scss";
 
 interface GameBoardProps {
-  gameSessionInfo?: GameSessionInfo;
+  tileGrid?: string[];
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
   const [width, setWidth] = useState(1080);
@@ -46,7 +46,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
 
   // Main UseEffect
   useEffect(() => {
-    if (!gameSessionInfo || !gameSessionInfo.gameState.tileGrid) return;
+    if (!tileGrid) return;
     const sketch = (p: p5) => {
       let desertImg: Image,
         forestImg: Image,
@@ -72,7 +72,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
       // Draw everything
       p.draw = () => {
         p.background(255);
-        const tileGrid = gameSessionInfo.gameState.tileGrid;
+        
 
         for (let x = 0; x < 18; x++) {
           for (let y = 0; y < 18; y++) {
@@ -139,13 +139,21 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
           return;
         }
 
-        let xIndex = Math.floor(p.mouseX / tileSize);
-        let yIndex = Math.floor(p.mouseY / tileSize);
-        if (xIndex < 18 && yIndex < 18) {
-          const tileIndex = xIndex + yIndex * 18;
-          const tileType = gameSessionInfo.gameState.tileGrid[tileIndex];
-          // Function to set the state in React component
-          onTileSelect(tileType, xIndex, yIndex);
+        // Check if the click is within the game board boundaries
+        if (
+          p.mouseX >= 0 &&
+          p.mouseX <= width &&
+          p.mouseY >= 0 &&
+          p.mouseY <= height
+        ) {
+          let xIndex = Math.floor(p.mouseX / tileSize);
+          let yIndex = Math.floor(p.mouseY / tileSize);
+          if (xIndex < 18 && yIndex < 18) {
+            const tileIndex = xIndex + yIndex * 18;
+            const tileType = tileGrid[tileIndex];
+            // Function to set the state in React component
+            onTileSelect(tileType, xIndex, yIndex);
+          }
         }
       };
     };
@@ -159,7 +167,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameSessionInfo }) => {
         myp5.remove();
       }
     };
-  }, [gameSessionInfo, showTileDetails]);
+  }, [tileGrid, showTileDetails]);
 
   const onTileSelect = (tileType: string, x: number, y: number) => {
     let imageSrc = "";
