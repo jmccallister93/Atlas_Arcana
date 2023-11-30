@@ -185,9 +185,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
     }
   };
   const onTileSelect = (tileType: string, x: number, y: number) => {
-    // console.log("From on tileSelect tileGrid:", tileGrid)
-    console.log("From on tileSelect x:", x);
-    console.log("From on tileSelect y:", y);
     let imageSrc = "";
     let buildingBonuses = "";
     let monsterBonuses = "";

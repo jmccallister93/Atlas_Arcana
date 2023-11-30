@@ -50,6 +50,9 @@ const MultiPlayerGamePage = () => {
     null
   );
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
+  const [gamePhaseButton, setGamePhaseButton] = useState<
+    JSX.Element | null
+  >();
 
   // Join the game session
   useEffect(() => {
@@ -151,6 +154,25 @@ const MultiPlayerGamePage = () => {
     setCurrentPlayerTurn(gameState?.gameState.turnOrder[0] ?? null);
   }, [gameState]);
 
+  useEffect(() => {
+    if (currentPlayer?.username === currentPlayerTurn) {
+      const gamePhaseButtonRender = (
+        <h4 className="pageHeader">
+          Next Phase{" "}
+          <IonIcon
+            icon={arrowForwardCircleOutline}
+            size="large"
+            color="success"
+            onClick={advancePhase}
+          />
+        </h4>
+      );
+      setGamePhaseButton(gamePhaseButtonRender);
+    } else {
+      setGamePhaseButton(null);
+    }
+  }, [currentPlayerTurn]);
+
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
   const advancePhase = () => {
     const currentPhaseIndex = phaseOrder.indexOf(
@@ -218,22 +240,14 @@ const MultiPlayerGamePage = () => {
           ))}
         </div>
         <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
-          <h4 className="pageHeader">
-            Game Phase: {gameState?.gameState.currentPhase}
-          </h4>
-          <h4 className="pageHeader">
-          Next Phase{" "}
-          <IonIcon
-            icon={arrowForwardCircleOutline}
-            size="large"
-            color="success"
-            onClick={advancePhase}
-          />
+        <h4 className="pageHeader">
+          Game Phase: {gameState?.gameState.currentPhase || "Draw"}
         </h4>
+         {gamePhaseButton}
         <h4 className="pageHeader">Turn Number: </h4>
         <h4 className="pageHeader">VP Counts: </h4>
         <h4 className="pageHeader">Timer: </h4>
-   
+
         <div className="gameBoardContainer">
           {" "}
           <GameBoard tileGrid={gameState?.gameState.tileGrid} />
