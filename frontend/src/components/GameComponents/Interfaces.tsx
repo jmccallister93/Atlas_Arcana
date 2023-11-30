@@ -3,7 +3,7 @@ export interface GameSessionInfo {
   gameState: {
     turnOrder: string[];
     tileGrid: [];
-    currentTurn: string;
+    currentPlayerTurn: string;
     currentPhase: string;
     turnsCompleted: number;
   };

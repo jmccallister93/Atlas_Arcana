@@ -46,7 +46,9 @@ const MultiPlayerGamePage = () => {
   const [currentPlayerData, setCurrentPlayerData] = useState<PlayerInfo[]>([]);
 
   // Turn order and state
-  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(null);
+  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(
+    null
+  );
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
 
   // Join the game session
@@ -146,29 +148,44 @@ const MultiPlayerGamePage = () => {
 
   // Turn order
   useEffect(() => {
-    console.log("Game State turn:", gameState?.gameState.turnOrder[0]);
-    setCurrentPlayerTurn(gameState?.gameState.turnOrder[0] ?? null)
+    setCurrentPlayerTurn(gameState?.gameState.turnOrder[0] ?? null);
   }, [gameState]);
+
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
-  // const advancePhase = () => {
-  //   const currentPhaseIndex = phaseOrder.indexOf(gameState.currentPhase);
-  //   const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
+  const advancePhase = () => {
+    const currentPhaseIndex = phaseOrder.indexOf(
+      gameState?.gameState?.currentPhase ?? phaseOrder[0]
+    );
+    const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
+    const nextPhase = phaseOrder[nextPhaseIndex];
 
-  //   const nextPhase = phaseOrder[nextPhaseIndex];
-  //   const isEndOfTurn = nextPhase === phaseOrder[0];
+    if (gameState && gameState.gameState) {
+      let nextPlayerTurn = gameState.gameState.currentPlayerTurn;
 
-  //   const newState: Partial<GameSessionInfo> = {
-  //     currentPhase: nextPhase,
-  //   };
+      const isEndOfTurn = nextPhase === phaseOrder[0];
+      if (isEndOfTurn) {
+        const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
+          (player) => player === gameState.gameState.currentPlayerTurn
+        );
+        const nextPlayerIndex =
+          (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
 
-  //   if (isEndOfTurn) {
-  //     // Logic for end of turn, like advancing the player's turn
-  //     newState.currentTurn = // new current player's turn
-  //   }
+        // Ensure nextPlayerTurn is always a string
+        nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+      }
 
-  //   // Emit updated state
-  //   emitGameStateUpdate(newState);
-  // };
+      const newState = {
+        gameState: {
+          ...gameState.gameState,
+          currentPhase: nextPhase,
+          currentPlayerTurn: nextPlayerTurn, // Ensured to be a string
+        },
+      };
+
+      // Emit updated state
+      emitGameStateUpdate(newState);
+    }
+  };
 
   return (
     <IonPage>
@@ -201,23 +218,26 @@ const MultiPlayerGamePage = () => {
           ))}
         </div>
         <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
-        <h4 className="pageHeader">Game Phase: </h4>
-        <h4 className="pageHeader">Turn Number: </h4>
-        <h4 className="pageHeader">VP Counts: </h4>
-        <h4 className="pageHeader">Timer: </h4>
-        <div className="gameBoardContainer">
-          {" "}
-          <GameBoard gameSessionInfo={gameState} />
-        </div>
-        <h4 className="pageHeader">
+          <h4 className="pageHeader">
+            Game Phase: {gameState?.gameState.currentPhase}
+          </h4>
+          <h4 className="pageHeader">
           Next Phase{" "}
           <IonIcon
             icon={arrowForwardCircleOutline}
             size="large"
             color="success"
-            // onClick={toggleMenu}
+            onClick={advancePhase}
           />
         </h4>
+        <h4 className="pageHeader">Turn Number: </h4>
+        <h4 className="pageHeader">VP Counts: </h4>
+        <h4 className="pageHeader">Timer: </h4>
+   
+        <div className="gameBoardContainer">
+          {" "}
+          <GameBoard gameSessionInfo={gameState} />
+        </div>
       </IonContent>
     </IonPage>
   );

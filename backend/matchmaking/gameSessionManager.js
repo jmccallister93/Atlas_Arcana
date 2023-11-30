@@ -65,8 +65,7 @@ async function createGameSession(playerOneData, playerTwoData) {
     gameState: {
       turnOrder,
       tileGrid,
-      currentTurn,
-      currentPhase,
+
       turnsCompleted: 0,
     },
   };
