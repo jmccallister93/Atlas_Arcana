@@ -25,7 +25,13 @@ async function createGameSession(playerOneData, playerTwoData) {
   const players = initializePlayers([playerOneData, playerTwoData]);
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
+  const setCurrentPlayerTurn = (turnOrder) => {
+    return turnOrder[0]
+  }
+  const currentPlayerTurn = setCurrentPlayerTurn(turnOrder)
 
+  // Set starting phase of the game
+  const currentPhase = "Draw"
   //Determine starting cards
   const startingCards = determineStartingCards(players);
 
@@ -64,8 +70,9 @@ async function createGameSession(playerOneData, playerTwoData) {
     players,
     gameState: {
       turnOrder,
+      currentPlayerTurn,
       tileGrid,
-
+      currentPhase,
       turnsCompleted: 0,
     },
   };

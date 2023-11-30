@@ -50,9 +50,7 @@ const MultiPlayerGamePage = () => {
     null
   );
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
-  const [gamePhaseButton, setGamePhaseButton] = useState<
-    JSX.Element | null
-  >();
+  const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
 
   // Join the game session
   useEffect(() => {
@@ -151,11 +149,18 @@ const MultiPlayerGamePage = () => {
 
   // Turn order
   useEffect(() => {
-    setCurrentPlayerTurn(gameState?.gameState.turnOrder[0] ?? null);
+    setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
+
+    
   }, [gameState]);
 
+  // Render advance phase for player who's turn it is
   useEffect(() => {
     if (currentPlayer?.username === currentPlayerTurn) {
+      console.log(
+        "Currentplayer turn from render buttons:",
+        currentPlayer.username
+      );
       const gamePhaseButtonRender = (
         <h4 className="pageHeader">
           Next Phase{" "}
@@ -171,8 +176,16 @@ const MultiPlayerGamePage = () => {
     } else {
       setGamePhaseButton(null);
     }
-  }, [currentPlayerTurn]);
+  }, [currentPlayerTurn, gameState]);
 
+  // Set initial phase
+  useEffect(() => {
+    if (gameSessionInfo && gameSessionInfo.gameState) {
+      setCurrentPhase(gameSessionInfo.gameState.currentPhase);
+    }
+  }, [gameSessionInfo]);
+
+  // Phase order
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
   const advancePhase = () => {
     const currentPhaseIndex = phaseOrder.indexOf(
@@ -184,16 +197,34 @@ const MultiPlayerGamePage = () => {
     if (gameState && gameState.gameState) {
       let nextPlayerTurn = gameState.gameState.currentPlayerTurn;
 
-      const isEndOfTurn = nextPhase === phaseOrder[0];
-      if (isEndOfTurn) {
+      // Check if we need to move to the next player
+      if (nextPhase === phaseOrder[0]) {
+        console.log(
+          "Current Player Turn:",
+          gameState.gameState.currentPlayerTurn
+        );
+        console.log("Turn Order:", gameState.gameState.turnOrder);
+
         const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
           (player) => player === gameState.gameState.currentPlayerTurn
         );
+
+        // Debugging logs
+        console.log("Current playerindex:", currentPlayerIndex);
+
+        // Handle the case where the current player index is not found
+        if (currentPlayerIndex === -1) {
+          console.error("Current player turn not found in turn order.");
+          // Optionally set a default player or handle this error appropriately
+          return;
+        }
+
         const nextPlayerIndex =
           (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+        console.log("Current nextPlayerIndex:", nextPlayerIndex);
 
-        // Ensure nextPlayerTurn is always a string
         nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+        console.log("Current nextPlayerTurn:", nextPlayerTurn);
       }
 
       const newState = {
@@ -241,9 +272,9 @@ const MultiPlayerGamePage = () => {
         </div>
         <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
         <h4 className="pageHeader">
-          Game Phase: {gameState?.gameState.currentPhase || "Draw"}
+          Game Phase: {gameState?.gameState.currentPhase}
         </h4>
-         {gamePhaseButton}
+        {gamePhaseButton}
         <h4 className="pageHeader">Turn Number: </h4>
         <h4 className="pageHeader">VP Counts: </h4>
         <h4 className="pageHeader">Timer: </h4>
