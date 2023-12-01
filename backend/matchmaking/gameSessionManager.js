@@ -82,8 +82,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       tileGrid, 
       currentPhase,
       turnsCompleted: 0,
-      titans,
-      titanPosition,
+      titans: titanPosition,
     },
   };
   console.log(

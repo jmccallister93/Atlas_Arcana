@@ -7,24 +7,20 @@ export interface GameSessionInfo {
     currentPhase: string;
     turnsCompleted: number;
     titans: TitanInfo[];
-    titanPosition: TitanPosition[],
+    // Removed titanPosition
   };
   players: PlayerInfo[];
 }
 
 export interface TitanInfo {
-  titanName: string,
-  rank: number,
-  health: number,
-  offense: number,
-  defense: number,
-  stamina: number,
-}
-
-export interface TitanPosition {
-  titan: string; 
-  row: number;
-  col: number;
+  titanName: string;
+  rank: number;
+  health: number;
+  offense: number;
+  defense: number;
+  stamina: number;
+  row: number; // Added position information
+  col: number; // Added position information
 }
 
 export interface LocationState {

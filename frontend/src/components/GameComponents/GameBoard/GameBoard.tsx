@@ -7,29 +7,27 @@ import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
 import { IonButton, IonContent, IonIcon, IonModal } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import fireTitanToken from '../Titans/Tokens/fire_titan_token.png'
-import iceTitanToken from '../Titans/Tokens/ice_titan_token.png'
-import stoneTitanToken from '../Titans/Tokens/stone_titan_token.png'
-import stormTitanToken from '../Titans/Tokens/storm_titan_token.png'
+import fireTitanToken from "../Titans/Tokens/fire_titan_token.png";
+import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
+import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
+import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 
 interface GameBoardProps {
   tileGrid?: string[][];
-  titanPositions?: {
-    titan: {
-      defense: number;
-      health: number;
-      offense: number;
-      rank: number;
-      stamina: number;
-      titanName: string;
-    };
+  titans?: {
+    titanName: string;
+    rank: number;
+    health: number;
+    offense: number;
+    defense: number;
+    stamina: number;
     row: number;
     col: number;
   }[];
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
@@ -50,7 +48,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
 
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
-
 
   // Main UseEffect
   useEffect(() => {
@@ -104,7 +101,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
 
         for (let x = 0; x < tileGrid.length; x++) {
           for (let y = 0; y < tileGrid[x].length; y++) {
-            let tileType = tileGrid[x][y]; 
+            let tileType = tileGrid[x][y];
 
             switch (tileType) {
               case "oasis":
@@ -159,9 +156,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
           }
         }
         // Draw titan tokens
-        titanPositions?.forEach(({ titan, row, col }) => {
+        titans?.forEach(({ titanName, row, col }) => {
           let img;
-          switch (titan.titanName) {
+          switch (titanName) {
             case "FireTitan":
               img = fireTitanImg;
               break;
@@ -196,7 +193,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
       }
     };
     if (canvasRef.current) {
-      canvasRef.current.addEventListener('click', handleClick);
+      canvasRef.current.addEventListener("click", handleClick);
     }
 
     return () => {
@@ -205,22 +202,22 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
       }
       if (canvasRef.current) {
         // Remove the event listener when the component unmounts
-        canvasRef.current.removeEventListener('click', handleTileSelection);
+        canvasRef.current.removeEventListener("click", handleTileSelection);
       }
     };
-  }, [tileGrid, showTileDetails, titanPositions]);
+  }, [tileGrid, showTileDetails, titans]);
 
   const handleTileSelection = () => {
     if (!tileGrid) return;
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
     const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-  
+
     if (xIndex < tileGrid.length && yIndex < tileGrid[0].length) {
       const tileType = tileGrid[xIndex][yIndex];
       onTileSelect(tileType, xIndex, yIndex);
     }
   };
-  
+
   const onTileSelect = (tileType: string, x: number, y: number) => {
     let imageSrc = "";
     let buildingBonuses = "";
