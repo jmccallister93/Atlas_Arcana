@@ -31,9 +31,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
-  const [width, setWidth] = useState(1080);
-  const [height, setHeight] = useState(1080);
-  const [tileSize, setTileSize] = useState(60);
+  const [width, setWidth] = useState(720);
+  const [height, setHeight] = useState(720);
+  const [tileSize, setTileSize] = useState(30);
   interface TileInfo {
     type: string;
     x: number;
@@ -85,16 +85,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         }
       };
 
-      // Gradient drawing function
-      function drawGradient(x: any, y: any, w: any, h:any, startColor:any, endColor:any) {
-        // For horizontal gradient, change the 'x' and 'width' in the loop
-        for (let i = y; i <= y + h; i++) {
-          let inter = p.map(i, y, y + h, 0, 1);
-          let c = p.lerpColor(startColor, endColor, inter);
-          p.fill(c);
-          p.rect(x, i, w, 1); // Draw line by line
-        }
-      }
       // Draw everything
       p.draw = () => {
         p.background(255);
@@ -102,9 +92,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         const tileTypeToColor: any = {
           forest: "#095300", // Dark Green
           desert: "#F9DA70", // Sandy Color
-          oasis: "#00CED1", // Dark Turquoise
+          oasis: "#005fcc", // Dark Turquoise
           tundra: "#D9D9D9", // Silver
-          grassland: "#32CD32", // Lime Green
+          grassland: "#00BC53", // Lime Green
         };
 
         for (let x = 0; x < tileGrid.length; x++) {
@@ -223,9 +213,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
     const yIndex = Math.floor(mouseCoords.current.y / tileSize);
 
-    if (xIndex < tileGrid.length && yIndex < tileGrid[0].length) {
+    // Check if the indices are within the bounds of the tileGrid
+    if (
+      xIndex >= 0 &&
+      xIndex < tileGrid.length &&
+      yIndex >= 0 &&
+      yIndex < tileGrid[xIndex].length
+    ) {
       const tileType = tileGrid[xIndex][yIndex];
       onTileSelect(tileType, xIndex, yIndex);
+    } else {
+      // Handle out-of-bounds selection here (e.g., show an error message or do nothing)
+      console.log("Selected tile is out of bounds.");
     }
   };
 
@@ -265,6 +264,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         monsterBonuses = "";
         break;
     }
+      // Handle unknown or undefined tile types
+  if (!imageSrc) {
+    console.error("Unknown tile type selected:", tileType);
+    // Perform any additional error handling here
+    return;
+  }
     setSelectedTile({
       type: tileType,
       x,

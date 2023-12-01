@@ -17,3 +17,16 @@
       }
     }
   }
+
+  .canvasWrapper {
+  max-width: 100vw; /* or any specific width */
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+}
+.canvasContainer{
+ 
+  overflow: auto; /* Enables scrolling */
+  position: relative; /* This helps with the layout */
+ 
+}

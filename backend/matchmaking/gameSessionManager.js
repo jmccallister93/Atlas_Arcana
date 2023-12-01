@@ -38,7 +38,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   // GameBoard
   // Create tile grid to be sent to the front end
   const createTileGrid = () => {
-    let gridSize = 18; // 18x18 grid
+    let gridSize = 24; // 18x18 grid
     const tileGrid = new Array(gridSize)
       .fill(null)
       .map(() => new Array(gridSize).fill(null));
@@ -66,7 +66,7 @@ async function createGameSession(playerOneData, playerTwoData) {
 
   // Grid
   const tileGrid = createTileGrid();
-  const gridSize = 18;
+  const gridSize = 24;
 
   //Titans
   const titans = determineStartingTitans(titanCards, players.length);
