@@ -6,8 +6,25 @@ export interface GameSessionInfo {
     currentPlayerTurn: string;
     currentPhase: string;
     turnsCompleted: number;
+    titans: TitanInfo[];
+    titanPosition: TitanPosition[],
   };
   players: PlayerInfo[];
+}
+
+export interface TitanInfo {
+  titanName: string,
+  rank: number,
+  health: number,
+  offense: number,
+  defense: number,
+  stamina: number,
+}
+
+export interface TitanPosition {
+  titan: string; 
+  row: number;
+  col: number;
 }
 
 export interface LocationState {

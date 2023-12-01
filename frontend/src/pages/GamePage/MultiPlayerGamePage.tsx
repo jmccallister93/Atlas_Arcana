@@ -140,6 +140,16 @@ const MultiPlayerGamePage = () => {
     }
   };
 
+  // Transform the titan positions to the expected format
+  // const transformedTitanPositions = gameState?.gameState.titanPosition?.map(
+  //   (tp) => ({
+  //     titan: tp.titan, // Assuming you want to use the titanName here
+  //     row: tp.row,
+  //     col: tp.col,
+  //   })
+  // );
+
+  console.log(gameState?.gameState.titanPosition);
   return (
     <IonPage>
       {/* <WelcomeModal
@@ -170,7 +180,7 @@ const MultiPlayerGamePage = () => {
             </div>
           ))}
         </div>
-   
+
         <GameTurnManager
           gameState={gameState}
           players={players}
@@ -182,7 +192,10 @@ const MultiPlayerGamePage = () => {
         <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}
-          <GameBoard tileGrid={gameState?.gameState.tileGrid} />
+          <GameBoard
+            tileGrid={gameState?.gameState.tileGrid}
+            titanPositions={gameState?.gameState.titanPosition}
+          />
         </div>
       </IonContent>
     </IonPage>

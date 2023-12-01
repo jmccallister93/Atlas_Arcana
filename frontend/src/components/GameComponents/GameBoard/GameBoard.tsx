@@ -7,14 +7,29 @@ import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
 import { IonButton, IonContent, IonIcon, IonModal } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-
+import fireTitanToken from '../Titans/Tokens/fire_titan_token.png'
+import iceTitanToken from '../Titans/Tokens/ice_titan_token.png'
+import stoneTitanToken from '../Titans/Tokens/stone_titan_token.png'
+import stormTitanToken from '../Titans/Tokens/storm_titan_token.png'
 import "./GameBoard.scss";
 
 interface GameBoardProps {
   tileGrid?: string[][];
+  titanPositions?: {
+    titan: {
+      defense: number;
+      health: number;
+      offense: number;
+      rank: number;
+      stamina: number;
+      titanName: string;
+    };
+    row: number;
+    col: number;
+  }[];
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titanPositions }) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
@@ -45,7 +60,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
         forestImg: Image,
         grasslandImg: Image,
         tundraImg: Image,
-        oasisImg: Image;
+        oasisImg: Image,
+        fireTitanImg: Image, // Titan token images
+        iceTitanImg: Image,
+        stoneTitanImg: Image,
+        stormTitanImg: Image;
 
       //   Preload images
       p.preload = () => {
@@ -54,6 +73,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
         grasslandImg = p.loadImage(grassland);
         tundraImg = p.loadImage(tundra);
         oasisImg = p.loadImage(oasis);
+        fireTitanImg = p.loadImage(fireTitanToken);
+        iceTitanImg = p.loadImage(iceTitanToken);
+        stoneTitanImg = p.loadImage(stoneTitanToken);
+        stormTitanImg = p.loadImage(stormTitanToken);
       };
 
       // Setup canvas
@@ -135,6 +158,28 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
             }
           }
         }
+        // Draw titan tokens
+        titanPositions?.forEach(({ titan, row, col }) => {
+          let img;
+          switch (titan.titanName) {
+            case "FireTitan":
+              img = fireTitanImg;
+              break;
+            case "IceTitan":
+              img = iceTitanImg;
+              break;
+            case "StoneTitan":
+              img = stoneTitanImg;
+              break;
+            case "StormTitan":
+              img = stormTitanImg;
+              break;
+            // Add cases for other titans as needed
+          }
+          if (img) {
+            p.image(img, col * tileSize, row * tileSize, tileSize, tileSize);
+          }
+        });
       };
     };
 
@@ -163,20 +208,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid }) => {
         canvasRef.current.removeEventListener('click', handleTileSelection);
       }
     };
-  }, [tileGrid, showTileDetails]);
+  }, [tileGrid, showTileDetails, titanPositions]);
 
-  // Handle tile selection
-  // const handleTileSelection = () => {
-  //   if (!tileGrid) return
-  //   const xIndex = Math.floor(mouseCoords.current.x / tileSize);
-  //   const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-
-  //   if (xIndex < 18 && yIndex < 18) {
-  //     const tileIndex = xIndex + yIndex * 18;
-  //     const tileType = tileGrid[tileIndex];
-  //     onTileSelect(tileType, xIndex, yIndex);
-  //   }
-  // };
   const handleTileSelection = () => {
     if (!tileGrid) return;
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);

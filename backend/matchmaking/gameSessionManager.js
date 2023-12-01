@@ -70,7 +70,7 @@ async function createGameSession(playerOneData, playerTwoData) {
 
   //Titans
   const titans = determineStartingTitans(titanCards, players.length);
-  const titanPositions = placeTitansOnGrid(gridSize, titans);
+  const titanPosition = placeTitansOnGrid(gridSize, titans);
 
   // NewSession to pass
   const newSession = {
@@ -83,7 +83,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       currentPhase,
       turnsCompleted: 0,
       titans,
-      titanPositions,
+      titanPosition,
     },
   };
   console.log(
