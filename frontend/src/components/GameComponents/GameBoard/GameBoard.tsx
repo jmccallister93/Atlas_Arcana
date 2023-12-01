@@ -43,7 +43,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
     buildingBonuses: string;
     // buildings: string[];
     // players: string[];
-    // titans: string[];
+    titan: {
+      titanName: string;
+      rank: number;
+      health: number;
+      offense: number;
+      defense: number;
+      stamina: number;
+      row: number;
+      col: number;
+    } | null;
   }
 
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
@@ -157,7 +166,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         }
         // Draw titan tokens
         titans?.forEach(({ titanName, row, col }) => {
-          console.log("Titan Name:", titanName);
           let img;
           switch (titanName) {
             case "Fire Titan":
@@ -264,12 +272,43 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         monsterBonuses = "";
         break;
     }
-      // Handle unknown or undefined tile types
-  if (!imageSrc) {
-    console.error("Unknown tile type selected:", tileType);
-    // Perform any additional error handling here
-    return;
-  }
+    // Handle unknown or undefined tile types
+    if (!imageSrc) {
+      console.error("Unknown tile type selected:", tileType);
+      // Perform any additional error handling here
+      return;
+    }
+    // Check for a titan on the tile
+    const titanOnTile = titans?.find(
+      (titan) => titan.row === y && titan.col === x
+    ) || null;
+    console.log("Titan on tile:", titanOnTile);
+    console.log("Selected coordinates: ", x, y);
+    console.log("Titans array:", titans);
+    titans?.forEach((titan, index) => {
+      console.log(`Titan ${index}: row ${titan.row}, col ${titan.col}`);
+    });
+
+    if (titanOnTile) {
+      let titanImageUrl = "";
+      // Determine the image URL based on the titan's name
+      switch (titanOnTile.titanName) {
+        case "Fire Titan":
+          titanImageUrl = fireTitanToken;
+          break;
+        case "Ice Titan":
+          titanImageUrl = iceTitanToken;
+          break;
+        case "Stone Titan":
+          titanImageUrl = stoneTitanToken;
+          break;
+        case "Storm Titan":
+          titanImageUrl = stormTitanToken;
+          break;
+      }
+
+      // titanOnTile.imageUrl = titanImageUrl; // Set the image URL
+    }
     setSelectedTile({
       type: tileType,
       x,
@@ -277,6 +316,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
       image: imageSrc,
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
+      titan: titanOnTile, // set the titan if found
     });
     setShowTileDetails(true);
   };
@@ -322,6 +362,27 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
               <p>
                 <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
               </p>
+              {selectedTile.titan && (
+                <div>
+                  <img />
+                  <h3>{selectedTile.titan.titanName} Details</h3>
+                  <p>
+                    <b>Rank:</b> {selectedTile.titan.rank}
+                  </p>
+                  <p>
+                    <b>Health:</b> {selectedTile.titan.health}
+                  </p>
+                  <p>
+                    <b>Offense:</b> {selectedTile.titan.offense}
+                  </p>
+                  <p>
+                    <b>Defense:</b> {selectedTile.titan.defense}
+                  </p>
+                  <p>
+                    <b>Stamina:</b> {selectedTile.titan.stamina}
+                  </p>
+                </div>
+              )}
             </>
           )}
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
