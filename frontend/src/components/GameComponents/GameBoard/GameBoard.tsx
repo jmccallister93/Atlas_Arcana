@@ -157,15 +157,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         }
         // Draw titan tokens
         titans?.forEach(({ titanName, row, col }) => {
+          console.log("Titan Name:", titans)
           let img;
           switch (titanName) {
-            case "FireTitan":
+            case "Fire Titan":
               img = fireTitanImg;
               break;
-            case "IceTitan":
+            case "Ice Titan":
               img = iceTitanImg;
               break;
-            case "StoneTitan":
+            case "Stone Titan":
               img = stoneTitanImg;
               break;
             case "StormTitan":

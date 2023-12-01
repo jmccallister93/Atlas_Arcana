@@ -276,7 +276,11 @@ function placeTitansOnGrid(gridSize, titans) {
       let col = getRandomInt(3, gridSize - 4);
 
       if (isPositionValid(titanPositions, row, col)) {
-        titanPositions.push({ titan, row, col });
+        titanPositions.push({ 
+          ...titan, // Spread the existing properties of the titan
+          row, // Add the row property
+          col  // Add the col property
+        });
         positionFound = true;
       }
     }
