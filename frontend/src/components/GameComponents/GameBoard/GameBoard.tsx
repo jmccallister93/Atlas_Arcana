@@ -12,6 +12,7 @@ import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
 import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
+import TileMenuDetails from "./TileMenuDetails";
 
 interface GameBoardProps {
   tileGrid?: string[][];
@@ -25,6 +26,8 @@ interface GameBoardProps {
     row: number;
     col: number;
   }[];
+  player?: {}
+  buildings?: {}
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
@@ -43,6 +46,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
     buildingBonuses: string;
     // buildings: string[];
     // players: string[];
+
     titan: {
       titanName: string;
       rank: number;
@@ -53,8 +57,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
       row: number;
       col: number;
     } | null;
+    titanImage: string;
   }
-
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
 
@@ -190,7 +194,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
     };
 
     let myp5 = new p5(sketch);
-    // Attach the click event listener to the div (canvas container)
+
+    // Handle clicking on a tile
     const handleClick = (e: MouseEvent) => {
       if (canvasRef.current) {
         const rect = canvasRef.current.getBoundingClientRect();
@@ -216,6 +221,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
     };
   }, [tileGrid, showTileDetails, titans]);
 
+// Handle Selected tile
   const handleTileSelection = () => {
     if (!tileGrid) return;
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
@@ -279,18 +285,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
       return;
     }
     // Check for a titan on the tile
-    const titanOnTile = titans?.find(
-      (titan) => titan.row === y && titan.col === x
-    ) || null;
-    console.log("Titan on tile:", titanOnTile);
-    console.log("Selected coordinates: ", x, y);
-    console.log("Titans array:", titans);
-    titans?.forEach((titan, index) => {
-      console.log(`Titan ${index}: row ${titan.row}, col ${titan.col}`);
-    });
-
+    const titanOnTile =
+      titans?.find((titan) => titan.row === y && titan.col === x) || null;
+    let titanImageUrl = "";
     if (titanOnTile) {
-      let titanImageUrl = "";
       // Determine the image URL based on the titan's name
       switch (titanOnTile.titanName) {
         case "Fire Titan":
@@ -306,8 +304,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
           titanImageUrl = stormTitanToken;
           break;
       }
-
-      // titanOnTile.imageUrl = titanImageUrl; // Set the image URL
     }
     setSelectedTile({
       type: tileType,
@@ -317,6 +313,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
       titan: titanOnTile, // set the titan if found
+      titanImage: titanImageUrl,
     });
     setShowTileDetails(true);
   };
@@ -334,7 +331,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
       >
         <IonContent>
           <div className="modalHeader">
-            <h2>Tile Details</h2>
+            <h2>Details</h2>
             <button
               className="closeButton"
               onClick={() => setShowTileDetails(false)}
@@ -342,49 +339,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
               <IonIcon icon={closeOutline} />
             </button>
           </div>
-          {selectedTile && (
-            <>
-              <img
-                src={selectedTile.image}
-                alt={selectedTile.type}
-                style={{ maxWidth: "45%" }}
-              />
-              <p>
-                <b>Type:</b> {selectedTile.type}
-              </p>
+          <TileMenuDetails
+            selectedTile={selectedTile}
+            showTileDetails={showTileDetails}
+            setShowTileDetails={setShowTileDetails}
+          />
 
-              <p>
-                <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
-              </p>
-              <p>
-                <b>Building Bonuses:</b> {selectedTile.buildingBonuses}
-              </p>
-              <p>
-                <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
-              </p>
-              {selectedTile.titan && (
-                <div>
-                  <img />
-                  <h3>{selectedTile.titan.titanName} Details</h3>
-                  <p>
-                    <b>Rank:</b> {selectedTile.titan.rank}
-                  </p>
-                  <p>
-                    <b>Health:</b> {selectedTile.titan.health}
-                  </p>
-                  <p>
-                    <b>Offense:</b> {selectedTile.titan.offense}
-                  </p>
-                  <p>
-                    <b>Defense:</b> {selectedTile.titan.defense}
-                  </p>
-                  <p>
-                    <b>Stamina:</b> {selectedTile.titan.stamina}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
         </IonContent>
       </IonModal>
