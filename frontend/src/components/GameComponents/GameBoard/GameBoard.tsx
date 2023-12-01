@@ -85,79 +85,89 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
         }
       };
 
-      // Attach a mouse click event listener to the canvas
-      // p.canvas.addEventListener("click", (e) => {
-      //   const rect = p.canvas.getBoundingClientRect();
-      //   mouseCoords.current = {
-      //     x: e.clientX - rect.left,
-      //     y: e.clientY - rect.top,
-      //   };
-      //   handleTileSelection();
-      // });
-
+      // Gradient drawing function
+      function drawGradient(x: any, y: any, w: any, h:any, startColor:any, endColor:any) {
+        // For horizontal gradient, change the 'x' and 'width' in the loop
+        for (let i = y; i <= y + h; i++) {
+          let inter = p.map(i, y, y + h, 0, 1);
+          let c = p.lerpColor(startColor, endColor, inter);
+          p.fill(c);
+          p.rect(x, i, w, 1); // Draw line by line
+        }
+      }
       // Draw everything
       p.draw = () => {
         p.background(255);
 
+        const tileTypeToColor: any = {
+          forest: "#095300", // Dark Green
+          desert: "#F9DA70", // Sandy Color
+          oasis: "#00CED1", // Dark Turquoise
+          tundra: "#D9D9D9", // Silver
+          grassland: "#32CD32", // Lime Green
+        };
+
         for (let x = 0; x < tileGrid.length; x++) {
           for (let y = 0; y < tileGrid[x].length; y++) {
             let tileType = tileGrid[x][y];
-
-            switch (tileType) {
-              case "oasis":
-                p.image(
-                  oasisImg,
-                  x * tileSize,
-                  y * tileSize,
-                  tileSize,
-                  tileSize
-                );
-                break;
-              case "desert":
-                p.image(
-                  desertImg,
-                  x * tileSize,
-                  y * tileSize,
-                  tileSize,
-                  tileSize
-                );
-                break;
-              case "forest":
-                p.image(
-                  forestImg,
-                  x * tileSize,
-                  y * tileSize,
-                  tileSize,
-                  tileSize
-                );
-                break;
-              case "grassland":
-                p.image(
-                  grasslandImg,
-                  x * tileSize,
-                  y * tileSize,
-                  tileSize,
-                  tileSize
-                );
-                break;
-              case "tundra":
-                p.image(
-                  tundraImg,
-                  x * tileSize,
-                  y * tileSize,
-                  tileSize,
-                  tileSize
-                );
-                break;
-              default:
-                // Handle unknown tile types if necessary
-                break;
-            }
+            let color = tileTypeToColor[tileType] || "#FFFFFF";
+            p.fill(color);
+            p.rect(x * tileSize, y * tileSize, tileSize, tileSize);
+            // switch (tileType) {
+            //   case "oasis":
+            //     p.image(
+            //       oasisImg,
+            //       x * tileSize,
+            //       y * tileSize,
+            //       tileSize,
+            //       tileSize
+            //     );
+            //     break;
+            //   case "desert":
+            //     p.image(
+            //       desertImg,
+            //       x * tileSize,
+            //       y * tileSize,
+            //       tileSize,
+            //       tileSize
+            //     );
+            //     break;
+            //   case "forest":
+            //     p.image(
+            //       forestImg,
+            //       x * tileSize,
+            //       y * tileSize,
+            //       tileSize,
+            //       tileSize
+            //     );
+            //     break;
+            //   case "grassland":
+            //     p.image(
+            //       grasslandImg,
+            //       x * tileSize,
+            //       y * tileSize,
+            //       tileSize,
+            //       tileSize
+            //     );
+            //     break;
+            //   case "tundra":
+            //     p.image(
+            //       tundraImg,
+            //       x * tileSize,
+            //       y * tileSize,
+            //       tileSize,
+            //       tileSize
+            //     );
+            //     break;
+            //   default:
+            //     // Handle unknown tile types if necessary
+            //     break;
+            // }
           }
         }
         // Draw titan tokens
         titans?.forEach(({ titanName, row, col }) => {
-          console.log("Titan Name:", titans)
+          console.log("Titan Name:", titanName);
           let img;
           switch (titanName) {
             case "Fire Titan":
@@ -169,7 +179,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
             case "Stone Titan":
               img = stoneTitanImg;
               break;
-            case "StormTitan":
+            case "Storm Titan":
               img = stormTitanImg;
               break;
             // Add cases for other titans as needed
