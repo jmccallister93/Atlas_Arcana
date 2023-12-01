@@ -37,36 +37,40 @@ async function createGameSession(playerOneData, playerTwoData) {
 
   // GameBoard
   // Create tile grid to be sent to the front end
-// Create tile grid to be sent to the front end
-const createTileGrid = () => {
-  let gridSize = 18; // 18x18 grid
-  const tileGrid = new Array(gridSize).fill(null).map(() => new Array(gridSize).fill(null));
-  // Define tile types and their cumulative distribution probabilities
-  const tileTypes = [
-    { type: "oasis", probability: 0.05 },
-    { type: "desert", probability: 0.25 },
-    { type: "forest", probability: 0.5 },
-    { type: "grassland", probability: 0.75 },
-    { type: "tundra", probability: 1.0 },
-  ];
+  const createTileGrid = () => {
+    let gridSize = 18; // 18x18 grid
+    const tileGrid = new Array(gridSize)
+      .fill(null)
+      .map(() => new Array(gridSize).fill(null));
+    // Define tile types and their cumulative distribution probabilities
+    const tileTypes = [
+      { type: "oasis", probability: 0.05 },
+      { type: "desert", probability: 0.25 },
+      { type: "forest", probability: 0.5 },
+      { type: "grassland", probability: 0.75 },
+      { type: "tundra", probability: 1.0 },
+    ];
 
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      let randomNum = Math.random();
-      let tileType = tileTypes.find((tile) => randomNum <= tile.probability).type;
-      tileGrid[i][j] = tileType;
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        let randomNum = Math.random();
+        let tileType = tileTypes.find(
+          (tile) => randomNum <= tile.probability
+        ).type;
+        tileGrid[i][j] = tileType;
+      }
     }
-  }
 
-  return tileGrid;
-};
+    return tileGrid;
+  };
 
+  // Grid
   const tileGrid = createTileGrid();
-
+  const gridSize = 18;
 
   //Titans
   const titans = determineStartingTitans(titanCards, players.length);
-  const { tileGridWithTitans, titanPositions } = placeTitansOnGrid(tileGrid, titans);
+  const titanPositions = placeTitansOnGrid(gridSize, titans);
 
   // NewSession to pass
   const newSession = {
@@ -75,12 +79,11 @@ const createTileGrid = () => {
     gameState: {
       turnOrder,
       currentPlayerTurn,
-      tileGrid,
+      tileGrid, 
       currentPhase,
       turnsCompleted: 0,
       titans,
       titanPositions,
-      tileGridWithTitans,
     },
   };
   console.log(
@@ -227,7 +230,6 @@ function determineStartingCards(players) {
     //   const randomIndex = Math.floor(Math.random() * treasureCards.length);
     //   player.inventory.treasures.push(treasureCards[randomIndex]);
     // }
-
   });
 
   return players;
@@ -265,25 +267,23 @@ function determineNumberOfTitans(numberOfPlayers) {
 }
 
 // Function to place Titans on the grid
-function placeTitansOnGrid(tileGrid, titans) {
-  const gridSize = tileGrid.length;
-  const titanPositions = [];
+function placeTitansOnGrid(gridSize, titans) {
+  const titanPositions = []; // Initialized as an empty array
 
   for (const titan of titans) {
     let positionFound = false;
     while (!positionFound) {
-      let row = getRandomInt(3, gridSize - 4); // Avoid edges
-      let col = getRandomInt(3, gridSize - 4); // Avoid edges
+      let row = getRandomInt(3, gridSize - 4);
+      let col = getRandomInt(3, gridSize - 4);
 
-      if (isPositionValid(tileGrid, row, col, titanPositions)) {
+      if (isPositionValid(titanPositions, row, col)) {
         titanPositions.push({ titan, row, col });
-        tileGrid[row][col] = 'Titan'; // Or any identifier for Titan
         positionFound = true;
       }
     }
   }
 
-  return { tileGrid, titanPositions };
+  return titanPositions;
 }
 
 // Helper function to get random integer within range
@@ -292,16 +292,15 @@ function getRandomInt(min, max) {
 }
 
 // Function to check if the position is valid
-function isPositionValid(tileGrid, row, col, titanPositions) {
-  // Check proximity to other titans
+function isPositionValid(titanPositions, row, col) {
   for (const pos of titanPositions) {
     if (Math.abs(pos.row - row) <= 6 && Math.abs(pos.col - col) <= 6) {
       return false; // Too close to another titan
     }
   }
-  // Add any other validation checks as needed
   return true;
 }
+
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
