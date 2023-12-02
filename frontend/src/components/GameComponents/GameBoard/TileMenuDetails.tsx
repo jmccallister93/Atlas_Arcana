@@ -77,9 +77,55 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                 </p>
               </div>
             )}
-            <p>
+             {/* {selectedTile.player && (
+              <div>
+                <h3>{selectedTile.player.playerName} Details</h3>
+                <img
+                  src={selectedTile.player.image}
+                  alt={selectedTile.player.playerName}
+                  style={{ maxWidth: "100%" }}
+                />
+                <p>
+                  <b>Rank:</b> {selectedTile.player.rank}
+                </p>
+                <p>
+                  <b>Health:</b> {selectedTile.player.health}
+                </p>
+                <p>
+                  <b>Offense:</b> {selectedTile.player.offense}
+                </p>
+                <p>
+                  <b>Defense:</b> {selectedTile.player.defense}
+                </p>
+                <p>
+                  <b>Stamina:</b> {selectedTile.player.stamina}
+                </p>
+              </div>
+            )}
+             {selectedTile.building && (
+              <div>
+                <h3>{selectedTile.building.buildingName} Details</h3>
+                <img
+                  src={selectedTile.building.image}
+                  alt={selectedTile.building.buildingName}
+                  style={{ maxWidth: "100%" }}
+                />
+                <p>
+                  <b>Description:</b> {selectedTile.building.description}
+                </p>
+                <p>
+                  <b>Health:</b> {selectedTile.building.health}
+                </p>
+                <p>
+                  <b>Offense:</b> {selectedTile.building.offense}
+                </p>
+                <p>
+                  <b>Defense:</b> {selectedTile.building.defense}
+                </p>
+              </div>
+            )} */}
+            <div>
               <h3>Tile Details</h3>
-            </p>
             <img
               src={selectedTile.image}
               alt={selectedTile.type}
@@ -97,6 +143,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             <p>
               <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
             </p>
+            </div>
           </>
         )}
         <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

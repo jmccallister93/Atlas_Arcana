@@ -26,6 +26,52 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   useEffect(() => {
     setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
   }, [gameState]);
+  // Initial setup phase
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+
+  // Calculate distance of tiles
+  const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number => {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  };
+  
+  // Validate stronghold placement
+  const isValidStrongholdPlacement = (x: number, y: number): boolean => {
+    for (let titan of gameState?.gameState.titans ?? []) {
+      const distance = calculateDistance(x, y, titan.col, titan.row);
+      if (distance <= 6) {
+        return false; // Too close to a titan
+      }
+    }
+    for (let player of gameState?.players ?? []) {
+      const distance = calculateDistance(x, y, player.col, player.row);
+      if (distance <= 6) {
+        return false; // Too close to a player
+      }
+    }
+  
+    return true; // Valid placement
+  };
+  
+  
+  // Handle the setup action
+  const handleSetupAction = (player: PlayerInfo, x: number, y: number) => {
+    if (isValidStrongholdPlacement(x, y)) {
+      // Place the stronghold and update the game state
+      // Check if all players have placed their strongholds
+      // If yes, setIsSetupComplete(true);
+    } else {
+      // Handle invalid placement (e.g., show error message)
+    }
+  };
+  
+  // Transition to normal gamephase
+  useEffect(() => {
+    if (isSetupComplete) {
+      // Transition to the first normal game phase, e.g., 'Draw'
+      // Update the game state accordingly
+    }
+  }, [isSetupComplete]);
+  
 
   // Render advance phase for player who's turn it is
   useEffect(() => {

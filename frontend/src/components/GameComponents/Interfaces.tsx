@@ -49,6 +49,8 @@ export interface QuestItem {
 
 export interface PlayerInfo {
   username: string;
+  col: number;
+  row: number;
   victoryPoints: number;
   rank: number;
   health: number;

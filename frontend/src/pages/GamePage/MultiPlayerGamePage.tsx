@@ -141,7 +141,7 @@ const MultiPlayerGamePage = () => {
   };
 
 
-  console.log(gameState?.gameState.titans);
+  
   return (
     <IonPage>
       {/* <WelcomeModal
@@ -187,6 +187,8 @@ const MultiPlayerGamePage = () => {
           <GameBoard
             tileGrid={gameState?.gameState.tileGrid}
             titans={gameState?.gameState.titans}
+            players={gameState?.players}
+
           />
         </div>
       </IonContent>

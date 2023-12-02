@@ -26,11 +26,11 @@ interface GameBoardProps {
     row: number;
     col: number;
   }[];
-  player?: {}
+  players?: {}
   buildings?: {}
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players }) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
