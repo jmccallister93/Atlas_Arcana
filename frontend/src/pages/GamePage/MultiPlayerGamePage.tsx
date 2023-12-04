@@ -140,8 +140,6 @@ const MultiPlayerGamePage = () => {
     }
   };
 
-
-  
   return (
     <IonPage>
       {/* <WelcomeModal
@@ -185,6 +183,8 @@ const MultiPlayerGamePage = () => {
         <div className="gameBoardContainer">
           {" "}
           <GameBoard
+            gameState={gameState}
+            currentPlayer={currentPlayer}
             tileGrid={gameState?.gameState.tileGrid}
             titans={gameState?.gameState.titans}
             players={gameState?.players}

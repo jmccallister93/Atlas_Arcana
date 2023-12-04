@@ -5,7 +5,15 @@ import forest from "./GameTiles/forestTile.png";
 import grassland from "./GameTiles/grasslandTile.png";
 import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
-import { IonButton, IonContent, IonIcon, IonModal } from "@ionic/react";
+import stronghold1 from "./GameTiles/stronghold1.png";
+import stronghold2 from "./GameTiles/stronghold2.png";
+import {
+  IonAlert,
+  IonButton,
+  IonContent,
+  IonIcon,
+  IonModal,
+} from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import fireTitanToken from "../Titans/Tokens/fire_titan_token.png";
 import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
@@ -16,6 +24,8 @@ import TileMenuDetails from "./TileMenuDetails";
 import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
+  gameState?: GameSessionInfo;
+  currentPlayer: PlayerInfo | undefined;
   tileGrid?: string[][];
   titans?: {
     titanName: string;
@@ -27,12 +37,19 @@ interface GameBoardProps {
     row: number;
     col: number;
   }[];
-  players?: PlayerInfo[]
-  buildings?: {}
+  players?: PlayerInfo[];
+  buildings?: {};
   emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGameStateUpdate }) => {
+const GameBoard: React.FC<GameBoardProps> = ({
+  tileGrid,
+  titans,
+  players,
+  emitGameStateUpdate,
+  gameState,
+  currentPlayer,
+}) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
@@ -63,6 +80,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
   }
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
+  const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
+    useState(false);
+  const [showStrongholdConfirmation, setShowStrongholdConfirmation] =
+    useState(false);
+  const [selectedStrongholdCoordinates, setSelectedStrongholdCoordinates] =
+    useState({ x: 0, y: 0 });
 
   // Main UseEffect
   useEffect(() => {
@@ -76,7 +99,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
         fireTitanImg: Image, // Titan token images
         iceTitanImg: Image,
         stoneTitanImg: Image,
-        stormTitanImg: Image;
+        stormTitanImg: Image,
+        stronghold1Img: Image,
+        stronghold2Img: Image;
 
       //   Preload images
       p.preload = () => {
@@ -89,6 +114,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
         iceTitanImg = p.loadImage(iceTitanToken);
         stoneTitanImg = p.loadImage(stoneTitanToken);
         stormTitanImg = p.loadImage(stormTitanToken);
+        stronghold1Img = p.loadImage(stronghold1);
+        stronghold2Img = p.loadImage(stronghold2);
       };
 
       // Setup canvas
@@ -192,6 +219,20 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
             p.image(img, col * tileSize, row * tileSize, tileSize, tileSize);
           }
         });
+        // Inside p.draw function
+        players?.forEach((player) => {
+          if (player.strongHold) {
+            let strongholdImg =
+              player.username === "Player1" ? stronghold1Img : stronghold2Img;
+            p.image(
+              strongholdImg,
+              player.strongHold.col * tileSize,
+              player.strongHold.row * tileSize,
+              tileSize,
+              tileSize
+            );
+          }
+        });
       };
     };
 
@@ -224,10 +265,15 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
   }, [tileGrid, showTileDetails, titans]);
 
   // Calculate distance of tiles
-  const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number => {
+  const calculateDistance = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): number => {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   };
-    // Validate stronghold placement
+  // Validate stronghold placement
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
@@ -241,25 +287,28 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
         return false; // Too close to a player
       }
     }
-  
+
     return true; // Valid placement
   };
-   // Handle the setup action
-   const handleSetupAction = (player: PlayerInfo, x: number, y: number) => {
-    if (isValidStrongholdPlacement(x, y)) {
-      // Place the stronghold and update the game state
-      // Check if all players have placed their strongholds
-      // If yes, setIsSetupComplete(true);
+
+  // Check if stronghold is placed and if cuurrent player turn
+  useEffect(() => {
+    if (
+      gameState?.gameState.currentPhase === "Setup" &&
+      currentPlayer?.username === gameState?.gameState.currentPlayerTurn
+    ) {
+      setIsStrongholdPlacementMode(true);
     } else {
-      // Handle invalid placement (e.g., show error message)
+      setIsStrongholdPlacementMode(false);
     }
-  };
-// Handle Selected tile
+  }, [gameState, currentPlayer]);
+
+  // Handle Selected tile
   const handleTileSelection = () => {
     if (!tileGrid) return;
+
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
     const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-
     // Check if the indices are within the bounds of the tileGrid
     if (
       xIndex >= 0 &&
@@ -268,13 +317,37 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
       yIndex < tileGrid[xIndex].length
     ) {
       const tileType = tileGrid[xIndex][yIndex];
-      onTileSelect(tileType, xIndex, yIndex);
+
+      // Call onTileSelect here if the current phase is not "Setup"
+      if (gameState?.gameState.currentPhase !== "Setup") {
+        onTileSelect(tileType, xIndex, yIndex);
+      }
+
+      // Additional logic for stronghold placement during setup phase
+      if (
+        isStrongholdPlacementMode &&
+        gameState?.gameState.currentPhase === "Setup" &&
+        currentPlayer?.username === gameState?.gameState.currentPlayerTurn
+      ) {
+        if (
+          isStrongholdPlacementMode &&
+          gameState?.gameState.currentPhase === "Setup" &&
+          currentPlayer?.username === gameState?.gameState.currentPlayerTurn
+        ) {
+          if (isValidStrongholdPlacement(xIndex, yIndex)) {
+            setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
+            setShowStrongholdConfirmation(true); // Show the confirmation alert
+          } else {
+            console.error("Invalid stronghold placement");
+          }
+        }
+      }
     } else {
-      // Handle out-of-bounds selection here (e.g., show an error message or do nothing)
-      console.log("Selected tile is out of bounds.");
+      console.error("Selected tile is out of bounds.");
     }
   };
 
+  // On tile Select render out details
   const onTileSelect = (tileType: string, x: number, y: number) => {
     let imageSrc = "";
     let buildingBonuses = "";
@@ -338,6 +411,28 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
           break;
       }
     }
+
+    // Handle stronghold placement if in 'Setup' phase
+    if (gameState?.gameState.currentPhase === "Setup" && currentPlayer) {
+      if (isValidStrongholdPlacement(x, y)) {
+        // Update the stronghold position
+        const updatedPlayer = {
+          ...currentPlayer,
+          strongHold: { col: x, row: y },
+        };
+
+        // Emit the updated game state
+        const updatedGameState = {
+          ...gameState,
+          players: players?.map((p) =>
+            p.username === updatedPlayer.username ? updatedPlayer : p
+          ),
+        };
+        emitGameStateUpdate(updatedGameState);
+      } else {
+        alert("Invalid stronghold placement.");
+      }
+    }
     setSelectedTile({
       type: tileType,
       x,
@@ -346,9 +441,34 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
       titan: titanOnTile, // set the titan if found
-      titanImage: titanImageUrl,
+      titanImage: titanOnTile ? getTitanImageUrl(titanOnTile.titanName) : "",
     });
     setShowTileDetails(true);
+  };
+  const getTitanImageUrl = (titanName: any) => {
+    switch (titanName) {
+      case "Fire Titan":
+        return fireTitanToken;
+      case "Ice Titan":
+        return iceTitanToken;
+      case "Stone Titan":
+        return stoneTitanToken;
+      case "Storm Titan":
+        return stormTitanToken;
+      default:
+        return "";
+    }
+  };
+  const placeStronghold = (player: any, x: any, y: any) => {
+    const updatedPlayer = { ...player, strongHold: { col: x, row: y } };
+    const updatedGameState = {
+      ...gameState,
+      players: players?.map((p) =>
+        p.username === updatedPlayer.username ? updatedPlayer : p
+      ),
+    };
+    emitGameStateUpdate(updatedGameState);
+    setShowStrongholdConfirmation(false); // Hide the confirmation alert
   };
 
   return (
@@ -358,6 +478,32 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGa
           <div ref={canvasRef}></div>
         </div>
       </div>
+      <IonAlert
+        isOpen={showStrongholdConfirmation}
+        onDidDismiss={() => setShowStrongholdConfirmation(false)}
+        header={"Confirm Placement"}
+        message={`Are you sure you want to place your stronghold at (${selectedStrongholdCoordinates.x}, ${selectedStrongholdCoordinates.y})?`}
+        buttons={[
+          {
+            text: "Cancel",
+            role: "cancel",
+            handler: () => {
+              console.log("Placement cancelled");
+            },
+          },
+          {
+            text: "Confirm",
+            handler: () => {
+              placeStronghold(
+                currentPlayer,
+                selectedStrongholdCoordinates.x,
+                selectedStrongholdCoordinates.y
+              );
+            },
+          },
+        ]}
+      />
+
       <IonModal
         isOpen={showTileDetails}
         onDidDismiss={() => setShowTileDetails(false)}
