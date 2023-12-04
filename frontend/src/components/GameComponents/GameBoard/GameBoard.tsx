@@ -82,8 +82,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
-  const [showStrongholdConfirmation, setShowStrongholdConfirmation] =
-    useState(false);
   const [selectedStrongholdCoordinates, setSelectedStrongholdCoordinates] =
     useState({ x: 0, y: 0 });
 
@@ -364,7 +362,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
     // Handle unknown or undefined tile types
     if (!imageSrc) {
       console.error("Unknown tile type selected:", tileType);
-      // Perform any additional error handling here
       return;
     }
     // Check for a titan on the tile
@@ -386,29 +383,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         case "Storm Titan":
           titanImageUrl = stormTitanToken;
           break;
-      }
-    }
-
-    // Handle stronghold placement if in 'Setup' phase
-    if (gameState?.gameState.currentPhase === "Setup" && currentPlayer) {
-      if (isValidStrongholdPlacement(x, y)) {
-        // Update the stronghold position
-        const updatedPlayer = {
-          ...currentPlayer,
-          strongHold: { col: x, row: y },
-        };
-
-        // Emit the updated game state
-        const updatedGameState = {
-          ...gameState,
-          players: players?.map((p) =>
-            p.username === updatedPlayer.username ? updatedPlayer : p
-          ),
-        };
-        emitGameStateUpdate(updatedGameState);
-      } else {
-        alert("Invalid stronghold placement.");
-        return
       }
     }
     setSelectedTile({
@@ -461,8 +435,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         ),
       };
       emitGameStateUpdate(updatedGameState);
-      setShowStrongholdConfirmation(false);
-      // setStrongholdPlaced(true)
+    } else {
+      alert("Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan.");
+      return
     }
   };
 
@@ -494,8 +469,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
             setShowTileDetails={setShowTileDetails}
             isStrongholdPlacementMode={isStrongholdPlacementMode}
             placeStronghold={placeStronghold}
-            currentPlayer={currentPlayer}
-            strongholdCoordinates={selectedStrongholdCoordinates}
+            // currentPlayer={currentPlayer}
+            // strongholdCoordinates={selectedStrongholdCoordinates}
           />
 
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

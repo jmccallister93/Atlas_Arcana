@@ -31,8 +31,7 @@ interface TileMenuDetailsProps {
   setShowTileDetails: (show: boolean) => void;
   isStrongholdPlacementMode: boolean;
   placeStronghold: () => void;
-  currentPlayer: PlayerInfo | undefined; // Add currentPlayer
-  strongholdCoordinates: { x: number, y: number }; 
+
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
@@ -41,8 +40,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   setShowTileDetails,
   isStrongholdPlacementMode,
   placeStronghold,
-  currentPlayer,
-  strongholdCoordinates
+
 }) => {
   return (
     <IonModal
