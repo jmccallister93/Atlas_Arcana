@@ -36,12 +36,10 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       // Update the game state accordingly
     }
   }, [isSetupComplete]);
-  
 
   // Render advance phase for player who's turn it is
   useEffect(() => {
     if (currentPlayer?.username === currentPlayerTurn) {
-
       const gamePhaseButtonRender = (
         <h4 className="pageHeader">
           Next Phase{" "}
@@ -73,23 +71,38 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       console.error("Game state is undefined");
       return; // Exit the function if gameState is undefined
     }
-    const isSetupPhase = gameState?.gameState?.currentPhase === 'Setup';
+    // Assuming currentPlayer is part of the props and has the structure of PlayerInfo
+    const strongholdPlaced =
+      currentPlayer &&
+      currentPlayer.strongHold &&
+      currentPlayer.strongHold.row !== undefined &&
+      currentPlayer.strongHold.col !== undefined;
+
+    if (!strongholdPlaced) {
+      // Display an Ion alert to inform the player to place their stronghold
+      alert(
+        "You must place your stronghold before proceeding to the next phase."
+      );
+      return;
+    }
+    const isSetupPhase = gameState?.gameState?.currentPhase === "Setup";
     let nextPhase, nextPlayerTurn;
-  
+
     if (isSetupPhase) {
       // Find the next player who needs to complete the setup phase
       const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-        player => player === gameState.gameState.currentPlayerTurn
+        (player) => player === gameState.gameState.currentPlayerTurn
       );
-  
-      const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+
+      const nextPlayerIndex =
+        (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
       nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
-  
+
       // If we have looped back to the first player, setup is complete
       if (nextPlayerIndex === 0) {
         nextPhase = phaseOrder[0]; // Assuming 'Draw' is the first phase after setup
       } else {
-        nextPhase = 'Setup';
+        nextPhase = "Setup";
       }
     } else {
       // Existing logic for normal game phases
@@ -98,19 +111,20 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       );
       const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
       nextPhase = phaseOrder[nextPhaseIndex];
-  
+
       // Move to next player if the phase has wrapped around
       if (nextPhase === phaseOrder[0]) {
         const currentPlayerIndex = gameState?.gameState.turnOrder.findIndex(
-          player => player === gameState.gameState.currentPlayerTurn
+          (player) => player === gameState.gameState.currentPlayerTurn
         );
-        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+        const nextPlayerIndex =
+          (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
         nextPlayerTurn = gameState?.gameState.turnOrder[nextPlayerIndex];
       } else {
         nextPlayerTurn = gameState?.gameState.currentPlayerTurn;
       }
     }
-  
+
     // Update the game state
     const newState = {
       gameState: {
@@ -119,10 +133,9 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
         currentPlayerTurn: nextPlayerTurn,
       },
     };
-  
+
     emitGameStateUpdate(newState);
   };
-  
 
   return (
     <>

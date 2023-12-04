@@ -13,7 +13,7 @@ import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import TileMenuDetails from "./TileMenuDetails";
-import { PlayerInfo } from "../Interfaces";
+import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
   tileGrid?: string[][];
@@ -29,9 +29,10 @@ interface GameBoardProps {
   }[];
   players?: PlayerInfo[]
   buildings?: {}
+  emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players, emitGameStateUpdate }) => {
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);

@@ -188,7 +188,7 @@ const MultiPlayerGamePage = () => {
             tileGrid={gameState?.gameState.tileGrid}
             titans={gameState?.gameState.titans}
             players={gameState?.players}
-
+            emitGameStateUpdate={emitGameStateUpdate}
           />
         </div>
       </IonContent>
