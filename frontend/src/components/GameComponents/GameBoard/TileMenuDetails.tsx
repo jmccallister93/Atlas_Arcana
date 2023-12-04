@@ -1,6 +1,7 @@
 import React from "react";
 import { IonContent, IonIcon, IonModal, IonButton } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
+import { PlayerInfo } from "../Interfaces";
 
 interface Titan {
   titanName: string;
@@ -28,12 +29,20 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
+  isStrongholdPlacementMode: boolean;
+  placeStronghold: () => void;
+  currentPlayer: PlayerInfo | undefined; // Add currentPlayer
+  strongholdCoordinates: { x: number, y: number }; 
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
+  isStrongholdPlacementMode,
+  placeStronghold,
+  currentPlayer,
+  strongholdCoordinates
 }) => {
   return (
     <IonModal
@@ -77,53 +86,12 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                 </p>
               </div>
             )}
-             {/* {selectedTile.player && (
-              <div>
-                <h3>{selectedTile.player.playerName} Details</h3>
-                <img
-                  src={selectedTile.player.image}
-                  alt={selectedTile.player.playerName}
-                  style={{ maxWidth: "100%" }}
-                />
-                <p>
-                  <b>Rank:</b> {selectedTile.player.rank}
-                </p>
-                <p>
-                  <b>Health:</b> {selectedTile.player.health}
-                </p>
-                <p>
-                  <b>Offense:</b> {selectedTile.player.offense}
-                </p>
-                <p>
-                  <b>Defense:</b> {selectedTile.player.defense}
-                </p>
-                <p>
-                  <b>Stamina:</b> {selectedTile.player.stamina}
-                </p>
-              </div>
-            )}
-             {selectedTile.building && (
-              <div>
-                <h3>{selectedTile.building.buildingName} Details</h3>
-                <img
-                  src={selectedTile.building.image}
-                  alt={selectedTile.building.buildingName}
-                  style={{ maxWidth: "100%" }}
-                />
-                <p>
-                  <b>Description:</b> {selectedTile.building.description}
-                </p>
-                <p>
-                  <b>Health:</b> {selectedTile.building.health}
-                </p>
-                <p>
-                  <b>Offense:</b> {selectedTile.building.offense}
-                </p>
-                <p>
-                  <b>Defense:</b> {selectedTile.building.defense}
-                </p>
-              </div>
-            )} */}
+            {isStrongholdPlacementMode ? (
+              <>
+              <p>Place Stronghold on Tile?</p>
+              <IonButton onClick={placeStronghold}>Confirm</IonButton>
+              </>
+            ) : (null)}
             <div>
               <h3>Tile Details</h3>
             <img

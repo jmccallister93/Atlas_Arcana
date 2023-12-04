@@ -309,41 +309,29 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     const xIndex = Math.floor(mouseCoords.current.x / tileSize);
     const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-    // Check if the indices are within the bounds of the tileGrid
+
     if (
-      xIndex >= 0 &&
-      xIndex < tileGrid.length &&
-      yIndex >= 0 &&
-      yIndex < tileGrid[xIndex].length
+      xIndex < 0 ||
+      xIndex >= tileGrid.length ||
+      yIndex < 0 ||
+      yIndex >= tileGrid[xIndex].length
     ) {
-      const tileType = tileGrid[xIndex][yIndex];
+      console.error("Selected tile is out of bounds.");
+      return;
+    }
 
-      // Call onTileSelect here if the current phase is not "Setup"
-      if (gameState?.gameState.currentPhase !== "Setup") {
-        onTileSelect(tileType, xIndex, yIndex);
-      }
-
-      // Additional logic for stronghold placement during setup phase
-      if (
-        isStrongholdPlacementMode &&
-        gameState?.gameState.currentPhase === "Setup" &&
-        currentPlayer?.username === gameState?.gameState.currentPlayerTurn
-      ) {
-        if (
-          isStrongholdPlacementMode &&
-          gameState?.gameState.currentPhase === "Setup" &&
-          currentPlayer?.username === gameState?.gameState.currentPlayerTurn
-        ) {
-          if (isValidStrongholdPlacement(xIndex, yIndex)) {
-            setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
-            setShowStrongholdConfirmation(true); // Show the confirmation alert
-          } else {
-            alert("Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan.");
-          }
-        }
+    if (isStrongholdPlacementMode) {
+      if (isValidStrongholdPlacement(xIndex, yIndex)) {
+        setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
+        setShowStrongholdConfirmation(true);
+      } else {
+        alert(
+          "Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan."
+        );
       }
     } else {
-      console.error("Selected tile is out of bounds.");
+      // Other tile selection logic for non-setup phases
+      onTileSelect(tileGrid[xIndex][yIndex], xIndex, yIndex);
     }
   };
 
@@ -352,6 +340,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
     let imageSrc = "";
     let buildingBonuses = "";
     let monsterBonuses = "";
+    const xIndex = Math.floor(mouseCoords.current.x / tileSize);
+    const yIndex = Math.floor(mouseCoords.current.y / tileSize);
+    if (isStrongholdPlacementMode) {
+      if (isValidStrongholdPlacement(xIndex, yIndex)) {
+        setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
+        setShowStrongholdConfirmation(true);
+      } else {
+        alert(
+          "Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan."
+        );
+      }
+    }
     switch (tileType) {
       case "oasis":
         imageSrc = oasis;
@@ -445,6 +445,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     });
     setShowTileDetails(true);
   };
+  // Get titan images
   const getTitanImageUrl = (titanName: any) => {
     switch (titanName) {
       case "Fire Titan":
@@ -459,16 +460,26 @@ const GameBoard: React.FC<GameBoardProps> = ({
         return "";
     }
   };
-  const placeStronghold = (player: any, x: any, y: any) => {
-    const updatedPlayer = { ...player, strongHold: { col: x, row: y } };
-    const updatedGameState = {
-      ...gameState,
-      players: players?.map((p) =>
-        p.username === updatedPlayer.username ? updatedPlayer : p
-      ),
-    };
-    emitGameStateUpdate(updatedGameState);
-    setShowStrongholdConfirmation(false); // Hide the confirmation alert
+  // Place stronghold
+  const placeStronghold = () => {
+    if (currentPlayer) {
+      const updatedPlayer = {
+        ...currentPlayer,
+        strongHold: {
+          col: selectedStrongholdCoordinates.x,
+          row: selectedStrongholdCoordinates.y,
+        },
+      };
+      const updatedGameState = {
+        ...gameState,
+        players: players?.map((p) =>
+          p.username === updatedPlayer.username ? updatedPlayer : p
+        ),
+      };
+      emitGameStateUpdate(updatedGameState);
+      setShowStrongholdConfirmation(false);
+      // setStrongholdPlaced(true)
+    }
   };
 
   return (
@@ -478,31 +489,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <div ref={canvasRef}></div>
         </div>
       </div>
-      <IonAlert
-        isOpen={showStrongholdConfirmation}
-        onDidDismiss={() => setShowStrongholdConfirmation(false)}
-        header={"Confirm Placement"}
-        message={`Are you sure you want to place your stronghold at (${selectedStrongholdCoordinates.x}, ${selectedStrongholdCoordinates.y})?`}
-        buttons={[
-          {
-            text: "Cancel",
-            role: "cancel",
-            handler: () => {
-              console.log("Placement cancelled");
-            },
-          },
-          {
-            text: "Confirm",
-            handler: () => {
-              placeStronghold(
-                currentPlayer,
-                selectedStrongholdCoordinates.x,
-                selectedStrongholdCoordinates.y
-              );
-            },
-          },
-        ]}
-      />
 
       <IonModal
         isOpen={showTileDetails}
@@ -522,6 +508,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
             selectedTile={selectedTile}
             showTileDetails={showTileDetails}
             setShowTileDetails={setShowTileDetails}
+            isStrongholdPlacementMode={isStrongholdPlacementMode}
+            placeStronghold={placeStronghold}
+            currentPlayer={currentPlayer}
+            strongholdCoordinates={selectedStrongholdCoordinates}
           />
 
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

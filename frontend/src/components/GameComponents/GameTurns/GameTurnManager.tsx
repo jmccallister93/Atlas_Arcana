@@ -22,21 +22,28 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   );
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
+
   // Turn order
   useEffect(() => {
     setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
   }, [gameState]);
-  // Initial setup phase
-  const [isSetupComplete, setIsSetupComplete] = useState(false);
-  // onStronghold placed
 
-  // Transition to normal gamephase
+  // New useEffect for auto-advancing setup phase
   useEffect(() => {
-    if (isSetupComplete) {
-      // Transition to the first normal game phase, e.g., 'Draw'
-      // Update the game state accordingly
+    if (gameState?.gameState.currentPhase === "Setup") {
+      const allStrongholdsPlaced = players.every((player) => player.strongHold);
+      if (
+        currentPlayer?.strongHold &&
+        currentPlayer?.strongHold.row !== undefined &&
+        currentPlayer?.strongHold.col !== undefined &&
+        !allStrongholdsPlaced
+      ) {
+        advancePhase(); // Automatically advance if the current player has placed their stronghold
+      } else if (allStrongholdsPlaced) {
+        setCurrentPhase(phaseOrder[0]); // Resume normal turn order if all strongholds are placed
+      }
     }
-  }, [isSetupComplete]);
+  }, [currentPlayer]);
 
   // Render advance phase for player who's turn it is
   useEffect(() => {
@@ -72,20 +79,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       console.error("Game state is undefined");
       return; // Exit the function if gameState is undefined
     }
-    // Assuming currentPlayer is part of the props and has the structure of PlayerInfo
-    const strongholdPlaced =
-      currentPlayer &&
-      currentPlayer.strongHold &&
-      currentPlayer.strongHold.row !== undefined &&
-      currentPlayer.strongHold.col !== undefined;
-
-    if (!strongholdPlaced) {
-      // Display an Ion alert to inform the player to place their stronghold
-      alert(
-        "You must place your stronghold before proceeding to the next phase."
-      );
-      return;
-    }
+    
     const isSetupPhase = gameState?.gameState?.currentPhase === "Setup";
     let nextPhase, nextPlayerTurn;
 
