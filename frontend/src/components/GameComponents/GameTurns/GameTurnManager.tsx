@@ -69,57 +69,60 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   // Phase order
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
   const advancePhase = () => {
-    const currentPhaseIndex = phaseOrder.indexOf(
-      gameState?.gameState?.currentPhase ?? phaseOrder[0]
-    );
-    const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
-    const nextPhase = phaseOrder[nextPhaseIndex];
-
-    if (gameState && gameState.gameState) {
-      let nextPlayerTurn = gameState.gameState.currentPlayerTurn;
-
-      // Check if we need to move to the next player
-      if (nextPhase === phaseOrder[0]) {
-        console.log(
-          "Current Player Turn:",
-          gameState.gameState.currentPlayerTurn
-        );
-        console.log("Turn Order:", gameState.gameState.turnOrder);
-
-        const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-          (player) => player === gameState.gameState.currentPlayerTurn
-        );
-
-        // Debugging logs
-        console.log("Current playerindex:", currentPlayerIndex);
-
-        // Handle the case where the current player index is not found
-        if (currentPlayerIndex === -1) {
-          console.error("Current player turn not found in turn order.");
-          // Optionally set a default player or handle this error appropriately
-          return;
-        }
-
-        const nextPlayerIndex =
-          (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-        console.log("Current nextPlayerIndex:", nextPlayerIndex);
-
-        nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
-        console.log("Current nextPlayerTurn:", nextPlayerTurn);
-      }
-
-      const newState = {
-        gameState: {
-          ...gameState.gameState,
-          currentPhase: nextPhase,
-          currentPlayerTurn: nextPlayerTurn, // Ensured to be a string
-        },
-      };
-
-      // Emit updated state
-      emitGameStateUpdate(newState);
+    if (!gameState || !gameState.gameState) {
+      console.error("Game state is undefined");
+      return; // Exit the function if gameState is undefined
     }
+    const isSetupPhase = gameState?.gameState?.currentPhase === 'Setup';
+    let nextPhase, nextPlayerTurn;
+  
+    if (isSetupPhase) {
+      // Find the next player who needs to complete the setup phase
+      const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
+        player => player === gameState.gameState.currentPlayerTurn
+      );
+  
+      const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+      nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+  
+      // If we have looped back to the first player, setup is complete
+      if (nextPlayerIndex === 0) {
+        nextPhase = phaseOrder[0]; // Assuming 'Draw' is the first phase after setup
+      } else {
+        nextPhase = 'Setup';
+      }
+    } else {
+      // Existing logic for normal game phases
+      const currentPhaseIndex = phaseOrder.indexOf(
+        gameState?.gameState?.currentPhase ?? phaseOrder[0]
+      );
+      const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
+      nextPhase = phaseOrder[nextPhaseIndex];
+  
+      // Move to next player if the phase has wrapped around
+      if (nextPhase === phaseOrder[0]) {
+        const currentPlayerIndex = gameState?.gameState.turnOrder.findIndex(
+          player => player === gameState.gameState.currentPlayerTurn
+        );
+        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+        nextPlayerTurn = gameState?.gameState.turnOrder[nextPlayerIndex];
+      } else {
+        nextPlayerTurn = gameState?.gameState.currentPlayerTurn;
+      }
+    }
+  
+    // Update the game state
+    const newState = {
+      gameState: {
+        ...gameState.gameState,
+        currentPhase: nextPhase,
+        currentPlayerTurn: nextPlayerTurn,
+      },
+    };
+  
+    emitGameStateUpdate(newState);
   };
+  
 
   return (
     <>
