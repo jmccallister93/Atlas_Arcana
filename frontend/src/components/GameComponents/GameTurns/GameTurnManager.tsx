@@ -28,6 +28,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   }, [gameState]);
   // Initial setup phase
   const [isSetupComplete, setIsSetupComplete] = useState(false);
+  // onStronghold placed
 
   // Transition to normal gamephase
   useEffect(() => {

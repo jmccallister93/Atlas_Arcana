@@ -338,7 +338,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
             setShowStrongholdConfirmation(true); // Show the confirmation alert
           } else {
-            console.error("Invalid stronghold placement");
+            alert("Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan.");
           }
         }
       }
