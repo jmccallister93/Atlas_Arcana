@@ -29,21 +29,21 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   }, [gameState]);
 
   // New useEffect for auto-advancing setup phase
-  useEffect(() => {
-    if (gameState?.gameState.currentPhase === "Setup") {
-      const allStrongholdsPlaced = players.every((player) => player.strongHold);
-      if (
-        currentPlayer?.strongHold &&
-        currentPlayer?.strongHold.row !== undefined &&
-        currentPlayer?.strongHold.col !== undefined &&
-        !allStrongholdsPlaced
-      ) {
-        advancePhase(); // Automatically advance if the current player has placed their stronghold
-      } else if (allStrongholdsPlaced) {
-        setCurrentPhase(phaseOrder[0]); // Resume normal turn order if all strongholds are placed
-      }
-    }
-  }, [currentPlayer]);
+  // useEffect(() => {
+  //   if (gameState?.gameState.currentPhase === "Setup") {
+  //     const allStrongholdsPlaced = players.every((player) => player.strongHold);
+  //     if (
+  //       currentPlayer?.strongHold &&
+  //       currentPlayer?.strongHold.row !== undefined &&
+  //       currentPlayer?.strongHold.col !== undefined &&
+  //       !allStrongholdsPlaced
+  //     ) {
+  //       advancePhase(); // Automatically advance if the current player has placed their stronghold
+  //     } else if (allStrongholdsPlaced) {
+  //       setCurrentPhase(phaseOrder[0]); // Resume normal turn order if all strongholds are placed
+  //     }
+  //   }
+  // }, [currentPlayer]);
 
   // Render advance phase for player who's turn it is
   useEffect(() => {

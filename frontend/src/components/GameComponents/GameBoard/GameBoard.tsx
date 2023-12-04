@@ -319,20 +319,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
       console.error("Selected tile is out of bounds.");
       return;
     }
-
-    if (isStrongholdPlacementMode) {
-      if (isValidStrongholdPlacement(xIndex, yIndex)) {
-        setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
-        setShowStrongholdConfirmation(true);
-      } else {
-        alert(
-          "Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan."
-        );
-      }
-    } else {
-      // Other tile selection logic for non-setup phases
-      onTileSelect(tileGrid[xIndex][yIndex], xIndex, yIndex);
-    }
+    setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
+    onTileSelect(tileGrid[xIndex][yIndex], xIndex, yIndex);
   };
 
   // On tile Select render out details
@@ -340,18 +328,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     let imageSrc = "";
     let buildingBonuses = "";
     let monsterBonuses = "";
-    const xIndex = Math.floor(mouseCoords.current.x / tileSize);
-    const yIndex = Math.floor(mouseCoords.current.y / tileSize);
-    if (isStrongholdPlacementMode) {
-      if (isValidStrongholdPlacement(xIndex, yIndex)) {
-        setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
-        setShowStrongholdConfirmation(true);
-      } else {
-        alert(
-          "Invalid stronghold placement. Must be at least 6 tiles from another Player or Titan."
-        );
-      }
-    }
+   
     switch (tileType) {
       case "oasis":
         imageSrc = oasis;
@@ -431,6 +408,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         emitGameStateUpdate(updatedGameState);
       } else {
         alert("Invalid stronghold placement.");
+        return
       }
     }
     setSelectedTile({
@@ -462,7 +440,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
   // Place stronghold
   const placeStronghold = () => {
-    if (currentPlayer) {
+    if (
+      currentPlayer &&
+      isValidStrongholdPlacement(
+        selectedStrongholdCoordinates.x,
+        selectedStrongholdCoordinates.y
+      )
+    ) {
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
