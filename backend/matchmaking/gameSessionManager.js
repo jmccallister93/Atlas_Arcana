@@ -31,7 +31,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   const currentPlayerTurn = setCurrentPlayerTurn(turnOrder);
 
   // Set starting phase of the game
-  const currentPhase = "Draw";
+  const currentPhase = "Setup";
   //Determine starting cards
   const startingEquipmentCards = determineStartingCards(players);
 

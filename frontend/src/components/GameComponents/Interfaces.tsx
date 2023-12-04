@@ -7,7 +7,6 @@ export interface GameSessionInfo {
     currentPhase: string;
     turnsCompleted: number;
     titans: TitanInfo[];
-    // Removed titanPosition
   };
   players: PlayerInfo[];
 }
@@ -59,6 +58,10 @@ export interface PlayerInfo {
   stamina: number;
   movement: number;
   build: number;
+  strongHold: {
+    col: number;
+    row: number;
+  };
   equippedItems: {
     weapon: any[];
     armor: any[];
@@ -67,6 +70,7 @@ export interface PlayerInfo {
     gloves: any[];
   };
   buildings: {
+
     defense: {
       outpost: number;
       fortification: number;

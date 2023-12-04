@@ -13,6 +13,7 @@ import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import TileMenuDetails from "./TileMenuDetails";
+import { PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
   tileGrid?: string[][];
@@ -26,7 +27,7 @@ interface GameBoardProps {
     row: number;
     col: number;
   }[];
-  players?: {}
+  players?: PlayerInfo[]
   buildings?: {}
 }
 
@@ -221,6 +222,37 @@ const GameBoard: React.FC<GameBoardProps> = ({ tileGrid, titans, players }) => {
     };
   }, [tileGrid, showTileDetails, titans]);
 
+  // Calculate distance of tiles
+  const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number => {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  };
+    // Validate stronghold placement
+  const isValidStrongholdPlacement = (x: number, y: number): boolean => {
+    for (let titan of titans ?? []) {
+      const distance = calculateDistance(x, y, titan.col, titan.row);
+      if (distance <= 6) {
+        return false; // Too close to a titan
+      }
+    }
+    for (let player of players ?? []) {
+      const distance = calculateDistance(x, y, player.col, player.row);
+      if (distance <= 6) {
+        return false; // Too close to a player
+      }
+    }
+  
+    return true; // Valid placement
+  };
+   // Handle the setup action
+   const handleSetupAction = (player: PlayerInfo, x: number, y: number) => {
+    if (isValidStrongholdPlacement(x, y)) {
+      // Place the stronghold and update the game state
+      // Check if all players have placed their strongholds
+      // If yes, setIsSetupComplete(true);
+    } else {
+      // Handle invalid placement (e.g., show error message)
+    }
+  };
 // Handle Selected tile
   const handleTileSelection = () => {
     if (!tileGrid) return;
