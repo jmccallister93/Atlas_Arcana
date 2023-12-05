@@ -257,7 +257,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       }
       if (canvasRef.current) {
         // Remove the event listener when the component unmounts
-        canvasRef.current.removeEventListener("click", handleTileSelection);
+        canvasRef.current.removeEventListener("click", handleClick);
       }
     };
   }, [tileGrid, showTileDetails, titans]);
@@ -314,6 +314,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       yIndex < 0 ||
       yIndex >= tileGrid[xIndex].length
     ) {
+
       console.error("Selected tile is out of bounds.");
       return;
     }
@@ -414,6 +415,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
   // Place stronghold
   const placeStronghold = () => {
+    console.log(selectedStrongholdCoordinates.x, selectedStrongholdCoordinates.y)
     if (
       currentPlayer &&
       isValidStrongholdPlacement(
@@ -421,6 +423,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         selectedStrongholdCoordinates.y
       )
     ) {
+      
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
