@@ -52,12 +52,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
   currentPlayer,
 }) => {
-  const mouseCoords = useRef({ x: 0, y: 0 });
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [seed, setSeed] = useState<number | null>(null);
-  const [width, setWidth] = useState(720);
-  const [height, setHeight] = useState(720);
-  const [tileSize, setTileSize] = useState(30);
   interface TileInfo {
     type: string;
     x: number;
@@ -65,9 +59,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     image: string;
     monsterBonuses: string;
     buildingBonuses: string;
-    // buildings: string[];
-    // players: string[];
 
+    players: PlayerInfo | null;
+    stronghold: PlayerInfo | null,
     titan: {
       titanName: string;
       rank: number;
@@ -80,6 +74,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
     } | null;
     titanImage: string;
   }
+  const mouseCoords = useRef({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [seed, setSeed] = useState<number | null>(null);
+  const [width, setWidth] = useState(720);
+  const [height, setHeight] = useState(720);
+  const [tileSize, setTileSize] = useState(30);
+
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
@@ -359,6 +360,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
           break;
       }
     }
+    // Check for a player on the tile
+    const playerOnTile =
+      players?.find((player) => player.row === y && player.col === x) || null;
+
+    //Check if stronghold on the tile
+    const strongholdOnTile =
+      players?.find(
+        (player) => player.strongHold.row === y && player.strongHold.col === x
+      ) || null;
+
+    // Check for buildings on the tile
+    const buildingOnTile = players?.find((player) => player.buildings);
+
     setSelectedTile({
       type: tileType,
       x,
@@ -366,26 +380,15 @@ const GameBoard: React.FC<GameBoardProps> = ({
       image: imageSrc,
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
-      titan: titanOnTile, // set the titan if found
-      titanImage: titanOnTile ? getTitanImageUrl(titanOnTile.titanName) : "",
+      titan: titanOnTile,
+      titanImage: titanImageUrl,
+      players: playerOnTile,
+      stronghold: strongholdOnTile,
+      // buildings: buildingsOnTile,
     });
     setShowTileDetails(true);
   };
-  // Get titan images
-  const getTitanImageUrl = (titanName: any) => {
-    switch (titanName) {
-      case "Fire Titan":
-        return fireTitanToken;
-      case "Ice Titan":
-        return iceTitanToken;
-      case "Stone Titan":
-        return stoneTitanToken;
-      case "Storm Titan":
-        return stormTitanToken;
-      default:
-        return "";
-    }
-  };
+
   // Place stronghold
   const placeStronghold = () => {
     console.log(
@@ -449,6 +452,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
             setShowTileDetails={setShowTileDetails}
             isStrongholdPlacementMode={isStrongholdPlacementMode}
             placeStronghold={placeStronghold}
+            // player={selectedTile?.player} // Pass the player
+            // buildings={selectedTile?.buildings} // Pass the buildings
             // currentPlayer={currentPlayer}
             // strongholdCoordinates={selectedStrongholdCoordinates}
           />

@@ -31,7 +31,6 @@ interface TileMenuDetailsProps {
   setShowTileDetails: (show: boolean) => void;
   isStrongholdPlacementMode: boolean;
   placeStronghold: () => void;
-
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
@@ -40,7 +39,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   setShowTileDetails,
   isStrongholdPlacementMode,
   placeStronghold,
-
 }) => {
   return (
     <IonModal
@@ -59,6 +57,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
         </div>
         {selectedTile && (
           <>
+            {/* titan details */}
             {selectedTile.titan && (
               <div>
                 <h3>{selectedTile.titan.titanName} Details</h3>
@@ -84,31 +83,56 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                 </p>
               </div>
             )}
+            {/* {selectedTile.player && (
+              <div>
+                <h3>Player Details</h3>
+                <p>
+                  <b>Victory Points:</b> {selectedTile.player.victoryPoints}
+                </p>
+                <p>
+                  <b>Rank:</b> {selectedTile.player.rank}
+                </p>
+                <p>
+                  <b>Health:</b> {selectedTile.player.health}
+                </p>
+                <p>
+                  <b>Offense:</b> {selectedTile.player.offense}
+                </p>
+                <p>
+                  <b>Defense:</b> {selectedTile.player.defense}
+                </p>
+                <p>
+                  <b>Stamina:</b> {selectedTile.player.stamina}
+                </p>
+             
+              </div>
+            )} */}
+
             {isStrongholdPlacementMode ? (
               <>
-              <p>Place Stronghold on Tile?</p>
-              <IonButton onClick={placeStronghold}>Confirm</IonButton>
+                <p>Place Stronghold on Tile?</p>
+                <IonButton onClick={placeStronghold}>Confirm</IonButton>
               </>
-            ) : (null)}
+            ) : null}
             <div>
               <h3>Tile Details</h3>
-            <img
-              src={selectedTile.image}
-              alt={selectedTile.type}
-              style={{ maxWidth: "45%" }}
-            />
-            <p>
-              <b>Type:</b> {selectedTile.type}
-            </p>
-            <p>
-              <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
-            </p>
-            <p>
-              <b>Building Bonuses:</b> {selectedTile.buildingBonuses}
-            </p>
-            <p>
-              <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
-            </p>
+              <img
+                src={selectedTile.image}
+                alt={selectedTile.type}
+                style={{ maxWidth: "45%" }}
+              />
+              <p>
+                <b>Type:</b> {selectedTile.type}
+              </p>
+              <p>
+                <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
+              </p>
+              <p>
+                <b>Building Bonuses:</b> {selectedTile.buildingBonuses}
+              </p>
+              <p>
+                <b>Monster Bonuses:</b> {selectedTile.monsterBonuses}
+              </p>
             </div>
           </>
         )}
