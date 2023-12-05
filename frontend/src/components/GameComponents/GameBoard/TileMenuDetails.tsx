@@ -3,6 +3,7 @@ import { IonContent, IonIcon, IonModal, IonButton } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
 
+
 interface Titan {
   titanName: string;
   rank: number;
@@ -31,6 +32,7 @@ interface TileInfo {
   buildings: BuildingInfo[] | null;
   stronghold: StrongholdInfo | null;
   titan: Titan | null;
+  titanImage?: string;
 }
 
 interface TileMenuDetailsProps {
@@ -78,7 +80,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
               <div>
                 <h3>{selectedTile.titan.titanName} Details</h3>
                 <img
-                  src={selectedTile.titan.image}
+                  src={selectedTile.titanImage}
                   alt={selectedTile.titan.titanName}
                   style={{ maxWidth: "100%" }}
                 />
