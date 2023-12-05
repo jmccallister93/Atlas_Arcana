@@ -22,7 +22,7 @@ import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
 import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
-import TileMenuDetails from "./TileMenuDetails";
+import TileMenuDetails, { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
@@ -61,7 +61,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     buildingBonuses: string;
     buildings: BuildingInfo[] | null;
     players: PlayerInfo | null;
-    stronghold: PlayerInfo | null;
+    stronghold: StrongholdInfo | null;
     titan: {
       titanName: string;
       rank: number;
@@ -299,7 +299,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Updated function to check entities on a tile
   const checkEntitiesOnTile = (x: number, y: number) => {
     let playerOnTile = null;
-    let strongholdOnTile = null;
+    let strongholdOnTile: StrongholdInfo | null = null;
     let buildingsOnTile: BuildingInfo[] = [];
     let titanOnTile = null;
     let titanImageUrl = "";
@@ -332,14 +332,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
         playerOnTile = player;
       }
 
-      // Check for stronghold
-      if (
-        player.strongHold &&
-        player.strongHold.row === y &&
-        player.strongHold.col === x
-      ) {
-        strongholdOnTile = player.strongHold;
-      }
+      if (player.strongHold && player.strongHold.row === y && player.strongHold.col === x) {
+        strongholdOnTile = {
+          ...player.strongHold,
+          ownerUsername: player.username // Include the owner's username
+        }}
 
       // Check for buildings
       Object.values(player.buildings).forEach((buildingCategory) => {
@@ -496,10 +493,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
             setShowTileDetails={setShowTileDetails}
             isStrongholdPlacementMode={isStrongholdPlacementMode}
             placeStronghold={placeStronghold}
-            // player={selectedTile?.player} // Pass the player
-            // buildings={selectedTile?.buildings} // Pass the buildings
-            // currentPlayer={currentPlayer}
-            // strongholdCoordinates={selectedStrongholdCoordinates}
           />
 
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

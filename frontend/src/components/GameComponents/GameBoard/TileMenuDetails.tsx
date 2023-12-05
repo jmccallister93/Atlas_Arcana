@@ -14,6 +14,11 @@ interface Titan {
   col: number;
   image?: string;
 }
+export interface StrongholdInfo {
+  row: number;
+  col: number;
+  ownerUsername: string; // Add this to store the owner's username
+}
 
 interface TileInfo {
   type: string;
@@ -24,7 +29,7 @@ interface TileInfo {
   buildingBonuses: string;
   players: PlayerInfo | null;
   buildings: BuildingInfo[] | null;
-  stronghold: { row: number; col: number } | null;
+  stronghold: StrongholdInfo | null;
   titan: Titan | null;
 }
 
@@ -129,6 +134,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             {selectedTile.stronghold && (
               <div>
                 <h3>Stronghold</h3>
+                <p>Owner: {selectedTile.stronghold.ownerUsername}</p>
                 <p>
                   Coordinates: (X: {selectedTile.stronghold.col}, Y:{" "}
                   {selectedTile.stronghold.row})
