@@ -342,14 +342,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
       }
 
       // Check for buildings
-      Object.values(player.buildings).forEach((category) => {
-        category.forEach((building) => {
-          building.location.forEach((loc) => {
-            if (loc.row === y && loc.col === x) {
-              buildingsOnTile.push(building);
-            }
+      Object.values(player.buildings).forEach((buildingCategory) => {
+        // Ensure buildingCategory is an array before calling forEach
+        if (Array.isArray(buildingCategory)) {
+          buildingCategory.forEach((building) => {
+            building.location.forEach((loc) => {
+              if (loc.row === y && loc.col === x) {
+                buildingsOnTile.push(building);
+              }
+            });
           });
-        });
+        }
       });
     });
 
