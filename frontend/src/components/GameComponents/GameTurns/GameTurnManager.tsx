@@ -22,30 +22,37 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   );
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
+  const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
 
   // Turn order
   useEffect(() => {
     setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
   }, [gameState]);
 
+  
   // New useEffect for auto-advancing setup phase
   useEffect(() => {
     if (gameState?.gameState.currentPhase === "Setup") {
-      const allStrongholdsPlaced = players.every((player) => player.strongHold);
-      if (
-        currentPlayer?.strongHold &&
-        currentPlayer?.strongHold.row !== undefined &&
-        currentPlayer?.strongHold.col !== undefined &&
-        !allStrongholdsPlaced
-      ) {
-        console.log("Current Player",currentPlayer)
-        console.log("Game phase",gameState?.gameState.currentPhase)
-        advancePhase(); // Automatically advance if the current player has placed their stronghold
-      } else if (allStrongholdsPlaced) {
-        setCurrentPhase(phaseOrder[0]); // Resume normal turn order if all strongholds are placed
+      // Check if the players array is not empty and every player has placed their stronghold
+      const allStrongholdsPlaced = players.length > 0 && players.every((player) => player.strongHold);
+  
+      if (allStrongholdsPlaced) {
+        // All players have placed their strongholds
+        const newState = {
+          gameState: {
+            ...gameState.gameState,
+            currentPhase: phaseOrder[0], // 'Draw' phase
+            currentPlayerTurn: gameState.gameState.turnOrder[0] // First player in the turn order
+          },
+        };
+  
+        console.log("Advancing to Draw phase");
+        emitGameStateUpdate(newState);
       }
     }
-  }, [currentPlayer]);
+  }, [currentPlayer, gameState, players, phaseOrder]);
+  
+  
 
   // Render advance phase for player who's turn it is
   useEffect(() => {
@@ -75,7 +82,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   }, [gameState]);
 
   // Phase order
-  const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
+  //Advance PHase
   const advancePhase = () => {
     if (!gameState || !gameState.gameState) {
       console.error("Game state is undefined");

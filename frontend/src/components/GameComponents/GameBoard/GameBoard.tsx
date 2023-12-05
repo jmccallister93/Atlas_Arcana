@@ -273,16 +273,26 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
   // Validate stronghold placement
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
+    // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
       if (distance <= 6) {
         return false; // Too close to a titan
       }
     }
+
+    // Check distance from other players' strongholds
     for (let player of players ?? []) {
-      const distance = calculateDistance(x, y, player.col, player.row);
-      if (distance <= 6) {
-        return false; // Too close to a player
+      if (player.strongHold && player.username !== currentPlayer?.username) {
+        const distance = calculateDistance(
+          x,
+          y,
+          player.strongHold.col,
+          player.strongHold.row
+        );
+        if (distance <= 6) {
+          return false; // Too close to another player's stronghold
+        }
       }
     }
 
@@ -314,7 +324,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
       yIndex < 0 ||
       yIndex >= tileGrid[xIndex].length
     ) {
-
       console.error("Selected tile is out of bounds.");
       return;
     }
@@ -327,7 +336,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     let imageSrc = "";
     let buildingBonuses = "";
     let monsterBonuses = "";
-   
+
     switch (tileType) {
       case "oasis":
         imageSrc = oasis;
@@ -415,7 +424,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
   };
   // Place stronghold
   const placeStronghold = () => {
-    console.log(selectedStrongholdCoordinates.x, selectedStrongholdCoordinates.y)
+    console.log(
+      selectedStrongholdCoordinates.x,
+      selectedStrongholdCoordinates.y
+    );
     if (
       currentPlayer &&
       isValidStrongholdPlacement(
@@ -423,7 +435,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         selectedStrongholdCoordinates.y
       )
     ) {
-      
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
@@ -439,8 +450,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       };
       emitGameStateUpdate(updatedGameState);
     } else {
-      alert("Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan.");
-      return
+      alert(
+        "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
+      );
+      return;
     }
   };
 
