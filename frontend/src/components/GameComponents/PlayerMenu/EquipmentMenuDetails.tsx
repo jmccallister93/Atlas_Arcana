@@ -144,6 +144,13 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     }
   };
 
+  // Function to check if a specific type of building is present
+const isBuildingPresent = (buildingType: string): boolean => {
+  return player.buildings.equipment.some(
+    building => building.type === buildingType && building.count > 0
+  );
+};
+
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,
@@ -162,7 +169,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     const hasWhetstone = player.inventory.treasures.some(
       (treasure) => treasure.treasureName === "Whetstone"
     );
-    const hasForge = player.buildings.equipment.forge !== 0;
+    const hasForge = isBuildingPresent("forge");
     const hasResources = player.inventory.resources > 3;
     const rankUpPrereq = hasWhetstone || (hasForge && hasResources);
     // Check prerequisites
@@ -239,7 +246,7 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     const hasWhetstone = player.inventory.treasures.some(
       (treasure) => treasure.treasureName === "Whetstone"
     );
-    const hasForge = player.buildings.equipment.forge !== 0;
+    const hasForge = isBuildingPresent("forge");
     const hasResources = player.inventory.resources >= 4;
     // Show both options if all prerequisites are met
     if (hasWhetstone && hasForge && hasResources) {
@@ -305,10 +312,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   emberTypes.includes(treasure.treasureName)
 );
 
-    const hasShrine = player.buildings.equipment.attunementShrine !== 0;
+const hasAttunementShrine = isBuildingPresent("attunementShrine");
     const hasResources = player.inventory.resources > 3;
     const attunePrereq =
-      availableEmbers.length > 0 || (hasShrine && hasResources);
+      availableEmbers.length > 0 || (hasAttunementShrine && hasResources);
     // Check prerequisites
     if (attunePrereq) {
       // Set the selected item
@@ -388,7 +395,7 @@ const availableEmbers = player.inventory.treasures.filter((treasure) =>
   emberTypes.includes(treasure.treasureName)
 );
 
-    const hasShrine = player.buildings.equipment.attunementShrine !== 0;
+const hasAttunementShrine = isBuildingPresent("attunementShrine");
     const hasResources = player.inventory.resources > 3;
 
     // Add a button for each available Ember type
@@ -402,7 +409,7 @@ const availableEmbers = player.inventory.treasures.filter((treasure) =>
     });
 
     // Add the option to choose an element for attunement
-    if (hasShrine && hasResources) {
+    if (hasAttunementShrine && hasResources) {
       buttons.push({
         text: "Use Attunement Shrine and lose 4 Resources",
         role: "confirm",

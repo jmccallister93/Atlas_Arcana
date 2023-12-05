@@ -23,7 +23,7 @@ import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import TileMenuDetails from "./TileMenuDetails";
-import { GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
   gameState?: GameSessionInfo;
@@ -59,9 +59,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     image: string;
     monsterBonuses: string;
     buildingBonuses: string;
-
+    buildings: BuildingInfo[] | null;
     players: PlayerInfo | null;
-    stronghold: PlayerInfo | null,
+    stronghold: PlayerInfo | null;
     titan: {
       titanName: string;
       rank: number;
@@ -296,6 +296,72 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onTileSelect(tileGrid[xIndex][yIndex], xIndex, yIndex);
   };
 
+  // Updated function to check entities on a tile
+  const checkEntitiesOnTile = (x: number, y: number) => {
+    let playerOnTile = null;
+    let strongholdOnTile = null;
+    let buildingsOnTile: BuildingInfo[] = [];
+    let titanOnTile = null;
+    let titanImageUrl = "";
+    // Check for titans
+    const foundTitan = titans?.find(
+      (titan) => titan.row === y && titan.col === x
+    );
+    if (foundTitan) {
+      titanOnTile = foundTitan;
+      // Determine the image URL based on the titan's name
+      switch (titanOnTile.titanName) {
+        case "Fire Titan":
+          titanImageUrl = fireTitanToken;
+          break;
+        case "Ice Titan":
+          titanImageUrl = iceTitanToken;
+          break;
+        case "Stone Titan":
+          titanImageUrl = stoneTitanToken;
+          break;
+        case "Storm Titan":
+          titanImageUrl = stormTitanToken;
+          break;
+      }
+    }
+    // Determine the image URL based on the titan's name
+    players?.forEach((player) => {
+      // Check for player
+      if (player.row === y && player.col === x) {
+        playerOnTile = player;
+      }
+
+      // Check for stronghold
+      if (
+        player.strongHold &&
+        player.strongHold.row === y &&
+        player.strongHold.col === x
+      ) {
+        strongholdOnTile = player.strongHold;
+      }
+
+      // Check for buildings
+      Object.values(player.buildings).forEach((category) => {
+        category.forEach((building) => {
+          building.location.forEach((loc) => {
+            if (loc.row === y && loc.col === x) {
+              buildingsOnTile.push(building);
+            }
+          });
+        });
+      });
+    });
+
+    return {
+      playerOnTile,
+      strongholdOnTile,
+      buildingsOnTile,
+      titanOnTile,
+      titanImageUrl,
+    };
+  };
+
   // On tile Select render out details
   const onTileSelect = (tileType: string, x: number, y: number) => {
     let imageSrc = "";
@@ -339,39 +405,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
       console.error("Unknown tile type selected:", tileType);
       return;
     }
-    // Check for a titan on the tile
-    const titanOnTile =
-      titans?.find((titan) => titan.row === y && titan.col === x) || null;
-    let titanImageUrl = "";
-    if (titanOnTile) {
-      // Determine the image URL based on the titan's name
-      switch (titanOnTile.titanName) {
-        case "Fire Titan":
-          titanImageUrl = fireTitanToken;
-          break;
-        case "Ice Titan":
-          titanImageUrl = iceTitanToken;
-          break;
-        case "Stone Titan":
-          titanImageUrl = stoneTitanToken;
-          break;
-        case "Storm Titan":
-          titanImageUrl = stormTitanToken;
-          break;
-      }
-    }
-    // Check for a player on the tile
-    const playerOnTile =
-      players?.find((player) => player.row === y && player.col === x) || null;
 
-    //Check if stronghold on the tile
-    const strongholdOnTile =
-      players?.find(
-        (player) => player.strongHold.row === y && player.strongHold.col === x
-      ) || null;
-
-    // Check for buildings on the tile
-    const buildingOnTile = players?.find((player) => player.buildings);
+    const {
+      playerOnTile,
+      strongholdOnTile,
+      buildingsOnTile,
+      titanOnTile,
+      titanImageUrl,
+    } = checkEntitiesOnTile(x, y);
 
     setSelectedTile({
       type: tileType,
@@ -384,7 +425,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       titanImage: titanImageUrl,
       players: playerOnTile,
       stronghold: strongholdOnTile,
-      // buildings: buildingsOnTile,
+      buildings: buildingsOnTile,
     });
     setShowTileDetails(true);
   };

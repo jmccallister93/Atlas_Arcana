@@ -46,6 +46,15 @@ export interface QuestItem {
   description: string;
 }
 
+export interface BuildingInfo {
+  type: string; // e.g., 'outpost', 'fortification', 'armory', etc.
+  count: number; // The count of this type of building
+  location: {
+    row: number;
+    col: number;
+  }[];
+}
+
 export interface PlayerInfo {
   username: string;
   col: number;
@@ -70,36 +79,11 @@ export interface PlayerInfo {
     gloves: any[];
   };
   buildings: {
-    defense: {
-      outpost: number;
-      fortification: number;
-      archerTower: number;
-      battlement: number;
-    };
-    equipment: {
-      armory: number;
-      forge: number;
-      attunementShrine: number;
-      warehouse: number;
-    };
-    quest: {
-      tavern: number;
-      guildHall: number;
-      library: number;
-      oracleHut: number;
-    };
-    resource: {
-      farm: number;
-      ranch: number;
-      plantation: number;
-    };
-    movement: {
-      portal: number;
-      road: number;
-      humanCatapult: number;
-    };
-    equipmentCardCapacity: number;
-    treasureCardCapacity: number;
+    defense: BuildingInfo[];
+    equipment: BuildingInfo[];
+    quest: BuildingInfo[];
+    resource: BuildingInfo[];
+    movement: BuildingInfo[];
   };
   inventory: {
     resources: any;
