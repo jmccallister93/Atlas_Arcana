@@ -70,7 +70,6 @@ export interface PlayerInfo {
     gloves: any[];
   };
   buildings: {
-
     defense: {
       outpost: number;
       fortification: number;

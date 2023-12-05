@@ -7,6 +7,8 @@ import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
 import stronghold1 from "./GameTiles/stronghold1.png";
 import stronghold2 from "./GameTiles/stronghold2.png";
+import stronghold3 from "./GameTiles/stronghold3.png";
+import stronghold4 from "./GameTiles/stronghold4.png";
 import {
   IonAlert,
   IonButton,
@@ -99,7 +101,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         stoneTitanImg: Image,
         stormTitanImg: Image,
         stronghold1Img: Image,
-        stronghold2Img: Image;
+        stronghold2Img: Image,
+        stronghold3Img: Image,
+        stronghold4Img: Image;
 
       //   Preload images
       p.preload = () => {
@@ -114,6 +118,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
         stormTitanImg = p.loadImage(stormTitanToken);
         stronghold1Img = p.loadImage(stronghold1);
         stronghold2Img = p.loadImage(stronghold2);
+        stronghold3Img = p.loadImage(stronghold3);
+        stronghold4Img = p.loadImage(stronghold4);
       };
 
       // Setup canvas
@@ -143,56 +149,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
             let color = tileTypeToColor[tileType] || "#FFFFFF";
             p.fill(color);
             p.rect(x * tileSize, y * tileSize, tileSize, tileSize);
-            // switch (tileType) {
-            //   case "oasis":
-            //     p.image(
-            //       oasisImg,
-            //       x * tileSize,
-            //       y * tileSize,
-            //       tileSize,
-            //       tileSize
-            //     );
-            //     break;
-            //   case "desert":
-            //     p.image(
-            //       desertImg,
-            //       x * tileSize,
-            //       y * tileSize,
-            //       tileSize,
-            //       tileSize
-            //     );
-            //     break;
-            //   case "forest":
-            //     p.image(
-            //       forestImg,
-            //       x * tileSize,
-            //       y * tileSize,
-            //       tileSize,
-            //       tileSize
-            //     );
-            //     break;
-            //   case "grassland":
-            //     p.image(
-            //       grasslandImg,
-            //       x * tileSize,
-            //       y * tileSize,
-            //       tileSize,
-            //       tileSize
-            //     );
-            //     break;
-            //   case "tundra":
-            //     p.image(
-            //       tundraImg,
-            //       x * tileSize,
-            //       y * tileSize,
-            //       tileSize,
-            //       tileSize
-            //     );
-            //     break;
-            //   default:
-            //     // Handle unknown tile types if necessary
-            //     break;
-            // }
           }
         }
         // Draw titan tokens
@@ -217,11 +173,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
             p.image(img, col * tileSize, row * tileSize, tileSize, tileSize);
           }
         });
-        // Inside p.draw function
-        players?.forEach((player) => {
+
+        // Draw player strongholds
+        const strongholdImages = [
+          stronghold1Img,
+          stronghold2Img,
+          stronghold3Img,
+          stronghold4Img,
+        ];
+
+        players?.forEach((player, index) => {
           if (player.strongHold) {
             let strongholdImg =
-              player.username === "Player1" ? stronghold1Img : stronghold2Img;
+              strongholdImages[index % strongholdImages.length];
             p.image(
               strongholdImg,
               player.strongHold.col * tileSize,

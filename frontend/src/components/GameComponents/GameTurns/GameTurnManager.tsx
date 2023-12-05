@@ -27,31 +27,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   // Turn order
   useEffect(() => {
     setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
-  }, [gameState]);
-
-  
-  // New useEffect for auto-advancing setup phase
-  useEffect(() => {
-    if (gameState?.gameState.currentPhase === "Setup") {
-      // Check if the players array is not empty and every player has placed their stronghold
-      const allStrongholdsPlaced = players.length > 0 && players.every((player) => player.strongHold);
-  
-      if (allStrongholdsPlaced) {
-        // All players have placed their strongholds
-        const newState = {
-          gameState: {
-            ...gameState.gameState,
-            currentPhase: phaseOrder[0], // 'Draw' phase
-            currentPlayerTurn: gameState.gameState.turnOrder[0] // First player in the turn order
-          },
-        };
-  
-        console.log("Advancing to Draw phase");
-        emitGameStateUpdate(newState);
-      }
-    }
-  }, [currentPlayer, gameState, players, phaseOrder]);
-  
+  }, [gameState]);  
   
 
   // Render advance phase for player who's turn it is
