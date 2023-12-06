@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { IonIcon, ReactComponentOrElement } from "@ionic/react";
+import { IonIcon, ReactComponentOrElement, IonAlert } from "@ionic/react";
 import { arrowForwardCircleOutline } from "ionicons/icons";
 import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 import DrawPhase from "./DrawPhase";
+import TradePhase from "./TradePhase";
+import RestPhase from "./RestPhase";
+import MapPhase from "./MapPhase";
+import CombatPhase from "./CombatPhase";
+import TitanPhase from "./TitanPhase";
 
 interface GameTurnManagerProps {
   gameState?: GameSessionInfo;
@@ -24,7 +29,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
-  const [drawPhase, setDrawPhase] = useState<ReactComponentOrElement>();
+  const [phaseMessage, setPhaseMessage] = useState<ReactComponentOrElement>();
+  const [showStrongholdAlert, setShowStrongholdAlert] = useState(false); 
 
   // Turn order
   useEffect(() => {
@@ -65,7 +71,10 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       console.error("Game state is undefined");
       return; // Exit the function if gameState is undefined
     }
-
+    if (!currentPlayer || currentPlayer.strongHold === undefined) {
+      setShowStrongholdAlert(true); // Show alert if 'strongHold' is missing
+      return; // Prevent further execution
+    }
     const isSetupPhase = gameState?.gameState?.currentPhase === "Setup";
     let nextPhase, nextPlayerTurn;
 
@@ -119,16 +128,35 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   };
   // Draw phase
   useEffect(() => {
-    if(currentPlayer?.username === currentPlayerTurn){
-      if (
-        gameState?.gameState.currentPhase === "Draw" 
-      ) {
-        // setDrawPhase(<DrawPhase currentPlayer={currentPlayer}/>)
-        console.log(currentPlayerTurn);
+    if (currentPlayer?.username === currentPlayerTurn) {
+      const currentPhase = gameState?.gameState.currentPhase;
+      switch (currentPhase) {
+        case "Draw":
+          setPhaseMessage(<DrawPhase />)
+          break;
+        case "Trade":
+          setPhaseMessage(<TradePhase/>)
+          break;
+        case "Rest":
+          setPhaseMessage(<RestPhase/>)
+          break;
+        case "Map":
+          setPhaseMessage(<MapPhase/>)
+          break;
+        case "Combat":
+          setPhaseMessage(<CombatPhase/>)
+          break;
+        case "Titan":
+          setPhaseMessage(<TitanPhase/>)
+          break;
+        default:
+          // Optional: handle any case where currentPhase doesn't match any of the cases
+          break;
+          
       }
+      
     }
-   
-  }, [gameState]);
+  }, [gameState,  currentPlayerTurn, currentPlayer]);
 
   return (
     <>
@@ -137,7 +165,14 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
         Game Phase: {gameState?.gameState.currentPhase}
       </h4>
       {gamePhaseButton}
-      {drawPhase}
+      {phaseMessage}
+      <IonAlert
+        isOpen={showStrongholdAlert}
+        onDidDismiss={() => setShowStrongholdAlert(false)}
+        header={'Action Required'}
+        message={'Please place your stronghold before advancing the turn.'}
+        buttons={['OK']}
+      />
     </>
   );
 };
