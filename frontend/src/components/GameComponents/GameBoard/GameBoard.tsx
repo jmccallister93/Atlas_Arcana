@@ -87,6 +87,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     useState(false);
   const [selectedStrongholdCoordinates, setSelectedStrongholdCoordinates] =
     useState({ x: 0, y: 0 });
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   // Main UseEffect
   useEffect(() => {
@@ -332,11 +334,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
         playerOnTile = player;
       }
 
-      if (player.strongHold && player.strongHold.row === y && player.strongHold.col === x) {
+      if (
+        player.strongHold &&
+        player.strongHold.row === y &&
+        player.strongHold.col === x
+      ) {
         strongholdOnTile = {
           ...player.strongHold,
-          ownerUsername: player.username // Include the owner's username
-        }}
+          ownerUsername: player.username, // Include the owner's username
+        };
+      }
 
       // Check for buildings
       Object.values(player.buildings).forEach((buildingCategory) => {
@@ -458,9 +465,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       };
       emitGameStateUpdate(updatedGameState);
     } else {
-      alert(
+      setAlertMessage(
         "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
       );
+      setShowAlert(true);
       return;
     }
   };
@@ -498,6 +506,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
         </IonContent>
       </IonModal>
+      <IonAlert
+        isOpen={showAlert}
+        onDidDismiss={() => setShowAlert(false)}
+        header={"Alert"}
+        message={alertMessage}
+        buttons={["OK"]}
+      />
     </>
   );
 };

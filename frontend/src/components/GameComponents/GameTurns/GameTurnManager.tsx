@@ -29,7 +29,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
-  const [phaseMessage, setPhaseMessage] = useState<ReactComponentOrElement>();
+  const [phaseAction, setPhaseAction] = useState<ReactComponentOrElement>();
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false); 
 
   // Turn order
@@ -132,22 +132,22 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       const currentPhase = gameState?.gameState.currentPhase;
       switch (currentPhase) {
         case "Draw":
-          setPhaseMessage(<DrawPhase />)
+          setPhaseAction(<DrawPhase />)
           break;
         case "Trade":
-          setPhaseMessage(<TradePhase/>)
+          setPhaseAction(<TradePhase/>)
           break;
         case "Rest":
-          setPhaseMessage(<RestPhase/>)
+          setPhaseAction(<RestPhase/>)
           break;
         case "Map":
-          setPhaseMessage(<MapPhase/>)
+          setPhaseAction(<MapPhase/>)
           break;
         case "Combat":
-          setPhaseMessage(<CombatPhase/>)
+          setPhaseAction(<CombatPhase/>)
           break;
         case "Titan":
-          setPhaseMessage(<TitanPhase/>)
+          setPhaseAction(<TitanPhase/>)
           break;
         default:
           // Optional: handle any case where currentPhase doesn't match any of the cases
@@ -165,12 +165,12 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
         Game Phase: {gameState?.gameState.currentPhase}
       </h4>
       {gamePhaseButton}
-      {phaseMessage}
+      {phaseAction}
       <IonAlert
         isOpen={showStrongholdAlert}
         onDidDismiss={() => setShowStrongholdAlert(false)}
         header={'Action Required'}
-        message={'Please place your stronghold before advancing the turn.'}
+        message={'Please place your Stronghold before advancing the turn.'}
         buttons={['OK']}
       />
     </>
