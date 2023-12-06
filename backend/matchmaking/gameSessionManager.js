@@ -304,6 +304,13 @@ function isPositionValid(titanPositions, row, col) {
   return true;
 }
 
+//DRAW PHASE
+function drawPhaseCardDraw(){
+  for (let i = 0; i < 1; i++) {
+    const randomIndex = Math.floor(Math.random() * equipmentCards.length);
+    player.inventory.equipment.push(equipmentCards[randomIndex]);
+  }
+}
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {

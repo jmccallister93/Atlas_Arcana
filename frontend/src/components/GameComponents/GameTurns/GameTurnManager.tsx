@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, ReactComponentOrElement } from "@ionic/react";
 import { arrowForwardCircleOutline } from "ionicons/icons";
 import { GameSessionInfo, PlayerInfo } from "../Interfaces";
+import DrawPhase from "./DrawPhase";
 
 interface GameTurnManagerProps {
   gameState?: GameSessionInfo;
@@ -23,12 +24,12 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
+  const [drawPhase, setDrawPhase] = useState<ReactComponentOrElement>();
 
   // Turn order
   useEffect(() => {
     setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
-  }, [gameState]);  
-  
+  }, [gameState]);
 
   // Render advance phase for player who's turn it is
   useEffect(() => {
@@ -64,7 +65,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       console.error("Game state is undefined");
       return; // Exit the function if gameState is undefined
     }
-    
+
     const isSetupPhase = gameState?.gameState?.currentPhase === "Setup";
     let nextPhase, nextPlayerTurn;
 
@@ -116,6 +117,18 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
 
     emitGameStateUpdate(newState);
   };
+  // Draw phase
+  useEffect(() => {
+    if(currentPlayer?.username === currentPlayerTurn){
+      if (
+        gameState?.gameState.currentPhase === "Draw" 
+      ) {
+        // setDrawPhase(<DrawPhase currentPlayer={currentPlayer}/>)
+        console.log(currentPlayerTurn);
+      }
+    }
+   
+  }, [gameState]);
 
   return (
     <>
@@ -124,6 +137,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
         Game Phase: {gameState?.gameState.currentPhase}
       </h4>
       {gamePhaseButton}
+      {drawPhase}
     </>
   );
 };
