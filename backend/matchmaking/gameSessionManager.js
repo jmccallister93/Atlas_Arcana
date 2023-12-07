@@ -314,6 +314,9 @@ async function drawPhaseCardDraw(player, sessionId) {
   player.inventory.equipment.push(card);
   sessionData.gameState.equipmentCardCount.push(card.equipmentName);
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
+
+  
+  return card
 }
 
 
