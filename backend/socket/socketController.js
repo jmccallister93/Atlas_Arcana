@@ -158,10 +158,10 @@ module.exports = function (socket, io) {
         // Emit back the result to the specific player
         socket.emit('cardDrawn', cardDrawn);
   
-        // Optionally, retrieve the updated game state
-        const updatedGameState = await gameSessionManager.getGameState(sessionId);
-        // Broadcast the updated state to all players in the session
-        io.to(sessionId).emit('updateGameState', updatedGameState);
+        // // Optionally, retrieve the updated game state
+        // const updatedGameState = await gameSessionManager.getGameState(sessionId);
+        // // Broadcast the updated state to all players in the session
+        // io.to(sessionId).emit('updateGameState', updatedGameState);
        
     } catch (error) {
         console.error('Error in drawCard:', error);

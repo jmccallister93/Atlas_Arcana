@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonModal, IonButton, IonIcon, IonAlert } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
-import { EquipmentItem, PlayerInfo } from "../Interfaces";
+import { BuildingInfo, EquipmentItem, PlayerInfo } from "../Interfaces";
 
 interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
@@ -145,11 +145,12 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   };
 
   // Function to check if a specific type of building is present
-const isBuildingPresent = (buildingType: string): boolean => {
-  return player.buildings.equipment.some(
-    building => building.type === buildingType && building.count > 0
-  );
-};
+  const isBuildingPresent = (buildingType: string): boolean => {
+    return Array.isArray(player.buildings.equipment) && player.buildings.equipment.some(
+      building => building.type === buildingType && building.count > 0
+    );
+  };
+  
 
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (

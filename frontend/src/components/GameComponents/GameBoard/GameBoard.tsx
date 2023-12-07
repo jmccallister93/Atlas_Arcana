@@ -227,7 +227,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         canvasRef.current.removeEventListener("click", handleClick);
       }
     };
-  }, [tileGrid, showTileDetails, titans]);
+  }, [tileGrid, titans]);
 
   // Calculate distance of tiles
   const calculateDistance = (
