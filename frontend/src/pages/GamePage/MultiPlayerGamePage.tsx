@@ -46,7 +46,10 @@ const MultiPlayerGamePage = () => {
    const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
-
+  //Set the current phase
+  const [currentPhase, setCurrentPhase] = useState(gameState?.gameState.currentPhase)
+  const [currentPlayerTurn, setCurrentPlayerTurn] = useState(gameState?.gameState.currentPhase)
+  // Is setup completed?
   useEffect(() => {
     if(gameState?.gameState.currentPhase){
       if (gameState?.gameState.currentPhase === "Setup") {
@@ -56,7 +59,15 @@ const MultiPlayerGamePage = () => {
       }
     }
   }, [gameState?.gameState.currentPhase]);
-
+//Set current game phase
+useEffect(() => {
+  if(gameState?.gameState.currentPhase){
+    setCurrentPhase(gameState?.gameState.currentPhase)
+  }
+  if(gameState?.gameState.currentPlayerTurn){
+    setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null)
+  }
+}, [gameState?.gameState.currentPhase]);
  
   // Join the game session
   useEffect(() => {
@@ -111,12 +122,10 @@ const MultiPlayerGamePage = () => {
     if (gameState && gameState.players) {
       setPlayers(gameState.players);
     }
-  }, [gameState]);
+  }, [gameState?.players]);
 
   //Display all players Victory Points
-  useEffect(() => {
-    players;
-  }, [gameState]);
+
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
@@ -189,6 +198,8 @@ const MultiPlayerGamePage = () => {
           players={players}
           emitGameStateUpdate={emitGameStateUpdate}
           currentPlayer={currentPlayer}
+          currentPlayerTurn={currentPlayerTurn}
+          currentPhase={currentPhase}
         />
         <h4 className="pageHeader">Turn Number: </h4>
         <h4 className="pageHeader">VP Counts: </h4>

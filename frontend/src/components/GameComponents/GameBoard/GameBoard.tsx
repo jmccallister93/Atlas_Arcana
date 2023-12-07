@@ -247,7 +247,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
-      console.log("Distance from titan:",distance)
+      
       if (distance <= 6) {
         return false; // Too close to a titan
       }
@@ -262,7 +262,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           player.strongHold.col,
           player.strongHold.row
         );
-        console.log("Distance from player:",distance)
+       
         if (distance <= 6) {
           return false; // Too close to another player's stronghold
         }
@@ -526,8 +526,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
   );
 };
 const areEqual = (prevProps: any, nextProps: any) => {
-  console.log("prevProps:", prevProps)
-  console.log("nextProps:", nextProps)
   if (prevProps.currentPlayer?.username !== nextProps.currentPlayer?.username) {
     return false;  // Re-render if currentPlayer changes
   }

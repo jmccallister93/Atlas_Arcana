@@ -14,6 +14,8 @@ interface GameTurnManagerProps {
   players: PlayerInfo[];
   emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
   currentPlayer: PlayerInfo | undefined;
+  currentPlayerTurn: string | undefined;
+  currentPhase: string | undefined 
 }
 
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({
@@ -21,6 +23,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   players,
   emitGameStateUpdate,
   currentPlayer,
+  // currentPlayerTurn,
+  // currentPhase,
 }) => {
   // Turn order and state
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(
@@ -56,7 +60,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
     } else {
       setGamePhaseButton(null);
     }
-  }, [currentPlayerTurn, gameState]);
+  }, [currentPlayerTurn]);
 
   // Set initial phase
   useEffect(() => {
