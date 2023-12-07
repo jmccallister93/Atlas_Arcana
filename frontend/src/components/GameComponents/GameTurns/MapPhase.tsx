@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { PlayerInfo } from "../Interfaces";
+import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 
-export interface MapPhase{
+export interface MapPhaseProps{
+    gameState?: GameSessionInfo;
+    players: PlayerInfo[];
+    emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
     currentPlayer: PlayerInfo | undefined;
 }
 
-const MapPhase: React.FC = () => {
+const MapPhase: React.FC<MapPhaseProps> = ({
+    currentPlayer,
+    emitGameStateUpdate,
+    gameState,
+    players,
+}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 

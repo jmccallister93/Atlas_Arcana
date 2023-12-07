@@ -148,6 +148,24 @@ module.exports = function (socket, io) {
       });
     }
   });
+
+  //Game Phases
+  //Draw phase
+  socket.on('drawCard', async ({ sessionId, playerId }) => {
+    try {
+        // Call the drawPhaseCardDraw function
+        const cardDrawn = gameSessionManager.drawPhaseCardDraw(playerId);
+
+        // Emit back the result to the specific player
+        socket.emit('cardDrawn', cardDrawn);
+
+        // Optionally, update game state and notify all players
+        // ...
+    } catch (error) {
+        console.error('Error in drawCard:', error);
+        socket.emit('errorDrawingCard', error.message);
+    }
+});
 };
 
 // Call to check user online status

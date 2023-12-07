@@ -133,22 +133,64 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       const currentPhase = gameState?.gameState.currentPhase;
       switch (currentPhase) {
         case "Draw":
-          setPhaseAction(<DrawPhase />);
+          setPhaseAction(
+            <DrawPhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         case "Trade":
-          setPhaseAction(<TradePhase />);
+          setPhaseAction(
+            <TradePhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         case "Rest":
-          setPhaseAction(<RestPhase />);
+          setPhaseAction(
+            <RestPhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         case "Map":
-          setPhaseAction(<MapPhase />);
+          setPhaseAction(
+            <MapPhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         case "Combat":
-          setPhaseAction(<CombatPhase />);
+          setPhaseAction(
+            <CombatPhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         case "Titan":
-          setPhaseAction(<TitanPhase />);
+          setPhaseAction(
+            <TitanPhase
+              gameState={gameState}
+              players={players}
+              emitGameStateUpdate={emitGameStateUpdate}
+              currentPlayer={currentPlayer}
+            />
+          );
           break;
         default:
           // Optional: handle any case where currentPhase doesn't match any of the cases

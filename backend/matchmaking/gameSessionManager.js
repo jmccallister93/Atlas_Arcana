@@ -305,7 +305,7 @@ function isPositionValid(titanPositions, row, col) {
 }
 
 //DRAW PHASE
-function drawPhaseCardDraw(){
+function drawPhaseCardDraw(player){
   for (let i = 0; i < 1; i++) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     player.inventory.equipment.push(equipmentCards[randomIndex]);
@@ -339,4 +339,5 @@ module.exports = {
   updateGameState,
   endGameSession,
   getGameState,
+  drawPhaseCardDraw,
 };

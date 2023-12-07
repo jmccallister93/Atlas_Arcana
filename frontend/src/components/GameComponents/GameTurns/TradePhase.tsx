@@ -1,17 +1,27 @@
 import { useState } from "react";
-import { PlayerInfo } from "../Interfaces";
+import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 
-export interface TradePhase{
-    currentPlayer: PlayerInfo | undefined;
+export interface TradePhaseProps {
+  gameState?: GameSessionInfo;
+  players: PlayerInfo[];
+  emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
+  currentPlayer: PlayerInfo | undefined;
 }
 
-const TradePhase: React.FC = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+const TradePhase: React.FC<TradePhaseProps> = ({
+  currentPlayer,
+  emitGameStateUpdate,
+  gameState,
+  players,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  return (
+    <>
+      <div> It's Tradeing time</div>
+    </>
+  );
+};
 
-    return ( <>
-    <div>  It's Tradeing time</div></> );
-}
- 
 export default TradePhase;
