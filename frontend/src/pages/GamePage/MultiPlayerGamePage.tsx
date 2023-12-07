@@ -40,6 +40,15 @@ const MultiPlayerGamePage = () => {
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
   const auth = useAuth();
+  // Has setup completed?
+  const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
+  useEffect(() => {
+    if (gameState?.gameState.currentPhase !== "Setup" && !hasSetupCompleted) {
+      setHasSetupCompleted(true);
+    }
+    
+  }, [gameState?.gameState.currentPhase]);
+
   // Set the current player based on authxontext
   const currentPlayer = players.find(
     (player) => player.username === auth.username
@@ -183,7 +192,8 @@ const MultiPlayerGamePage = () => {
         <div className="gameBoardContainer">
           {" "}
           <GameBoard
-            gameState={gameState}
+            hasSetupCompleted={hasSetupCompleted}
+            currentPlayerTurn={gameState?.gameState.currentPlayerTurn}
             currentPlayer={currentPlayer}
             tileGrid={gameState?.gameState.tileGrid}
             titans={gameState?.gameState.titans}

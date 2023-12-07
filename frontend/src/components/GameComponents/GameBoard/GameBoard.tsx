@@ -26,8 +26,10 @@ import TileMenuDetails, { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 
 interface GameBoardProps {
-  gameState?: GameSessionInfo;
+  // gameState?: GameSessionInfo;
   currentPlayer: PlayerInfo | undefined;
+  currentPlayerTurn: string | undefined;
+  hasSetupCompleted: boolean;
   tileGrid?: string[][];
   titans?: {
     titanName: string;
@@ -49,8 +51,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
   titans,
   players,
   emitGameStateUpdate,
-  gameState,
+  // gameState,
   currentPlayer,
+  currentPlayerTurn,
+  hasSetupCompleted,
 }) => {
   interface TileInfo {
     type: string;
@@ -269,14 +273,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (
-      gameState?.gameState.currentPhase === "Setup" &&
-      currentPlayer?.username === gameState?.gameState.currentPlayerTurn
+      hasSetupCompleted &&
+      currentPlayer?.username === currentPlayerTurn
     ) {
+      console.log("SetupComplete:", hasSetupCompleted)
       setIsStrongholdPlacementMode(true);
     } else {
+      console.log("SetupComplete:", hasSetupCompleted)
       setIsStrongholdPlacementMode(false);
     }
-  }, [gameState, currentPlayer]);
+  }, [currentPlayer]);
 
   // Handle Selected tile
   const handleTileSelection = () => {
@@ -457,8 +463,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
           row: selectedStrongholdCoordinates.y,
         },
       };
+//HERERERERERER 
       const updatedGameState = {
-        ...gameState,
+        // ...gameState,
         players: players?.map((p) =>
           p.username === updatedPlayer.username ? updatedPlayer : p
         ),
@@ -516,5 +523,21 @@ const GameBoard: React.FC<GameBoardProps> = ({
     </>
   );
 };
+const areEqual = (prevProps: any, nextProps: any) => {
+  // Compare specific parts of gameState
+  if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
+    return false; // Not equal, should re-render
+  }
+  if (prevProps.tileGrid !== nextProps.tileGrid) {
+    return false;
+  }
+  if (prevProps.titans !== nextProps.titans) {
+    return false; // Not equal, should re-render
+  }
+  if (prevProps.players !== nextProps.players) {
+    return false; // Not equal, should re-render
+  }
 
-export default GameBoard;
+  return true; // Props are equal, don't re-render
+};
+export default React.memo(GameBoard, areEqual);
