@@ -154,7 +154,7 @@ module.exports = function (socket, io) {
   socket.on('drawCard', async ({ sessionId, playerId }) => {
     try {
         // Call the drawPhaseCardDraw function
-        const cardDrawn = gameSessionManager.drawPhaseCardDraw(playerId);
+        const cardDrawn = gameSessionManager.drawPhaseCardDraw(playerId, sessionId);
 
         // Emit back the result to the specific player
         socket.emit('cardDrawn', cardDrawn);

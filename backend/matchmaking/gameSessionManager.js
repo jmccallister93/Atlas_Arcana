@@ -301,8 +301,6 @@ function isPositionValid(titanPositions, row, col) {
 }
 
 //DRAW PHASE
-function equipmentCardsInPlay() {}
-
 async function drawPhaseCardDraw(player, sessionId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let card;
@@ -310,11 +308,11 @@ async function drawPhaseCardDraw(player, sessionId) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     card = equipmentCards[randomIndex];
   } while (
-    sessionData.gameState.equipmentCardsInPlay.includes(card.equipmentName)
+    sessionData.gameState.equipmentCardCount.includes(card.equipmentName)
   );
 
   player.inventory.equipment.push(card);
-  sessionData.gameState.equipmentCardsInPlay.push(card.equipmentName);
+  sessionData.gameState.equipmentCardCount.push(card.equipmentName);
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
 
