@@ -42,18 +42,22 @@ const MultiPlayerGamePage = () => {
   const auth = useAuth();
   // Has setup completed?
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
-  useEffect(() => {
-    if (gameState?.gameState.currentPhase !== "Setup" && !hasSetupCompleted) {
-      setHasSetupCompleted(true);
-    }
-    
-  }, [gameState?.gameState.currentPhase]);
-
-  // Set the current player based on authxontext
-  const currentPlayer = players.find(
+   // Set the current player based on authxontext
+   const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
 
+  useEffect(() => {
+    if(gameState?.gameState.currentPhase){
+      if (gameState?.gameState.currentPhase === "Setup") {
+        setHasSetupCompleted(false);
+      } else{
+        setHasSetupCompleted(true)
+      }
+    }
+  }, [gameState?.gameState.currentPhase]);
+
+ 
   // Join the game session
   useEffect(() => {
     socket.emit("joinGame", { sessionId });

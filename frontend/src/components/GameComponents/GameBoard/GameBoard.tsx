@@ -247,12 +247,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
     // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
+      console.log("Distance from titan:",distance)
       if (distance <= 6) {
         return false; // Too close to a titan
       }
     }
 
-    // Check distance from other players' strongholds
+  // Check distance from other players' strongholds
     for (let player of players ?? []) {
       if (player.strongHold && player.username !== currentPlayer?.username) {
         const distance = calculateDistance(
@@ -261,6 +262,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           player.strongHold.col,
           player.strongHold.row
         );
+        console.log("Distance from player:",distance)
         if (distance <= 6) {
           return false; // Too close to another player's stronghold
         }
@@ -273,13 +275,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (
-      hasSetupCompleted &&
+      !hasSetupCompleted &&
       currentPlayer?.username === currentPlayerTurn
     ) {
-      console.log("SetupComplete:", hasSetupCompleted)
       setIsStrongholdPlacementMode(true);
     } else {
-      console.log("SetupComplete:", hasSetupCompleted)
       setIsStrongholdPlacementMode(false);
     }
   }, [currentPlayer]);
@@ -445,17 +445,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   // Place stronghold
   const placeStronghold = () => {
-    console.log(
-      selectedStrongholdCoordinates.x,
-      selectedStrongholdCoordinates.y
+    console.log("Selected Stronghold x",selectedStrongholdCoordinates.x,
+    "Selected Stronghold y", selectedStrongholdCoordinates.y,
+    "Selected Tile", selectedTile,
+    "currentPlayer:", currentPlayer
     );
     if (
-      currentPlayer &&
-      isValidStrongholdPlacement(
+      currentPlayer 
+      && isValidStrongholdPlacement(
         selectedStrongholdCoordinates.x,
         selectedStrongholdCoordinates.y
       )
     ) {
+      console.log("Fired")
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
@@ -524,6 +526,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
   );
 };
 const areEqual = (prevProps: any, nextProps: any) => {
+  console.log("prevProps:", prevProps)
+  console.log("nextProps:", nextProps)
+  if (prevProps.currentPlayer?.username !== nextProps.currentPlayer?.username) {
+    return false;  // Re-render if currentPlayer changes
+  }
+  
   // Compare specific parts of gameState
   if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
     return false; // Not equal, should re-render
