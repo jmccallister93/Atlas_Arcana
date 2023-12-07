@@ -29,8 +29,9 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
-  const [phaseAction, setPhaseAction] = useState<ReactComponentOrElement>();
-  const [showStrongholdAlert, setShowStrongholdAlert] = useState(false); 
+  const [phaseAction, setPhaseAction] =
+    useState<ReactComponentOrElement | null>();
+  const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
 
   // Turn order
   useEffect(() => {
@@ -128,35 +129,35 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   };
   // Draw phase
   useEffect(() => {
-    if (currentPlayer?.username === currentPlayerTurn) {
+    if (currentPlayerTurn === currentPlayer?.username) {
       const currentPhase = gameState?.gameState.currentPhase;
       switch (currentPhase) {
         case "Draw":
-          setPhaseAction(<DrawPhase />)
+          setPhaseAction(<DrawPhase />);
           break;
         case "Trade":
-          setPhaseAction(<TradePhase/>)
+          setPhaseAction(<TradePhase />);
           break;
         case "Rest":
-          setPhaseAction(<RestPhase/>)
+          setPhaseAction(<RestPhase />);
           break;
         case "Map":
-          setPhaseAction(<MapPhase/>)
+          setPhaseAction(<MapPhase />);
           break;
         case "Combat":
-          setPhaseAction(<CombatPhase/>)
+          setPhaseAction(<CombatPhase />);
           break;
         case "Titan":
-          setPhaseAction(<TitanPhase/>)
+          setPhaseAction(<TitanPhase />);
           break;
         default:
           // Optional: handle any case where currentPhase doesn't match any of the cases
           break;
-          
       }
-      
+    } else {
+      setPhaseAction(null);
     }
-  }, [gameState,  currentPlayerTurn, currentPlayer]);
+  }, [gameState, currentPlayerTurn, currentPlayer]);
 
   return (
     <>
@@ -165,13 +166,18 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
         Game Phase: {gameState?.gameState.currentPhase}
       </h4>
       {gamePhaseButton}
-      {phaseAction}
+      {currentPlayerTurn === currentPlayer?.username ? (
+        <>{phaseAction}</>
+      ) : (
+        <></>
+      )}
+
       <IonAlert
         isOpen={showStrongholdAlert}
         onDidDismiss={() => setShowStrongholdAlert(false)}
-        header={'Action Required'}
-        message={'Please place your Stronghold before advancing the turn.'}
-        buttons={['OK']}
+        header={"Action Required"}
+        message={"Please place your Stronghold before advancing the turn."}
+        buttons={["OK"]}
       />
     </>
   );
