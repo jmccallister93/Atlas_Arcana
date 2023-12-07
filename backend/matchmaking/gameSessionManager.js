@@ -33,7 +33,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   // Set starting phase of the game
   const currentPhase = "Setup";
   //Determine starting cards
-  const startingEquipmentCards = determineStartingCards(players);
+  const startingCardData = determineStartingCards(players);
 
   // GameBoard
   // Create tile grid to be sent to the front end
@@ -83,7 +83,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       currentPhase,
       turnsCompleted: 0,
       titans: titanPosition,
-      equipmentCardCount: [], // Counter for equipment cards
+      equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
       questCardCount: [], // Counter for quest cards
       treasureCardCount: [],
       worldEventCardCount: [], // Counter for world event cards
@@ -210,6 +210,7 @@ function determineTurnOrder(players) {
 
 // Draw Cards
 function determineStartingCards(players) {
+  let chosenEquipmentCards = [];
   players.forEach((player) => {
     // Allocate 3 resources
     for (let i = 0; i < 1; i++) {
@@ -217,25 +218,16 @@ function determineStartingCards(players) {
     }
 
     // Allocate 1 random equipment card
-    for (let i = 0; i < 1; i++) {
+    do {
       const randomIndex = Math.floor(Math.random() * equipmentCards.length);
-      player.inventory.equipment.push(equipmentCards[randomIndex]);
-    }
+      equipmentCard = equipmentCards[randomIndex];
+    } while (chosenEquipmentCards.includes(equipmentCard.equipmentName));
+    player.inventory.equipment.push(equipmentCard);
+    chosenEquipmentCards.push(equipmentCard.equipmentName);
 
-    // // Allocate 1 random quest card
-    // for (let i = 0; i < 1; i++) {
-    //   const randomIndex = Math.floor(Math.random() * questCards.length);
-    //   player.inventory.quests.push(questCards[randomIndex]);
-    // }
-
-    // // Allocate 1 random treasure card
-    // for (let i = 0; i < 1; i++) {
-    //   const randomIndex = Math.floor(Math.random() * treasureCards.length);
-    //   player.inventory.treasures.push(treasureCards[randomIndex]);
-    // }
   });
 
-  return players;
+  return { chosenEquipmentCards};
 }
 
 // Set Titans to start
@@ -311,7 +303,8 @@ function isPositionValid(titanPositions, row, col) {
 //DRAW PHASE
 function equipmentCardsInPlay() {}
 
-function drawPhaseCardDraw(player) {
+async function drawPhaseCardDraw(player, sessionId) {
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let card;
   do {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
@@ -322,7 +315,9 @@ function drawPhaseCardDraw(player) {
 
   player.inventory.equipment.push(card);
   sessionData.gameState.equipmentCardsInPlay.push(card.equipmentName);
+  await sessionClient.set(sessionId, JSON.stringify(sessionData));
 }
+
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
