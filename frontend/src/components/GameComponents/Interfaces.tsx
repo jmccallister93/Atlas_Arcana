@@ -7,6 +7,10 @@ export interface GameSessionInfo {
     currentPhase: string;
     turnsCompleted: number;
     titans: TitanInfo[];
+    equipmentCardCount: [], // Counter for equipment cards
+    questCardCount: [], // Counter for quest cards
+    treasureCardCount: [],
+    worldEventCardCount: [], // Counter for world event cards
   };
   players: PlayerInfo[];
 }

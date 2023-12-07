@@ -79,10 +79,14 @@ async function createGameSession(playerOneData, playerTwoData) {
     gameState: {
       turnOrder,
       currentPlayerTurn,
-      tileGrid, 
+      tileGrid,
       currentPhase,
       turnsCompleted: 0,
       titans: titanPosition,
+      equipmentCardCount: [], // Counter for equipment cards
+      questCardCount: [], // Counter for quest cards
+      treasureCardCount: [],
+      worldEventCardCount: [], // Counter for world event cards
     },
   };
   console.log(
@@ -276,10 +280,10 @@ function placeTitansOnGrid(gridSize, titans) {
       let col = getRandomInt(3, gridSize - 4);
 
       if (isPositionValid(titanPositions, row, col)) {
-        titanPositions.push({ 
+        titanPositions.push({
           ...titan, // Spread the existing properties of the titan
           row, // Add the row property
-          col  // Add the col property
+          col, // Add the col property
         });
         positionFound = true;
       }
@@ -305,11 +309,19 @@ function isPositionValid(titanPositions, row, col) {
 }
 
 //DRAW PHASE
-function drawPhaseCardDraw(player){
-  for (let i = 0; i < 1; i++) {
+function equipmentCardsInPlay() {}
+
+function drawPhaseCardDraw(player) {
+  let card;
+  do {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
-    player.inventory.equipment.push(equipmentCards[randomIndex]);
-  }
+    card = equipmentCards[randomIndex];
+  } while (
+    sessionData.gameState.equipmentCardsInPlay.includes(card.equipmentName)
+  );
+
+  player.inventory.equipment.push(card);
+  sessionData.gameState.equipmentCardsInPlay.push(card.equipmentName);
 }
 
 // Function to handle player disconnection
