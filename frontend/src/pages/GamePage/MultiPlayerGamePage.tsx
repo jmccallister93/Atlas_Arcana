@@ -22,18 +22,34 @@ import {
   GameSessionInfo,
   GameState,
   EquipmentItem,
+  TitanInfo,
 } from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
+import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
 
 const MultiPlayerGamePage = () => {
-  // Game State
-  const [gameState, setGameState] = useState<GameSessionInfo>();
+  // Must have variables
   const location = useLocation<LocationState>();
-  const { gameSessionInfo, sessionId } = location?.state;
-  // Player State
+  const { gameSessionInfo } = location.state;
+  const [gameState, setGameState] = useState<GameSessionInfo>(gameSessionInfo);
+  // Immutable Variables
+  const playerNames =
+    gameState?.players?.map((player) => player.username) || [];
+  const sessionId = gameState?.sessionId;
+  const turnOrder = gameState?.gameState.turnOrder;
+  const tileGrid = gameState?.gameState.tileGrid;
+  //  Changing Variables
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
+  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
+  const [currentPhase, setCurrentPhase] = useState<string>();
+  const [turnsCompleted, setTurnsCompleted] = useState<number>();
+  const [titans, setTitans] = useState<TitanInfo[]>();
+  const [equipmentCardCount, setEquipmentCardCount] = useState<[]>();
+  const [questCardCount, setQuestCardCount] = useState<[]>();
+  const [treasureCardCount, setTreasureCardCount] = useState<[]>();
+  const [worldEventCardCount, setWorldEventCardCount] = useState<[]>();
   // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
   // Player Menu
@@ -42,37 +58,46 @@ const MultiPlayerGamePage = () => {
   const auth = useAuth();
   // Has setup completed?
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
-   // Set the current player based on authxontext
-   const currentPlayer = players.find(
+  // Set the current player based on authxontext
+  const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
-  //Set the current phase
-  const [currentPhase, setCurrentPhase] = useState(gameState?.gameState.currentPhase)
-  const [currentPlayerTurn, setCurrentPlayerTurn] = useState(gameState?.gameState.currentPhase)
-  // Is setup completed?
+
+  // SET LOCAL STATES
+  // Set local gamestates
   useEffect(() => {
-    if(gameState?.gameState.currentPhase){
-      if (gameState?.gameState.currentPhase === "Setup") {
-        setHasSetupCompleted(false);
-      } else{
-        setHasSetupCompleted(true)
-      }
+    setGameState(gameSessionInfo);
+  }, []);
+  // Set local players State
+  useEffect(() => {
+    if (gameState && gameState.players) {
+      setPlayers(gameState.players);
     }
-  }, [gameState?.gameState.currentPhase]);
-//Set current game phase
-useEffect(() => {
-  if(gameState?.gameState.currentPhase){
-    setCurrentPhase(gameState?.gameState.currentPhase)
-  }
-  if(gameState?.gameState.currentPlayerTurn){
-    setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null)
-  }
-}, [gameState?.gameState.currentPhase]);
- 
-  // Join the game session
+  }, [gameState?.players]);
+  // Set Player turn
   useEffect(() => {
-    socket.emit("joinGame", { sessionId });
-  }, [sessionId]);
+    if (gameState.gameState.currentPlayerTurn) {
+      setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
+    }
+  }, [gameState.gameState.currentPlayerTurn]);
+// Set Current Phase
+  useEffect(() => {
+    if (gameSessionInfo.gameState.currentPhase) {
+      setCurrentPhase(gameState?.gameState.currentPhase);
+    }
+  }, [gameState.gameState.currentPhase]);
+  // Set Current Player Turn
+  useEffect(() => {
+    if (gameSessionInfo.gameState.currentPlayerTurn) {
+      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
+    }
+  }, []);
+  // Set Turns Completed
+  useEffect(() => {
+    if (gameSessionInfo?.gameState.turnsCompleted) {
+      setTurnsCompleted(gameState.gameState.turnsCompleted);
+    }
+  }, []);
 
   // Centralized function to emit game state updates
   const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
@@ -110,22 +135,25 @@ useEffect(() => {
     };
   }, []);
 
-  // Set local gamestate
+  // Is setup completed?
   useEffect(() => {
-    if (gameSessionInfo) {
-      setGameState(gameSessionInfo);
+    if (gameState?.gameState.currentPhase) {
+      if (gameState?.gameState.currentPhase === "Setup") {
+        setHasSetupCompleted(false);
+      } else {
+        setHasSetupCompleted(true);
+      }
     }
-  }, [gameSessionInfo]);
-
-  // Set local players State
+  }, [gameState?.gameState.currentPhase]);
+  //Set current game phase
   useEffect(() => {
-    if (gameState && gameState.players) {
-      setPlayers(gameState.players);
+    if (gameState?.gameState.currentPhase) {
+      setCurrentPhase(gameState?.gameState.currentPhase);
     }
-  }, [gameState?.players]);
-
-  //Display all players Victory Points
-
+    if (gameState?.gameState.currentPlayerTurn) {
+      setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
+    }
+  }, [gameState?.gameState.currentPhase]);
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
@@ -183,16 +211,19 @@ useEffect(() => {
             <IonIcon icon={addCircleOutline} size="large" color="success" />
           </button>
         </div>
+        {/* Title */}
         <h1 className="pageHeader">Multiplayer Game</h1>
-        <h4 className="pageHeader">Players in Game:</h4>
+        {/* Players in Game */}
+        <PlayersInGame playerNames={playerNames} />
+        {/* <h4 className="pageHeader">Players in Game:</h4>
         <div className="playerList">
           {players.map((player, index) => (
             <div key={index} className="playerName">
               {player.username} - VP's: {player.victoryPoints}
             </div>
           ))}
-        </div>
-
+        </div> */}
+        {/* Turn Manager */}
         <GameTurnManager
           gameState={gameState}
           players={players}
@@ -201,8 +232,11 @@ useEffect(() => {
           currentPlayerTurn={currentPlayerTurn}
           currentPhase={currentPhase}
         />
+        {/* Turn Count */}
         <h4 className="pageHeader">Turn Number: </h4>
+        {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
+        {/* GameTimers */}
         <h4 className="pageHeader">Timer: </h4>
         <div className="gameBoardContainer">
           {" "}

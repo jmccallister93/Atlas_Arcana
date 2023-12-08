@@ -1,10 +1,10 @@
 export interface GameSessionInfo {
   sessionId: string;
   gameState: {
+    currentPhase: string;
+    currentPlayerTurn: string;
     turnOrder: string[];
     tileGrid: [];
-    currentPlayerTurn: string;
-    currentPhase: string;
     turnsCompleted: number;
     titans: TitanInfo[];
     equipmentCardCount: [], // Counter for equipment cards
@@ -14,6 +14,7 @@ export interface GameSessionInfo {
   };
   players: PlayerInfo[];
 }
+
 
 export interface TitanInfo {
   titanName: string;
@@ -27,8 +28,7 @@ export interface TitanInfo {
 }
 
 export interface LocationState {
-  sessionId?: string;
-  gameSessionInfo?: GameSessionInfo;
+  gameSessionInfo: GameSessionInfo;
 }
 
 export interface EquipmentItem {

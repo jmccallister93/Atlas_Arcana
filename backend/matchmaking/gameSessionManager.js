@@ -224,10 +224,9 @@ function determineStartingCards(players) {
     } while (chosenEquipmentCards.includes(equipmentCard.equipmentName));
     player.inventory.equipment.push(equipmentCard);
     chosenEquipmentCards.push(equipmentCard.equipmentName);
-
   });
 
-  return { chosenEquipmentCards};
+  return { chosenEquipmentCards };
 }
 
 // Set Titans to start
@@ -315,10 +314,8 @@ async function drawPhaseCardDraw(player, sessionId) {
   sessionData.gameState.equipmentCardCount.push(card.equipmentName);
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
-  
-  return card
+  return card;
 }
-
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
