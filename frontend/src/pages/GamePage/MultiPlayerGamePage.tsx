@@ -34,12 +34,13 @@ const MultiPlayerGamePage = () => {
   const location = useLocation<LocationState>();
   const { gameSessionInfo } = location.state;
   const [gameState, setGameState] = useState<GameSessionInfo>(gameSessionInfo);
+  const auth = useAuth();
   // Immutable Variables
   const playerNames =
-    gameState?.players?.map((player) => player.username) || [];
-  const sessionId = gameState?.sessionId;
-  const turnOrder = gameState?.gameState.turnOrder;
-  const tileGrid = gameState?.gameState.tileGrid;
+    gameState.players.map((player) => player.username) || [];
+  const sessionId = gameState.sessionId;
+  const turnOrder = gameState.gameState.turnOrder;
+  const tileGrid = gameState.gameState.tileGrid;
   //  Changing Variables
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
@@ -55,7 +56,7 @@ const MultiPlayerGamePage = () => {
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
-  const auth = useAuth();
+  
   // Has setup completed?
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
   // Set the current player based on authxontext
@@ -70,10 +71,10 @@ const MultiPlayerGamePage = () => {
   }, []);
   // Set local players State
   useEffect(() => {
-    if (gameState && gameState.players) {
+    if (gameState.players) {
       setPlayers(gameState.players);
     }
-  }, [gameState?.players]);
+  }, [gameState.players]);
   // Set Player turn
   useEffect(() => {
     if (gameState.gameState.currentPlayerTurn) {
@@ -214,15 +215,7 @@ const MultiPlayerGamePage = () => {
         {/* Title */}
         <h1 className="pageHeader">Multiplayer Game</h1>
         {/* Players in Game */}
-        <PlayersInGame playerNames={playerNames} />
-        {/* <h4 className="pageHeader">Players in Game:</h4>
-        <div className="playerList">
-          {players.map((player, index) => (
-            <div key={index} className="playerName">
-              {player.username} - VP's: {player.victoryPoints}
-            </div>
-          ))}
-        </div> */}
+        <PlayersInGame playerNames={gameState.players.map((player) => player.username)} />
         {/* Turn Manager */}
         <GameTurnManager
           gameState={gameState}
