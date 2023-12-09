@@ -8,35 +8,28 @@ import RestPhase from "./RestPhase";
 import MapPhase from "./MapPhase";
 import CombatPhase from "./CombatPhase";
 import TitanPhase from "./TitanPhase";
+import socket from "../../../context/SocketClient/socketClient";
 
 interface GameTurnManagerProps {
-  gameState: GameSessionInfo;
-  players: PlayerInfo[];
-  emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
+  currentPlayerTurn: string;
+  currentPhase: string;
+  turnOrder: string[];
   currentPlayer: PlayerInfo | undefined;
+  sessionId: string;
 }
 
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({
-  gameState,
-  players,
-  emitGameStateUpdate, 
+  currentPlayerTurn,
+  currentPhase,
+  turnOrder,
   currentPlayer,
+  sessionId
 }) => {
-  // Turn order and state
-  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(
-    null
-  );
-  const [currentPhase, setCurrentPhase] = useState<string | null>(null);
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
   const [phaseAction, setPhaseAction] =
     useState<ReactComponentOrElement | null>();
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
-
-  // Turn order
-  useEffect(() => {
-    setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
-  }, [gameState]);
 
   // Render advance phase for player who's turn it is
   useEffect(() => {
@@ -58,36 +51,52 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
     }
   }, [currentPlayerTurn]);
 
-  // Set initial phase
-  useEffect(() => {
-    if (gameState && gameState.gameState) {
-      setCurrentPhase(gameState.gameState.currentPhase);
-    }
-  }, [gameState]);
+  // Socket emit for current player turn
+  const emitCurrentPlayerTurnUpdate = (
+    newCurrentPlayerTurn: string,
+    sessionId: string
+  ) => {
+    const partialUpdate = {
+      currentPlayerTurn: newCurrentPlayerTurn,
+    };
+
+    socket.emit("updateCurrentPlayerTurn",sessionId, partialUpdate);
+  };
+
+  // Socket emit for current phase
+  const emitCurrentPhaseUpdate = (
+    newCurrentPhase: string,
+    sessionId: string
+  ) => {
+    const partialUpdate = {
+      currentPhase: newCurrentPhase,
+    };
+
+    socket.emit("updateCurrentPhase", sessionId,partialUpdate);
+  };
 
   // Phase order
   //Advance PHase
   const advancePhase = () => {
-    if (!gameState || !gameState.gameState) {
-      console.error("Game state is undefined");
-      return; // Exit the function if gameState is undefined
+    if (!currentPlayer) {
+      console.error("Current player is undefined");
+      return;
     }
-    if (!currentPlayer || currentPlayer.strongHold === undefined) {
-      setShowStrongholdAlert(true); // Show alert if 'strongHold' is missing
-      return; // Prevent further execution
+    if (currentPlayer.strongHold === undefined) {
+      setShowStrongholdAlert(true);
+      return;
     }
-    const isSetupPhase = gameState?.gameState?.currentPhase === "Setup";
+    const isSetupPhase = currentPhase === "Setup";
     let nextPhase, nextPlayerTurn;
 
     if (isSetupPhase) {
       // Find the next player who needs to complete the setup phase
-      const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-        (player) => player === gameState.gameState.currentPlayerTurn
+      const currentPlayerIndex = turnOrder.findIndex(
+        (player) => player === currentPlayerTurn
       );
 
-      const nextPlayerIndex =
-        (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-      nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+      const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
+      nextPlayerTurn = turnOrder[nextPlayerIndex];
 
       // If we have looped back to the first player, setup is complete
       if (nextPlayerIndex === 0) {
@@ -98,115 +107,105 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
     } else {
       // Existing logic for normal game phases
       const currentPhaseIndex = phaseOrder.indexOf(
-        gameState?.gameState?.currentPhase ?? phaseOrder[0]
+        currentPhase ?? phaseOrder[0]
       );
       const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
       nextPhase = phaseOrder[nextPhaseIndex];
 
       // Move to next player if the phase has wrapped around
       if (nextPhase === phaseOrder[0]) {
-        const currentPlayerIndex = gameState?.gameState.turnOrder.findIndex(
-          (player) => player === gameState.gameState.currentPlayerTurn
+        const currentPlayerIndex = turnOrder.findIndex(
+          (player) => player === currentPlayerTurn
         );
-        const nextPlayerIndex =
-          (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-        nextPlayerTurn = gameState?.gameState.turnOrder[nextPlayerIndex];
+        const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
+        nextPlayerTurn = turnOrder[nextPlayerIndex];
       } else {
-        nextPlayerTurn = gameState?.gameState.currentPlayerTurn;
+        nextPlayerTurn = currentPlayerTurn;
       }
-    }
+    } 
 
-    // Update the game state
-    const newState = {
-      gameState: {
-        ...gameState.gameState,
-        currentPhase: nextPhase,
-        currentPlayerTurn: nextPlayerTurn,
-      },
-    };
+    emitCurrentPlayerTurnUpdate(sessionId,nextPlayerTurn)
+    emitCurrentPhaseUpdate(sessionId,nextPhase)
 
-    emitGameStateUpdate(newState);
   };
-  // Draw phase
-  useEffect(() => {
-    if (currentPlayerTurn === currentPlayer?.username) {
-      const currentPhase = gameState?.gameState.currentPhase;
-      switch (currentPhase) {
-        case "Draw":
-          setPhaseAction(
-            <DrawPhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        case "Trade":
-          setPhaseAction(
-            <TradePhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        case "Rest":
-          setPhaseAction(
-            <RestPhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        case "Map":
-          setPhaseAction(
-            <MapPhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        case "Combat":
-          setPhaseAction(
-            <CombatPhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        case "Titan":
-          setPhaseAction(
-            <TitanPhase
-              gameState={gameState}
-              players={players}
-              emitGameStateUpdate={emitGameStateUpdate}
-              currentPlayer={currentPlayer}
-            />
-          );
-          break;
-        default:
-          // Optional: handle any case where currentPhase doesn't match any of the cases
-          break;
-      }
-    } else {
-      setPhaseAction(null);
-    }
-  }, [gameState, currentPlayerTurn, currentPlayer]);
+  // Switch Case phase
+  // useEffect(() => {
+  //   if (currentPlayerTurn === currentPlayer?.username) {
+
+  //     switch (currentPhase) {
+  //       case "Draw":
+  //         setPhaseAction(
+  //           <DrawPhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       case "Trade":
+  //         setPhaseAction(
+  //           <TradePhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       case "Rest":
+  //         setPhaseAction(
+  //           <RestPhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       case "Map":
+  //         setPhaseAction(
+  //           <MapPhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       case "Combat":
+  //         setPhaseAction(
+  //           <CombatPhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       case "Titan":
+  //         setPhaseAction(
+  //           <TitanPhase
+  //             currentPhase = {currentPhase}
+  //             players={players}
+  //             emitGameStateUpdate={emitGameStateUpdate}
+  //             currentPlayer={currentPlayer}
+  //           />
+  //         );
+  //         break;
+  //       default:
+  //         // Optional: handle any case where currentPhase doesn't match any of the cases
+  //         break;
+  //     }
+  //   } else {
+  //     setPhaseAction(null);
+  //   }
+  // }, [ currentPlayerTurn, currentPlayer]);
 
   return (
     <>
       <h4 className="pageHeader">Player Turn: {currentPlayerTurn}</h4>
-      <h4 className="pageHeader">
-        Game Phase: {gameState?.gameState.currentPhase}
-      </h4>
+      <h4 className="pageHeader">Game Phase: {currentPhase}</h4>
       {gamePhaseButton}
       {currentPlayerTurn === currentPlayer?.username ? (
         <>{phaseAction}</>
@@ -225,4 +224,24 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   );
 };
 
-export default GameTurnManager;
+const areEqual = (prevProps: any, nextProps: any) => {
+  if (prevProps.playerNames !== nextProps.playerNames) {
+    return false;
+  }
+  if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
+    return false;
+  }
+  if (prevProps.currentPhase !== nextProps.currentPhase) {
+    return false;
+  }
+  if (prevProps.turnOrder !== nextProps.turnOrder) {
+    return false;
+  }
+  if (prevProps.currentPlayer !== nextProps.currentPlayer) {
+    return false;
+  }
+
+  return true; // Props are equal, don't re-render
+};
+
+export default React.memo(GameTurnManager, areEqual);

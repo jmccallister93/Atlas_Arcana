@@ -149,6 +149,18 @@ module.exports = function (socket, io) {
     }
   });
 
+  // Current Player Turn
+  socket.on("updateCurrentPlayerTurn", ({sessionId, partialUpdate}) =>{
+    gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
+    io.emit("gameStateUpdate", gameState)
+  })
+
+    // Current Phase
+    socket.on("updateCurrentPhase", ({sessionId, partialUpdate}) =>{
+      gameState.currentPhase = partialUpdate.currentPhase;
+      io.emit("gameStateUpdate", gameState)
+    })
+
   //Game Phases
   //Draw phase
   socket.on('drawCard', async ({ sessionId, playerId }) => {

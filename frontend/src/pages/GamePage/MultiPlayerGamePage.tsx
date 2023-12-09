@@ -42,7 +42,7 @@ const MultiPlayerGamePage = () => {
   const tileGrid = gameState.gameState.tileGrid;
 
   //  Changing Variables
-  const [players, setPlayers] = useState<PlayerInfo[]>([]);
+  const [players, setPlayers] = useState<PlayerInfo[]>(gameSessionInfo.players);
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
   const [currentPhase, setCurrentPhase] = useState<string>();
   const [turnsCompleted, setTurnsCompleted] = useState<number>();
@@ -54,14 +54,14 @@ const MultiPlayerGamePage = () => {
 
   // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
-  
+
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
 
   // Has setup completed?
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
-  
+
   // Set the current player based on authxontext
   const currentPlayer = players.find(
     (player) => player.username === auth.username
@@ -154,8 +154,8 @@ const MultiPlayerGamePage = () => {
     if (gameState?.gameState.currentPhase) {
       setCurrentPhase(gameState?.gameState.currentPhase);
     }
-    if (gameState?.gameState.currentPlayerTurn) {
-      setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
+    if (gameState.gameState.currentPlayerTurn) {
+      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
     }
   }, [gameState.gameState.currentPhase]);
 
@@ -230,10 +230,11 @@ const MultiPlayerGamePage = () => {
 
         {/* Turn Manager */}
         <GameTurnManager
-          gameState={gameState}
-          players={players}
-          emitGameStateUpdate={emitGameStateUpdate}
+          currentPlayerTurn={gameState.gameState.currentPlayerTurn}
+          currentPhase={gameState.gameState.currentPhase}
+          turnOrder={gameState.gameState.turnOrder}
           currentPlayer={currentPlayer}
+          sessionId={sessionId}
         />
 
         {/* Turn Count */}
