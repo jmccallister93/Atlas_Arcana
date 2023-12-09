@@ -7,10 +7,10 @@ export interface GameSessionInfo {
     tileGrid: [];
     turnsCompleted: number;
     titans: TitanInfo[];
-    equipmentCardCount: [], // Counter for equipment cards
-    questCardCount: [], // Counter for quest cards
+    equipmentCardCount: [], 
+    questCardCount: [], 
     treasureCardCount: [],
-    worldEventCardCount: [], // Counter for world event cards
+    worldEventCardCount: [], 
   };
   players: PlayerInfo[];
 }

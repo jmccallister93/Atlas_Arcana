@@ -99,7 +99,7 @@ const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, conn
     io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
 
     // Emitting to the room
-    io.to(roomName).emit("matchFound", newSession);
+    io.to(roomName).emit("matchFound", newSession); 
     // console.log("From notifyplayers newSession: " + JSON.stringify(newSession))
   } else {
     console.log("One or both players are not connected");

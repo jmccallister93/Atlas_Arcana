@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { GameState } from "../../components/GameComponents/Interfaces";
+import { GameSessionInfo, GameState } from "../../components/GameComponents/Interfaces";
 // Initiate connection to socket server
 const socket = io("http://localhost:3001"); 
 
@@ -19,17 +19,17 @@ socket.on("totalConnectedUsers", (usersCount) => {});
 socket.on("sendFriendRequest",  (senderId, receiverId) => {} );
 
 // Function to send game state updates
-const sendGameStateUpdate = (sessionId: string, newState: GameState) => {
+const sendGameStateUpdate = (sessionId: string, newState: GameSessionInfo) => {
   socket.emit("updateGameState", { sessionId, newState });
 };
 
 // Function to listen for game state updates
-const onGameStateUpdate = (callback: (newGameState: GameState) => void) => {
+const onGameStateUpdate = (callback: (newGameState: GameSessionInfo) => void) => {
   socket.on("updateGameState", callback);
 };
 
 // Function to stop listening for game state updates
-const offGameStateUpdate = (callback: (newGameState: GameState) => void) => {
+const offGameStateUpdate = (callback: (newGameState: GameSessionInfo) => void) => {
   socket.off("updateGameState", callback);
 };
 

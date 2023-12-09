@@ -138,6 +138,7 @@ module.exports = function (socket, io) {
       const updatedState = await gameSessionManager.getGameState(sessionId);
       // Broadcast the updated state to all players in the session
       console.log("Broadcasting updated state to session:", sessionId);
+      //AAAAAAAAAAAAAAAAAAAAAAAAAAAAA 
       io.to(sessionId)
       .emit("updateGameState", updatedState.gameState); // Emit the gameState part
     } catch (error) {

@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import socket from "../../context/SocketClient/socketClient";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import { useHistory } from "react-router-dom";
+import { GameProvider } from "../../context/GameContext/GameContext";
 
 interface GameSessionInfo {
   // Define the properties of gameSessionInfo
@@ -122,6 +123,7 @@ const joinMatchmaking = async () => {
   }, [history, socket]);
 
   return (
+    <GameProvider>
     <IonPage>
       {isLoggedIn ? (
         <IonContent fullscreen={true} className="ion-padding">
@@ -205,6 +207,7 @@ const joinMatchmaking = async () => {
         </IonContent>
       )}
     </IonPage>
+    </GameProvider>
   );
 };
 

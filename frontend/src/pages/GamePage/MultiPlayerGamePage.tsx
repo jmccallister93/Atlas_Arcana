@@ -28,6 +28,7 @@ import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
+import { GameProvider } from "../../context/GameContext/GameContext";
 
 const MultiPlayerGamePage = () => {
   // Must have variables
@@ -195,71 +196,71 @@ const MultiPlayerGamePage = () => {
   };
 
   return (
-    <IonPage>
-      {/* Welcome Modal */}
-      {/* <WelcomeModal
+    
+      <IonPage>
+        {/* Welcome Modal */}
+        {/* <WelcomeModal
         gameState={gameState}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
       /> */}
 
-      {/* Player Menu */}
-      <PlayerMenu
-        isOpen={isPlayerMenuOpen}
-        onClose={() => setIsPlayerMenuOpen(false)}
-        player={currentPlayer}
-        gameState={gameState}
-        updatePlayerData={updatePlayerData}
-      />
-
-      <IonContent>
-        {/* Floating player menu */}
-        <div className="actionsMenu">
-          <button className="actionsIcon" onClick={togglePlayerMenu}>
-            <IonIcon icon={addCircleOutline} size="large" color="success" />
-          </button>
-        </div>
-
-        {/* Title */}
-        <h1 className="pageHeader">Multiplayer Game</h1>
-
-        {/* Players in Game */}
-        <PlayersInGame
-          playerNames={gameState.players.map((player) => player.username)}
+        {/* Player Menu */}
+        <PlayerMenu
+          isOpen={isPlayerMenuOpen}
+          onClose={() => setIsPlayerMenuOpen(false)}
+          player={currentPlayer}
+          gameState={gameState}
+          updatePlayerData={updatePlayerData}
         />
 
-        {/* Turn Manager */}
-        <GameTurnManager
-          currentPlayerTurn={gameState.gameState.currentPlayerTurn}
-          currentPhase={gameState.gameState.currentPhase}
-          turnOrder={gameState.gameState.turnOrder}
-          currentPlayer={currentPlayer}
-          sessionId={sessionId}
-        />
+        <IonContent>
+          {/* Floating player menu */}
+          <div className="actionsMenu">
+            <button className="actionsIcon" onClick={togglePlayerMenu}>
+              <IonIcon icon={addCircleOutline} size="large" color="success" />
+            </button>
+          </div>
 
-        {/* Turn Count */}
-        <h4 className="pageHeader">Turn Number: </h4>
+          {/* Title */}
+          <h1 className="pageHeader">Multiplayer Game</h1>
 
-        {/* VP Count */}
-        <h4 className="pageHeader">VP Counts: </h4>
+          {/* Players in Game */}
+          <PlayersInGame/>
 
-        {/* GameTimers */}
-        <h4 className="pageHeader">Timer: </h4>
-
-        {/* GameBoard */}
-        <div className="gameBoardContainer">
-          <GameBoard
-            hasSetupCompleted={hasSetupCompleted}
-            currentPlayerTurn={gameState?.gameState.currentPlayerTurn}
+          {/* Turn Manager */}
+          <GameTurnManager
+            currentPlayerTurn={gameState.gameState.currentPlayerTurn}
+            currentPhase={gameState.gameState.currentPhase}
+            turnOrder={gameState.gameState.turnOrder}
             currentPlayer={currentPlayer}
-            tileGrid={gameState?.gameState.tileGrid}
-            titans={gameState?.gameState.titans}
-            players={gameState?.players}
-            emitGameStateUpdate={emitGameStateUpdate}
+            sessionId={sessionId}
           />
-        </div>
-      </IonContent>
-    </IonPage>
+
+          {/* Turn Count */}
+          <h4 className="pageHeader">Turn Number: </h4>
+
+          {/* VP Count */}
+          <h4 className="pageHeader">VP Counts: </h4>
+
+          {/* GameTimers */}
+          <h4 className="pageHeader">Timer: </h4>
+
+          {/* GameBoard */}
+          <div className="gameBoardContainer">
+            <GameBoard
+              hasSetupCompleted={hasSetupCompleted}
+              currentPlayerTurn={gameState?.gameState.currentPlayerTurn}
+              currentPlayer={currentPlayer}
+              tileGrid={gameState?.gameState.tileGrid}
+              titans={gameState?.gameState.titans}
+              players={gameState?.players}
+              emitGameStateUpdate={emitGameStateUpdate}
+            />
+          </div>
+        </IonContent>
+      </IonPage>
+   
   );
 };
 

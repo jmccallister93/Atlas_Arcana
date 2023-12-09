@@ -1,18 +1,18 @@
-import React from "react";;
+import React from "react";
+import { useGameContext } from "../../../context/GameContext/GameContext";
 
-interface PlayersInGameProps {
-  playerNames: string[];
-}
 
-const PlayersInGame: React.FC<PlayersInGameProps> = ({ playerNames }) => {
-    
+
+
+const PlayersInGame: React.FC = () => {
+  const { gameState } = useGameContext();
+  const playerNames = gameState.players.map(player => player.username);
 
   return (
     <>
-      {" "}
       <h4 className="pageHeader">Players in Game:</h4>
       <div className="playerList">
-        {playerNames?.map((player, index) => (
+        {playerNames.map((player, index) => (
           <div key={index} className="playerName">
             {player}
           </div>
@@ -22,12 +22,4 @@ const PlayersInGame: React.FC<PlayersInGameProps> = ({ playerNames }) => {
   );
 };
 
-const areEqual = (prevProps: any, nextProps: any) => {
-  if (prevProps.playerNames !== nextProps.playerNames) {
-    return false;  // Re-render if currentPlayer changes
-  }
-
-  return true; // Props are equal, don't re-render
-};
-
-export default React.memo(PlayersInGame, areEqual);
+export default PlayersInGame;

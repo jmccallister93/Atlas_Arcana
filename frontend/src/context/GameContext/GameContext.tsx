@@ -1,48 +1,66 @@
-import React, { createContext, useContext, useReducer } from 'react';
-import { GameSessionInfo } from '../../components/GameComponents/Interfaces';
+import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { GameSessionInfo } from "../../components/GameComponents/Interfaces";
+import socket, { onGameStateUpdate, offGameStateUpdate } from "../SocketClient/socketClient";
 
-interface GameContextType {
-    gameState: GameSessionInfo;
-    updateGameState: (newState: Partial<GameSessionInfo>) => void;
+// Define the shape of your context
+interface GameState {
+  gameState: GameSessionInfo;
+  updateGameState: (updatedData: Partial<GameSessionInfo>) => void;
 }
 
-const GameContext = createContext<GameContextType>(null!);
+// Create the context
+const GameContext = createContext<GameState | undefined>(undefined);
 
-const initialState: GameSessionInfo = {
-    sessionId: '',
-    gameState: {
-        // ... Initialize all fields of your gameState
-    },
-    players: []
+// Helper hook to use the context
+export const useGameContext = () => {
+  const context = useContext(GameContext);
+  if (!context) {
+    throw new Error("useGameContext must be used within a GameProvider");
+  }
+  return context;
 };
 
-function gameReducer(state: GameSessionInfo, action: { type: string, payload: any }): GameSessionInfo {
-    switch (action.type) {
-        case 'UPDATE_GAME_STATE':
-            return { ...state, ...action.payload };
-        default:
-            return state;
-    }
+const gameReducer = (state: GameSessionInfo, action: any) => {
+  switch (action.type) {
+    case "UPDATE_GAME_STATE":
+        console.log("From game reducer state:",state)
+        console.log("From game reducer action.payload:",action.payload)
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
+
+interface GameProviderProps {
+  children: React.ReactNode;
 }
 
-export const GameProvider: React.FC = ({  }) => {
-    const [gameState, dispatch] = useReducer(gameReducer, initialState);
-
-    const updateGameState = (newState: Partial<GameSessionInfo>) => {
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: newState });
+export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
+  const [gameState, dispatch] = useReducer(gameReducer, {}); // initial state
+  useEffect(() => {
+    const handleInitialGameState = (newSession: GameSessionInfo) => {
+      console.log("Game state initialized", newSession);
+      dispatch({ type: "UPDATE_GAME_STATE", payload: newSession });
     };
 
-    return (
-        <GameContext.Provider value={{ gameState, updateGameState }}>
-            {children}
-        </GameContext.Provider>
-    );
-};
+    // Subscribe to game state updates
+    socket.on("matchFound", handleInitialGameState)
 
-export const useGameContext = () => {
-    const context = useContext(GameContext);
-    if (!context) {
-        throw new Error('useGameContext must be used within a GameProvider');
-    }
-    return context;
+    // Clean up the listener when the component unmounts
+    return () => {
+        socket.off("matchFound", handleInitialGameState);
+    };
+  }, []);
+    console.log(gameState)
+  const updateGameState = (updatedData: Partial<GameSessionInfo>) => {
+    dispatch({ type: "UPDATE_GAME_STATE", payload: updatedData });
+    // Here, also handle your socket.emit or Redis server updates
+  };
+
+  
+  return (
+    <GameContext.Provider value={{ gameState, updateGameState }}>
+      {children}
+    </GameContext.Provider>
+  );
 };
