@@ -1,3 +1,7 @@
+interface TurnCountProps{
+    
+}
+
 const TurnCount: React.FC = () => {
     return ( <></> );
 }

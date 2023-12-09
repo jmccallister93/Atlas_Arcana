@@ -35,10 +35,12 @@ const MultiPlayerGamePage = () => {
   const { gameSessionInfo } = location.state;
   const [gameState, setGameState] = useState<GameSessionInfo>(gameSessionInfo);
   const auth = useAuth();
+
   // Immutable Variables
   const sessionId = gameState.sessionId;
   const turnOrder = gameState.gameState.turnOrder;
   const tileGrid = gameState.gameState.tileGrid;
+
   //  Changing Variables
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
@@ -49,14 +51,17 @@ const MultiPlayerGamePage = () => {
   const [questCardCount, setQuestCardCount] = useState<[]>();
   const [treasureCardCount, setTreasureCardCount] = useState<[]>();
   const [worldEventCardCount, setWorldEventCardCount] = useState<[]>();
+
   // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
+  
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
-  
+
   // Has setup completed?
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
+  
   // Set the current player based on authxontext
   const currentPlayer = players.find(
     (player) => player.username === auth.username
@@ -76,13 +81,13 @@ const MultiPlayerGamePage = () => {
   // Set Player turn
   useEffect(() => {
     if (gameState.gameState.currentPlayerTurn) {
-      setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
+      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
     }
   }, [gameState.gameState.currentPlayerTurn]);
-// Set Current Phase
+  // Set Current Phase
   useEffect(() => {
     if (gameSessionInfo.gameState.currentPhase) {
-      setCurrentPhase(gameState?.gameState.currentPhase);
+      setCurrentPhase(gameState.gameState.currentPhase);
     }
   }, [gameState.gameState.currentPhase]);
   // Set Current Player Turn
@@ -143,7 +148,7 @@ const MultiPlayerGamePage = () => {
         setHasSetupCompleted(true);
       }
     }
-  }, [gameState?.gameState.currentPhase]);
+  }, [gameState.gameState.currentPhase]);
   //Set current game phase
   useEffect(() => {
     if (gameState?.gameState.currentPhase) {
@@ -152,7 +157,7 @@ const MultiPlayerGamePage = () => {
     if (gameState?.gameState.currentPlayerTurn) {
       setCurrentPlayerTurn(gameState?.gameState.currentPlayerTurn ?? null);
     }
-  }, [gameState?.gameState.currentPhase]);
+  }, [gameState.gameState.currentPhase]);
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
@@ -191,11 +196,14 @@ const MultiPlayerGamePage = () => {
 
   return (
     <IonPage>
+      {/* Welcome Modal */}
       {/* <WelcomeModal
         gameState={gameState}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
       /> */}
+
+      {/* Player Menu */}
       <PlayerMenu
         isOpen={isPlayerMenuOpen}
         onClose={() => setIsPlayerMenuOpen(false)}
@@ -203,6 +211,7 @@ const MultiPlayerGamePage = () => {
         gameState={gameState}
         updatePlayerData={updatePlayerData}
       />
+
       <IonContent>
         {/* Floating player menu */}
         <div className="actionsMenu">
@@ -210,27 +219,34 @@ const MultiPlayerGamePage = () => {
             <IonIcon icon={addCircleOutline} size="large" color="success" />
           </button>
         </div>
+
         {/* Title */}
         <h1 className="pageHeader">Multiplayer Game</h1>
+
         {/* Players in Game */}
-        <PlayersInGame playerNames={gameState.players.map((player) => player.username)} />
+        <PlayersInGame
+          playerNames={gameState.players.map((player) => player.username)}
+        />
+
         {/* Turn Manager */}
         <GameTurnManager
           gameState={gameState}
           players={players}
           emitGameStateUpdate={emitGameStateUpdate}
           currentPlayer={currentPlayer}
-          currentPlayerTurn={currentPlayerTurn}
-          currentPhase={currentPhase}
         />
+
         {/* Turn Count */}
         <h4 className="pageHeader">Turn Number: </h4>
+
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
+
         {/* GameTimers */}
         <h4 className="pageHeader">Timer: </h4>
+
+        {/* GameBoard */}
         <div className="gameBoardContainer">
-          {" "}
           <GameBoard
             hasSetupCompleted={hasSetupCompleted}
             currentPlayerTurn={gameState?.gameState.currentPlayerTurn}

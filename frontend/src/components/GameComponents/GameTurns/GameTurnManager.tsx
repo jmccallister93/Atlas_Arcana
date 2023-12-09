@@ -10,21 +10,17 @@ import CombatPhase from "./CombatPhase";
 import TitanPhase from "./TitanPhase";
 
 interface GameTurnManagerProps {
-  gameState?: GameSessionInfo;
+  gameState: GameSessionInfo;
   players: PlayerInfo[];
   emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
   currentPlayer: PlayerInfo | undefined;
-  currentPlayerTurn: string | undefined;
-  currentPhase: string | undefined 
 }
 
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({
   gameState,
   players,
-  emitGameStateUpdate,
+  emitGameStateUpdate, 
   currentPlayer,
-  // currentPlayerTurn,
-  // currentPhase,
 }) => {
   // Turn order and state
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string | null>(

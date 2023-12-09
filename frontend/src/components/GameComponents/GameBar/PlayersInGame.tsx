@@ -1,5 +1,4 @@
-import socket from "../../../context/SocketClient/socketClient";
-import { useEffect, useState } from "react";
+import React from "react";;
 
 interface PlayersInGameProps {
   playerNames: string[];
@@ -23,4 +22,12 @@ const PlayersInGame: React.FC<PlayersInGameProps> = ({ playerNames }) => {
   );
 };
 
-export default PlayersInGame;
+const areEqual = (prevProps: any, nextProps: any) => {
+  if (prevProps.playerNames !== nextProps.playerNames) {
+    return false;  // Re-render if currentPlayer changes
+  }
+
+  return true; // Props are equal, don't re-render
+};
+
+export default React.memo(PlayersInGame, areEqual);
