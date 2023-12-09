@@ -36,8 +36,6 @@ const MultiPlayerGamePage = () => {
   const [gameState, setGameState] = useState<GameSessionInfo>(gameSessionInfo);
   const auth = useAuth();
   // Immutable Variables
-  const playerNames =
-    gameState.players.map((player) => player.username) || [];
   const sessionId = gameState.sessionId;
   const turnOrder = gameState.gameState.turnOrder;
   const tileGrid = gameState.gameState.tileGrid;
