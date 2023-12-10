@@ -105,25 +105,24 @@ const LobbyPage = () => {
   }, [isLoggedIn, token, username]);
 
   // Handle match found event
-// Handle match found event
-useEffect(() => {
-  const handleMatchFound = () => {
-    console.log("Match found! Redirecting to multiplayer game page");
-    setSearchingForGame(false);
+  useEffect(() => {
+    const handleMatchFound = () => {
+      setSearchingForGame(false);
+      setMatchFound(true);
 
-    // Redirect after a 5-second delay
-    setTimeout(() => {
-      history.push("/multiGame");
-    }, 5000);
-  };
+      // Redirect after a 5-second delay
+      setTimeout(() => {
+        history.push("/multiGame");
+        setMatchFound(false);
+      }, 5000);
+    };
 
-  socket.on("matchFound", handleMatchFound);
+    socket.on("matchFound", handleMatchFound);
 
-  return () => {
-    socket.off("matchFound", handleMatchFound);
-  };
-}, [history, socket]);
-
+    return () => {
+      socket.off("matchFound", handleMatchFound);
+    };
+  }, [history, socket]);
 
   return (
    

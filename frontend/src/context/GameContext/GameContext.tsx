@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { GameSessionInfo } from "../../components/GameComponents/Interfaces";
-import socket, { onGameStateUpdate, offGameStateUpdate } from "../SocketClient/socketClient";
+import { GameSessionInfo, PlayerInfo } from "../../components/GameComponents/Interfaces";
+import socket, {
+  onGameStateUpdate,
+  offGameStateUpdate,
+} from "../SocketClient/socketClient";
 
 // Define the shape of your context
 interface GameState {
   gameState: GameSessionInfo;
-  updateGameState: (updatedData: Partial<GameSessionInfo>) => void;
+  emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
+  updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
 // Create the context
@@ -23,9 +27,17 @@ export const useGameContext = () => {
 const gameReducer = (state: GameSessionInfo, action: any) => {
   switch (action.type) {
     case "UPDATE_GAME_STATE":
-        console.log("From game reducer state:",state)
-        console.log("From game reducer action.payload:",action.payload)
       return { ...state, ...action.payload };
+      case "UPDATE_PLAYER_DATA":
+      const updatedPlayers = state.players.map(player => 
+        player.username === action.payload.username ? action.payload : player
+      );
+      return { ...state, players: updatedPlayers };
+    case "SET_CURRENT_PLAYER_TURN":
+      return {
+        ...state,
+        gameState: { ...state.gameState, currentPlayerTurn: action.payload },
+      };
     default:
       return state;
   }
@@ -36,34 +48,53 @@ interface GameProviderProps {
 }
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [gameState, dispatch] = useReducer(gameReducer, {}); // initial state
+  const [gameState, dispatch] = useReducer(gameReducer, {});
+  // initial state
   useEffect(() => {
     const handleInitialGameState = (newSession: GameSessionInfo) => {
-      console.log("Game state initialized", newSession);
       dispatch({ type: "UPDATE_GAME_STATE", payload: newSession });
     };
 
     // Subscribe to game state updates
-    socket.on("matchFound", handleInitialGameState)
+    socket.on("matchFound", handleInitialGameState);
 
     // Clean up the listener when the component unmounts
     return () => {
-        socket.off("matchFound", handleInitialGameState);
+      socket.off("matchFound", handleInitialGameState);
     };
   }, []);
-    console.log("GameState from gamecontext:",gameState)
-    useEffect(() => {
-        console.log("gameState changed:", gameState);
-      }, [gameState]);
-      
-  const updateGameState = (updatedData: Partial<GameSessionInfo>) => {
-    dispatch({ type: "UPDATE_GAME_STATE", payload: updatedData });
-    // Here, also handle your socket.emit or Redis server updates
-  };
 
+  const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updateGameState", updatedState);
+    }
+  };
+  // Function to update player data
+  const updatePlayerData = (updatedPlayer: PlayerInfo) => {
+    // Assuming dispatch updates gameState correctly
+    dispatch({ type: "UPDATE_PLAYER_DATA", payload: updatedPlayer });
+
+    // Emit updated player data with correct typing
+    if (gameState && gameState.players) {
+      emitGameStateUpdate({
+        players: gameState.players.map((player: PlayerInfo) =>
+          player.username === updatedPlayer.username ? updatedPlayer : player
+        ),
+      });
+    }
+  };
   
   return (
-    <GameContext.Provider value={{ gameState, updateGameState }}>
+    <GameContext.Provider
+      value={{ gameState, emitGameStateUpdate, updatePlayerData }}
+    >
       {children}
     </GameContext.Provider>
   );

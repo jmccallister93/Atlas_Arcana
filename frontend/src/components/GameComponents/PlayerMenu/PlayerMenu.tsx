@@ -6,27 +6,26 @@ import {
   TreasureItem,
   GameSessionInfo,
   PlayerInfo,
-} from "../Interfaces"; 
+} from "../Interfaces";
 import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import PlayerMenuDetails from "./PlayerMenuDetails";
+import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
 
 interface PlayerMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  player?: PlayerInfo;
-  gameState?: GameSessionInfo;
-  updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
-const PlayerMenu: React.FC<PlayerMenuProps> = ({
-  isOpen,
-  onClose,
-  player,
-  gameState,
-  updatePlayerData,
-}) => {
+const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
+  // Context vars
+  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const auth = useAuth();
+  // Get Player data
+  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  const player = players.find((player) => player.username === auth.username);
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");
   const [currentDetailContent, setCurrentDetailContent] = useState<string>("");
@@ -34,7 +33,9 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     EquipmentItem[]
   >([]);
   const [currentQuestItem, setCurrentQuestItem] = useState<QuestItem[]>([]);
-  const [currentTreasureItem, setCurrentTreasureItem] = useState<TreasureItem[]>([]);
+  const [currentTreasureItem, setCurrentTreasureItem] = useState<
+    TreasureItem[]
+  >([]);
 
   // Need to verify player exists
   if (!player) {
@@ -292,7 +293,6 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({
     content: string | EquipmentItem[] | any
   ) => {
     setCurrentDetailType(type);
-   
 
     if (type === "Quests") {
       setCurrentQuestItem(content as QuestItem[]);
