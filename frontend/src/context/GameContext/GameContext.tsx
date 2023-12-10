@@ -103,7 +103,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
   };
   useEffect(() => {
-    console.log("From Gamecontext gameState:", gameState);
+    console.log("From Gamecontext sessionId:", gameState.sessionId);
   }, [gameState]);
 
   return (

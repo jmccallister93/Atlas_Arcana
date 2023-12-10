@@ -57,29 +57,30 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   }, [currentPlayerTurn, gameState.players]);
   //@@@@@@@@@Above is what is causing to re-render on gameState.players@@@@@@@@@ 
 
-  // Socket emit for current player turn
-  const emitCurrentPlayerTurnUpdate = (
-    newCurrentPlayerTurn: string,
-    sessionId: string
-  ) => {
-    const partialUpdate = {
+// Socket emit for current player turn
+const emitCurrentPlayerTurnUpdate = (newCurrentPlayerTurn: string, sessionId: string) => {
+  const payload = {
+    sessionId: sessionId,
+    partialUpdate: {
       currentPlayerTurn: newCurrentPlayerTurn,
-    };
-
-    socket.emit("updateCurrentPlayerTurn", sessionId, partialUpdate);
+    }
   };
 
-  // Socket emit for current phase
-  const emitCurrentPhaseUpdate = (
-    newCurrentPhase: string,
-    sessionId: string
-  ) => {
-    const partialUpdate = {
+  socket.emit("updateCurrentPlayerTurn", payload);
+};
+
+// Socket emit for current phase
+const emitCurrentPhaseUpdate = (newCurrentPhase: string, sessionId: string) => {
+ 
+  const payload = {
+    sessionId: sessionId,
+    partialUpdate: {
       currentPhase: newCurrentPhase,
-    };
-
-    socket.emit("updateCurrentPhase", sessionId, partialUpdate);
+    }
   };
+console.log("Payload from currentphase:", payload)
+  socket.emit("updateCurrentPhase", payload);
+};
 
   // Phase order
   //Advance PHase
@@ -130,8 +131,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       }
     }
 
-    emitCurrentPlayerTurnUpdate(gameState.sessionId, nextPlayerTurn);
-    emitCurrentPhaseUpdate(gameState.sessionId, nextPhase);
+    emitCurrentPlayerTurnUpdate(nextPlayerTurn, gameState.sessionId);
+    emitCurrentPhaseUpdate(nextPhase, gameState.sessionId);
   };
   // Switch Case phase
   // useEffect(() => {

@@ -151,16 +151,50 @@ module.exports = function (socket, io) {
   });
 
   // Current Player Turn
-  socket.on("updateCurrentPlayerTurn", ({sessionId, partialUpdate}) =>{
-    gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
-    io.emit("gameStateUpdate", gameState)
-  })
+  socket.on("updateCurrentPlayerTurn", async ({ sessionId, partialUpdate }) => {
+    try {
+      // Retrieve the current game state for the session
+      const gameState = await gameSessionManager.getGameState(sessionId);
+  
+      // Update the currentPlayerTurn
+      gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
+  
+      // Save or process the updated game state as needed
+      // (This step depends on how your gameSessionManager handles state updates)
+  
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updateGameState", gameState);
+    } catch (error) {
+      console.error("Error updating current player turn:", error);
+      // Optionally, emit an error message back to the client
+      socket.emit("gameStateUpdateError", {
+        message: "Failed to update current player turn.",
+      });
+    }
+  });
 
     // Current Phase
-    socket.on("updateCurrentPhase", ({sessionId, partialUpdate}) =>{
-      gameState.currentPhase = partialUpdate.currentPhase;
-      io.emit("gameStateUpdate", gameState)
-    })
+    socket.on("updateCurrentPhase", async ({ sessionId, partialUpdate }) => {
+      try {
+        // Retrieve the current game state for the session
+        const gameState = await gameSessionManager.getGameState(sessionId);
+    
+        // Update the currentPhase
+        gameState.currentPhase = partialUpdate.currentPhase;
+    
+        // Save or process the updated game state as needed
+        // (This step depends on how your gameSessionManager handles state updates)
+    
+        // Broadcast the updated state to all players in the session
+        io.to(sessionId).emit("updateGameState", gameState);
+      } catch (error) {
+        console.error("Error updating current phase:", error);
+        // Optionally, emit an error message back to the client
+        socket.emit("gameStateUpdateError", {
+          message: "Failed to update current phase.",
+        });
+      }
+    });
 
   //Game Phases
   //Draw phase
