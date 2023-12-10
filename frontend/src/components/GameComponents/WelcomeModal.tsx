@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import "./WelcomeModal.scss";
 import {
   GameSessionInfo,
-  GameState,
 } from "../../components/GameComponents/Interfaces";
+import { useGameContext } from "../../context/GameContext/GameContext";
 
 interface WelcomeModalProps {
-  gameState?: GameSessionInfo;
   isOpen: boolean;
   // messageGroups: MessageGroup[];
   onClose: () => void;
@@ -20,13 +19,12 @@ interface MessageGroup {
 }
 
 const WelcomeModal: React.FC<WelcomeModalProps> = ({
-  gameState,
   isOpen,
   // messageGroups,
   onClose,
 }) => {
   // State to hold the current message group
-
+const {gameState} = useGameContext()
   const [currentMessageGroup, setCurrentMessageGroup] =
     useState<MessageGroup | null>(null);
   const [currentContentIndex, setCurrentContentIndex] = useState(0);

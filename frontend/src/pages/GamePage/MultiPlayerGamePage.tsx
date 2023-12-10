@@ -27,28 +27,15 @@ import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
-import { GameProvider, useGameContext } from "../../context/GameContext/GameContext";
+import {
+  GameProvider,
+  useGameContext,
+} from "../../context/GameContext/GameContext";
 
 const MultiPlayerGamePage = () => {
   // Must have variables
   const { gameState } = useGameContext();
   const auth = useAuth();
-
-  // Immutable Variables
-  // const sessionId = gameState.sessionId;
-  // const turnOrder = gameState.gameState.turnOrder;
-  // const tileGrid = gameState.gameState.tileGrid;
-
-  //  Changing Variables
-  // const [players, setPlayers] = useState<PlayerInfo[]>(gameSessionInfo.players);
-  // const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
-  // const [currentPhase, setCurrentPhase] = useState<string>();
-  // const [turnsCompleted, setTurnsCompleted] = useState<number>();
-  // const [titans, setTitans] = useState<TitanInfo[]>();
-  // const [equipmentCardCount, setEquipmentCardCount] = useState<[]>();
-  // const [questCardCount, setQuestCardCount] = useState<[]>();
-  // const [treasureCardCount, setTreasureCardCount] = useState<[]>();
-  // const [worldEventCardCount, setWorldEventCardCount] = useState<[]>();
 
   // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
@@ -57,162 +44,57 @@ const MultiPlayerGamePage = () => {
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
 
-  // Has setup completed?
-  const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
-
-  // Set the current player based on authxontext
-  // const currentPlayer = players.find(
-  //   (player) => player.username === auth.username
-  // );
-
-  // SET LOCAL STATES
-  // Set local gamestates
-  // useEffect(() => {
-  //   setGameState(gameSessionInfo);
-  // }, []);
-  // // Set local players State
-  // useEffect(() => {
-  //   if (gameState.players) {
-  //     setPlayers(gameState.players);
-  //   }
-  // }, [gameState.players]);
-  // // Set Player turn
-  // useEffect(() => {
-  //   if (gameState.gameState.currentPlayerTurn) {
-  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-  //   }
-  // }, [gameState.gameState.currentPlayerTurn]);
-  // // Set Current Phase
-  // useEffect(() => {
-  //   if (gameSessionInfo.gameState.currentPhase) {
-  //     setCurrentPhase(gameState.gameState.currentPhase);
-  //   }
-  // }, [gameState.gameState.currentPhase]);
-  // // Set Current Player Turn
-  // useEffect(() => {
-  //   if (gameSessionInfo.gameState.currentPlayerTurn) {
-  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-  //   }
-  // }, []);
-  // // Set Turns Completed
-  // useEffect(() => {
-  //   if (gameSessionInfo?.gameState.turnsCompleted) {
-  //     setTurnsCompleted(gameState.gameState.turnsCompleted);
-  //   }
-  // }, []);
-
-
-  // Handle game stateupdate
-  useEffect(() => {
-    const handleGameStateUpdate = (updatedGameState: any) => {
-      console.log("Received updated game state:", updatedGameState);
-
-      // Update the entire game state
-      setGameState(updatedGameState);
-
-      // Check if the updated game state contains player information and update accordingly
-      if (updatedGameState && updatedGameState.players) {
-        setPlayers(updatedGameState.players);
-      }
-    };
-    // Register the event listener
-    socket.on("updateGameState", handleGameStateUpdate);
-
-    // Clean up the event listener
-    return () => {
-      socket.off("updateGameState", handleGameStateUpdate);
-    };
-  }, []);
-
-  // Is setup completed?
-  useEffect(() => {
-    if (gameState?.gameState.currentPhase) {
-      if (gameState?.gameState.currentPhase === "Setup") {
-        setHasSetupCompleted(false);
-      } else {
-        setHasSetupCompleted(true);
-      }
-    }
-  }, [gameState.gameState.currentPhase]);
-  // //Set current game phase
-  // useEffect(() => {
-  //   if (gameState?.gameState.currentPhase) {
-  //     setCurrentPhase(gameState?.gameState.currentPhase);
-  //   }
-  //   if (gameState.gameState.currentPlayerTurn) {
-  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-  //   }
-  // }, [gameState.gameState.currentPhase]);
-
   // Open and close playermenu
   const togglePlayerMenu = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
 
-
   return (
-    
-      <IonPage>
-        {/* Welcome Modal */}
-        {/* <WelcomeModal
-        gameState={gameState}
+    <IonPage>
+      {/* Welcome Modal */}
+      {/* <WelcomeModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
       /> */}
 
-        {/* Player Menu */}
-        <PlayerMenu
-          isOpen={isPlayerMenuOpen}
-          onClose={() => setIsPlayerMenuOpen(false)}
-        />
+      {/* Player Menu */}
+      <PlayerMenu
+        isOpen={isPlayerMenuOpen}
+        onClose={() => setIsPlayerMenuOpen(false)}
+      />
 
-        <IonContent>
-          {/* Floating player menu */}
-          <div className="actionsMenu">
-            <button className="actionsIcon" onClick={togglePlayerMenu}>
-              <IonIcon icon={addCircleOutline} size="large" color="success" />
-            </button>
-          </div>
+      <IonContent>
+        {/* Floating player menu */}
+        <div className="actionsMenu">
+          <button className="actionsIcon" onClick={togglePlayerMenu}>
+            <IonIcon icon={addCircleOutline} size="large" color="success" />
+          </button>
+        </div>
 
-          {/* Title */}
-          <h1 className="pageHeader">Multiplayer Game</h1>
+        {/* Title */}
+        <h1 className="pageHeader">Multiplayer Game</h1>
 
-          {/* Players in Game */}
-          <PlayersInGame/>
+        {/* Players in Game */}
+        <PlayersInGame />
 
-          {/* Turn Manager */}
-          <GameTurnManager
-            currentPlayerTurn={gameState.gameState.currentPlayerTurn}
-            currentPhase={gameState.gameState.currentPhase}
-            turnOrder={gameState.gameState.turnOrder}
-            currentPlayer={currentPlayer}
-            // sessionId={sessionId}
-          />
+        {/* Turn Manager */}
+        <GameTurnManager />
 
-          {/* Turn Count */}
-          <h4 className="pageHeader">Turn Number: </h4>
+        {/* Turn Count */}
+        <h4 className="pageHeader">Turn Number: </h4>
 
-          {/* VP Count */}
-          <h4 className="pageHeader">VP Counts: </h4>
+        {/* VP Count */}
+        <h4 className="pageHeader">VP Counts: </h4>
 
-          {/* GameTimers */}
-          <h4 className="pageHeader">Timer: </h4>
+        {/* GameTimers */}
+        <h4 className="pageHeader">Timer: </h4>
 
-          {/* GameBoard */}
-          <div className="gameBoardContainer">
-            <GameBoard
-              hasSetupCompleted={hasSetupCompleted}
-              currentPlayerTurn={gameState?.gameState.currentPlayerTurn}
-              currentPlayer={currentPlayer}
-              tileGrid={gameState?.gameState.tileGrid}
-              titans={gameState?.gameState.titans}
-              players={gameState?.players}
-              emitGameStateUpdate={emitGameStateUpdate}
-            />
-          </div>
-        </IonContent>
-      </IonPage>
-      
+        {/* GameBoard */}
+        <div className="gameBoardContainer">
+          <GameBoard />
+        </div>
+      </IonContent>
+    </IonPage>
   );
 };
 

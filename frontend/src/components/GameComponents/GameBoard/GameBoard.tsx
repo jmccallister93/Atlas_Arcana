@@ -24,38 +24,37 @@ import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import TileMenuDetails, { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
 
-interface GameBoardProps {
-  // gameState?: GameSessionInfo;
-  currentPlayer: PlayerInfo | undefined;
-  currentPlayerTurn: string | undefined;
-  hasSetupCompleted: boolean;
-  tileGrid?: string[][];
-  titans?: {
-    titanName: string;
-    rank: number;
-    health: number;
-    offense: number;
-    defense: number;
-    stamina: number;
-    row: number;
-    col: number;
-  }[];
-  players?: PlayerInfo[];
-  buildings?: {};
-  emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
-}
+interface GameBoardProps {}
 
-const GameBoard: React.FC<GameBoardProps> = ({
-  tileGrid,
-  titans,
-  players,
-  emitGameStateUpdate,
-  // gameState,
-  currentPlayer,
-  currentPlayerTurn,
-  hasSetupCompleted,
-}) => {
+const GameBoard: React.FC<GameBoardProps> = ({}) => {
+  // Get Game state
+  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const auth = useAuth();
+  // Player info
+  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  const currentPlayer = players.find(
+    (player) => player.username === auth.username
+  );
+  // States that were being passed
+  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
+  const [tileGrid, setTileGrid] = useState<string[]>(
+    gameState.gameState.tileGrid
+  );
+  const titans = gameState.gameState.titans;
+  const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
+  useEffect(() => {
+    if (gameState?.gameState.currentPhase) {
+      if (gameState?.gameState.currentPhase === "Setup") {
+        setHasSetupCompleted(false);
+      } else {
+        setHasSetupCompleted(true);
+      }
+    }
+  }, [gameState.gameState.currentPhase]);
+
   interface TileInfo {
     type: string;
     x: number;
@@ -247,13 +246,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
     // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
-      
+
       if (distance <= 6) {
         return false; // Too close to a titan
       }
     }
 
-  // Check distance from other players' strongholds
+    // Check distance from other players' strongholds
     for (let player of players ?? []) {
       if (player.strongHold && player.username !== currentPlayer?.username) {
         const distance = calculateDistance(
@@ -262,7 +261,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           player.strongHold.col,
           player.strongHold.row
         );
-       
+
         if (distance <= 6) {
           return false; // Too close to another player's stronghold
         }
@@ -274,10 +273,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
-    if (
-      !hasSetupCompleted &&
-      currentPlayer?.username === currentPlayerTurn
-    ) {
+    if (!hasSetupCompleted && currentPlayer?.username === currentPlayerTurn) {
       setIsStrongholdPlacementMode(true);
     } else {
       setIsStrongholdPlacementMode(false);
@@ -445,19 +441,24 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   // Place stronghold
   const placeStronghold = () => {
-    console.log("Selected Stronghold x",selectedStrongholdCoordinates.x,
-    "Selected Stronghold y", selectedStrongholdCoordinates.y,
-    "Selected Tile", selectedTile,
-    "currentPlayer:", currentPlayer
+    console.log(
+      "Selected Stronghold x",
+      selectedStrongholdCoordinates.x,
+      "Selected Stronghold y",
+      selectedStrongholdCoordinates.y,
+      "Selected Tile",
+      selectedTile,
+      "currentPlayer:",
+      currentPlayer
     );
     if (
-      currentPlayer 
-      && isValidStrongholdPlacement(
+      currentPlayer &&
+      isValidStrongholdPlacement(
         selectedStrongholdCoordinates.x,
         selectedStrongholdCoordinates.y
       )
     ) {
-      console.log("Fired")
+      console.log("Fired");
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
@@ -465,7 +466,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
           row: selectedStrongholdCoordinates.y,
         },
       };
-//HERERERERERER 
+      //HERERERERERER
       const updatedGameState = {
         // ...gameState,
         players: players?.map((p) =>
@@ -527,9 +528,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
 };
 const areEqual = (prevProps: any, nextProps: any) => {
   if (prevProps.currentPlayer?.username !== nextProps.currentPlayer?.username) {
-    return false;  // Re-render if currentPlayer changes
+    return false; // Re-render if currentPlayer changes
   }
-  
+
   // Compare specific parts of gameState
   if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
     return false; // Not equal, should re-render

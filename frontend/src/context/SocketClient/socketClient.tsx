@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { GameSessionInfo, GameState } from "../../components/GameComponents/Interfaces";
+import { GameSessionInfo } from "../../components/GameComponents/Interfaces";
 // Initiate connection to socket server
 const socket = io("http://localhost:3001"); 
 
