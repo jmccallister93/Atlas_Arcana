@@ -34,9 +34,9 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
   const auth = useAuth();
   // Player info
-  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
-  useEffect(() => {setPlayers(gameState.players)},[gameState.players])
-  const currentPlayer = players.find(
+  // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  // useEffect(() => {setPlayers(gameState.players)},[gameState.players])
+  const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
   // States that were being passed
@@ -188,15 +188,13 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
           stronghold3Img,
           stronghold4Img,
         ];
-        console.log("from before my foreach players:",players)
-        players.forEach((player, index) => {
+
+        gameState.players.forEach((player, index) => {
           if (player.strongHold) {
-            console.log("player stronghold:",player.strongHold)
             let strongholdImg =
               strongholdImages[index % strongholdImages.length];
-              console.log("stronghold image:", strongholdImg)
+
             p.image(
-              
               strongholdImg,
               player.strongHold.col * tileSize,
               player.strongHold.row * tileSize,
@@ -224,7 +222,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (canvasRef.current) {
       canvasRef.current.addEventListener("click", handleClick);
     }
-  
+
     return () => {
       if (myp5) {
         myp5.remove();
@@ -234,8 +232,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         canvasRef.current.removeEventListener("click", handleClick);
       }
     };
-    
-  }, [tileGrid, titans, players, gameState]);
+  }, [tileGrid, titans, gameState.players]);
 
   // Calculate distance of tiles
   const calculateDistance = (
@@ -258,7 +255,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
 
     // Check distance from other players' strongholds
-    for (let player of players ?? []) {
+    for (let player of gameState.players ?? []) {
       if (player.strongHold && player.username !== currentPlayer?.username) {
         const distance = calculateDistance(
           x,
@@ -335,7 +332,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       }
     }
     // Determine the image URL based on the titan's name
-    players?.forEach((player) => {
+    gameState.players?.forEach((player) => {
       // Check for player
       if (player.row === y && player.col === x) {
         playerOnTile = player;
@@ -446,16 +443,16 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   // Place stronghold
   const placeStronghold = () => {
-    console.log(
-      "Selected Stronghold x",
-      selectedStrongholdCoordinates.x,
-      "Selected Stronghold y",
-      selectedStrongholdCoordinates.y,
-      "Selected Tile",
-      selectedTile,
-      "currentPlayer:",
-      currentPlayer
-    );
+    // console.log(
+    //   "Selected Stronghold x",
+    //   selectedStrongholdCoordinates.x,
+    //   "Selected Stronghold y",
+    //   selectedStrongholdCoordinates.y,
+    //   "Selected Tile",
+    //   selectedTile,
+    //   "currentPlayer:",
+    //   currentPlayer
+    // );
     if (
       currentPlayer &&
       isValidStrongholdPlacement(
@@ -463,7 +460,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         selectedStrongholdCoordinates.y
       )
     ) {
-      
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
@@ -474,7 +470,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       //HERERERERERER
       const updatedGameState = {
         // ...gameState,
-        players: players?.map((p) =>
+        players: gameState.players?.map((p) =>
           p.username === updatedPlayer.username ? updatedPlayer : p
         ),
       };

@@ -19,8 +19,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
   const auth = useAuth();
   // Player info
-  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
-  const currentPlayer = players.find(
+  // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
   // States that were being passed
@@ -54,7 +54,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     } else {
       setGamePhaseButton(null);
     }
-  }, [currentPlayerTurn]);
+  }, [currentPlayerTurn, gameState.players]);
+  //@@@@@@@@@Above is what is causing to re-render on gameState.players@@@@@@@@@ 
 
   // Socket emit for current player turn
   const emitCurrentPlayerTurnUpdate = (
