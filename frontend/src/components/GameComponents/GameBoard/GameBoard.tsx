@@ -35,6 +35,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const auth = useAuth();
   // Player info
   const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  useEffect(() => {setPlayers(gameState.players)},[gameState.players])
   const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
@@ -187,12 +188,15 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
           stronghold3Img,
           stronghold4Img,
         ];
-
-        players?.forEach((player, index) => {
+        console.log("from before my foreach players:",players)
+        players.forEach((player, index) => {
           if (player.strongHold) {
+            console.log("player stronghold:",player.strongHold)
             let strongholdImg =
               strongholdImages[index % strongholdImages.length];
+              console.log("stronghold image:", strongholdImg)
             p.image(
+              
               strongholdImg,
               player.strongHold.col * tileSize,
               player.strongHold.row * tileSize,
@@ -220,7 +224,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (canvasRef.current) {
       canvasRef.current.addEventListener("click", handleClick);
     }
-
+  
     return () => {
       if (myp5) {
         myp5.remove();
@@ -230,7 +234,8 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         canvasRef.current.removeEventListener("click", handleClick);
       }
     };
-  }, [tileGrid, titans]);
+    
+  }, [tileGrid, titans, players, gameState]);
 
   // Calculate distance of tiles
   const calculateDistance = (
@@ -458,7 +463,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         selectedStrongholdCoordinates.y
       )
     ) {
-      console.log("Fired");
+      
       const updatedPlayer = {
         ...currentPlayer,
         strongHold: {
