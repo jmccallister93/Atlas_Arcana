@@ -27,30 +27,28 @@ import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
-import { GameProvider } from "../../context/GameContext/GameContext";
+import { GameProvider, useGameContext } from "../../context/GameContext/GameContext";
 
 const MultiPlayerGamePage = () => {
   // Must have variables
-  const location = useLocation<LocationState>();
-  const { gameSessionInfo } = location.state;
-  const [gameState, setGameState] = useState<GameSessionInfo>(gameSessionInfo);
+  const { gameState } = useGameContext();
   const auth = useAuth();
 
   // Immutable Variables
-  const sessionId = gameState.sessionId;
-  const turnOrder = gameState.gameState.turnOrder;
-  const tileGrid = gameState.gameState.tileGrid;
+  // const sessionId = gameState.sessionId;
+  // const turnOrder = gameState.gameState.turnOrder;
+  // const tileGrid = gameState.gameState.tileGrid;
 
   //  Changing Variables
-  const [players, setPlayers] = useState<PlayerInfo[]>(gameSessionInfo.players);
-  const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
-  const [currentPhase, setCurrentPhase] = useState<string>();
-  const [turnsCompleted, setTurnsCompleted] = useState<number>();
-  const [titans, setTitans] = useState<TitanInfo[]>();
-  const [equipmentCardCount, setEquipmentCardCount] = useState<[]>();
-  const [questCardCount, setQuestCardCount] = useState<[]>();
-  const [treasureCardCount, setTreasureCardCount] = useState<[]>();
-  const [worldEventCardCount, setWorldEventCardCount] = useState<[]>();
+  // const [players, setPlayers] = useState<PlayerInfo[]>(gameSessionInfo.players);
+  // const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>();
+  // const [currentPhase, setCurrentPhase] = useState<string>();
+  // const [turnsCompleted, setTurnsCompleted] = useState<number>();
+  // const [titans, setTitans] = useState<TitanInfo[]>();
+  // const [equipmentCardCount, setEquipmentCardCount] = useState<[]>();
+  // const [questCardCount, setQuestCardCount] = useState<[]>();
+  // const [treasureCardCount, setTreasureCardCount] = useState<[]>();
+  // const [worldEventCardCount, setWorldEventCardCount] = useState<[]>();
 
   // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
@@ -63,59 +61,46 @@ const MultiPlayerGamePage = () => {
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
 
   // Set the current player based on authxontext
-  const currentPlayer = players.find(
-    (player) => player.username === auth.username
-  );
+  // const currentPlayer = players.find(
+  //   (player) => player.username === auth.username
+  // );
 
   // SET LOCAL STATES
   // Set local gamestates
-  useEffect(() => {
-    setGameState(gameSessionInfo);
-  }, []);
-  // Set local players State
-  useEffect(() => {
-    if (gameState.players) {
-      setPlayers(gameState.players);
-    }
-  }, [gameState.players]);
-  // Set Player turn
-  useEffect(() => {
-    if (gameState.gameState.currentPlayerTurn) {
-      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-    }
-  }, [gameState.gameState.currentPlayerTurn]);
-  // Set Current Phase
-  useEffect(() => {
-    if (gameSessionInfo.gameState.currentPhase) {
-      setCurrentPhase(gameState.gameState.currentPhase);
-    }
-  }, [gameState.gameState.currentPhase]);
-  // Set Current Player Turn
-  useEffect(() => {
-    if (gameSessionInfo.gameState.currentPlayerTurn) {
-      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-    }
-  }, []);
-  // Set Turns Completed
-  useEffect(() => {
-    if (gameSessionInfo?.gameState.turnsCompleted) {
-      setTurnsCompleted(gameState.gameState.turnsCompleted);
-    }
-  }, []);
+  // useEffect(() => {
+  //   setGameState(gameSessionInfo);
+  // }, []);
+  // // Set local players State
+  // useEffect(() => {
+  //   if (gameState.players) {
+  //     setPlayers(gameState.players);
+  //   }
+  // }, [gameState.players]);
+  // // Set Player turn
+  // useEffect(() => {
+  //   if (gameState.gameState.currentPlayerTurn) {
+  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
+  //   }
+  // }, [gameState.gameState.currentPlayerTurn]);
+  // // Set Current Phase
+  // useEffect(() => {
+  //   if (gameSessionInfo.gameState.currentPhase) {
+  //     setCurrentPhase(gameState.gameState.currentPhase);
+  //   }
+  // }, [gameState.gameState.currentPhase]);
+  // // Set Current Player Turn
+  // useEffect(() => {
+  //   if (gameSessionInfo.gameState.currentPlayerTurn) {
+  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
+  //   }
+  // }, []);
+  // // Set Turns Completed
+  // useEffect(() => {
+  //   if (gameSessionInfo?.gameState.turnsCompleted) {
+  //     setTurnsCompleted(gameState.gameState.turnsCompleted);
+  //   }
+  // }, []);
 
-  // Centralized function to emit game state updates
-  const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
-    if (gameState) {
-      const updatedState = {
-        sessionId: gameState.sessionId,
-        newState: {
-          ...gameState,
-          ...updatedData,
-        },
-      };
-      socket.emit("updateGameState", updatedState);
-    }
-  };
 
   // Handle game stateupdate
   useEffect(() => {
@@ -149,50 +134,21 @@ const MultiPlayerGamePage = () => {
       }
     }
   }, [gameState.gameState.currentPhase]);
-  //Set current game phase
-  useEffect(() => {
-    if (gameState?.gameState.currentPhase) {
-      setCurrentPhase(gameState?.gameState.currentPhase);
-    }
-    if (gameState.gameState.currentPlayerTurn) {
-      setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
-    }
-  }, [gameState.gameState.currentPhase]);
+  // //Set current game phase
+  // useEffect(() => {
+  //   if (gameState?.gameState.currentPhase) {
+  //     setCurrentPhase(gameState?.gameState.currentPhase);
+  //   }
+  //   if (gameState.gameState.currentPlayerTurn) {
+  //     setCurrentPlayerTurn(gameState.gameState.currentPlayerTurn);
+  //   }
+  // }, [gameState.gameState.currentPhase]);
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
 
-  // Function to update player data
-  const updatePlayerData = (updatedPlayer: PlayerInfo) => {
-    setGameState((prevState) => {
-      if (!prevState) {
-        return prevState;
-      }
-
-      const updatedPlayers = prevState.players.map((player) =>
-        player.username === updatedPlayer.username ? updatedPlayer : player
-      );
-
-      // Update the game state with the new players array
-      const newState: GameSessionInfo = {
-        ...prevState,
-        players: updatedPlayers,
-      };
-
-      return newState;
-    });
-
-    // Emit updated player data after state update
-    if (gameState) {
-      emitGameStateUpdate({
-        players: gameState.players.map((player) =>
-          player.username === updatedPlayer.username ? updatedPlayer : player
-        ),
-      });
-    }
-  };
 
   return (
     
@@ -208,9 +164,6 @@ const MultiPlayerGamePage = () => {
         <PlayerMenu
           isOpen={isPlayerMenuOpen}
           onClose={() => setIsPlayerMenuOpen(false)}
-          player={currentPlayer}
-          gameState={gameState}
-          updatePlayerData={updatePlayerData}
         />
 
         <IonContent>
@@ -233,7 +186,7 @@ const MultiPlayerGamePage = () => {
             currentPhase={gameState.gameState.currentPhase}
             turnOrder={gameState.gameState.turnOrder}
             currentPlayer={currentPlayer}
-            sessionId={sessionId}
+            // sessionId={sessionId}
           />
 
           {/* Turn Count */}

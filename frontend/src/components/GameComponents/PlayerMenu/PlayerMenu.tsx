@@ -25,7 +25,8 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const auth = useAuth();
   // Get Player data
   const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
-  const player = players.find((player) => player.username === auth.username);
+  const currentPlayer = players.find((player) => player.username === auth.username);
+  // Local States
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");
   const [currentDetailContent, setCurrentDetailContent] = useState<string>("");
@@ -38,7 +39,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   >([]);
 
   // Need to verify player exists
-  if (!player) {
+  if (!currentPlayer) {
     return null;
   }
   //Conditional if equippedItems item is empty
@@ -128,37 +129,37 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const stats = [
     {
       label: "Rank",
-      value: player.rank,
+      value: currentPlayer.rank,
       description: "Used to determine usable equipment level.",
     },
     {
       label: "Health",
-      value: player.health,
+      value: currentPlayer.health,
       description: "Used for total life force, when 0 player dies.",
     },
     {
       label: "Offense",
-      value: player.offense,
+      value: currentPlayer.offense,
       description: "Used to determine number added to attack rolls.",
     },
     {
       label: "Defense",
-      value: player.defense,
+      value: currentPlayer.defense,
       description: "Used to determine number added to defense rolls.",
     },
     {
       label: "Stamina",
-      value: player.stamina,
+      value: currentPlayer.stamina,
       description: "Used to determine usable total attacks per combat round.",
     },
     {
       label: "Movement",
-      value: player.movement,
+      value: currentPlayer.movement,
       description: "Used to determine move spaces on the board.",
     },
     {
       label: "Build",
-      value: player.build,
+      value: currentPlayer.build,
       description:
         "Used to determine number of constructed buildings per turn.",
     },
@@ -176,27 +177,27 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const equippedItems = [
     {
       label: "Weapon",
-      value: renderEquippedItem(player.equippedItems.weapon, "weapon"),
+      value: renderEquippedItem(currentPlayer.equippedItems.weapon, "weapon"),
       description: "Used to increase offense.",
     },
     {
       label: "Armor",
-      value: renderEquippedItem(player.equippedItems.armor, "armor"),
+      value: renderEquippedItem(currentPlayer.equippedItems.armor, "armor"),
       description: "Used to increase defense.",
     },
     {
       label: "Amulet",
-      value: renderEquippedItem(player.equippedItems.amulet, "amulet"),
+      value: renderEquippedItem(currentPlayer.equippedItems.amulet, "amulet"),
       description: "Used to increase health.",
     },
     {
       label: "Boots",
-      value: renderEquippedItem(player.equippedItems.boots, "boots"),
+      value: renderEquippedItem(currentPlayer.equippedItems.boots, "boots"),
       description: "Used to increase speed.",
     },
     {
       label: "Gloves",
-      value: renderEquippedItem(player.equippedItems.gloves, "gloves"),
+      value: renderEquippedItem(currentPlayer.equippedItems.gloves, "gloves"),
       description: "Used to increase build.",
     },
   ];
@@ -211,7 +212,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
       >
         {item.label}{" "}
         <div className="namedCard">
-          {renderEquippedItem(player.equippedItems[slot], slot)}
+          {renderEquippedItem(currentPlayer.equippedItems[slot], slot)}
         </div>
       </div>
     );
@@ -221,23 +222,23 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const inventory = [
     {
       label: "Resources",
-      value: renderInventoryItem(player.inventory.resources),
+      value: renderInventoryItem(currentPlayer.inventory.resources),
       description: "Used to construct buildings.",
     },
     {
       label: "Equipment Cards",
-      value: renderEquipmentCardItem(player.inventory.equipment),
-      description: player.inventory.equipment,
+      value: renderEquipmentCardItem(currentPlayer.inventory.equipment),
+      description: currentPlayer.inventory.equipment,
     },
     {
       label: "Treasures",
-      value: renderTreasureCardItem(player.inventory.treasures),
-      description: player.inventory.treasures,
+      value: renderTreasureCardItem(currentPlayer.inventory.treasures),
+      description: currentPlayer.inventory.treasures,
     },
     {
       label: "Quests",
-      value: renderQuestCardItem(player.inventory.quests),
-      description: player.inventory.quests,
+      value: renderQuestCardItem(currentPlayer.inventory.quests),
+      description: currentPlayer.inventory.quests,
     },
   ];
   const inventoryCards = inventory.map((item) => (
@@ -253,27 +254,27 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const buildings = [
     {
       label: "Resource",
-      value: renderBuildingItem(player.buildings.resource),
+      value: renderBuildingItem(currentPlayer.buildings.resource),
       description: "Used to generate resources.",
     },
     {
       label: "Defense",
-      value: renderBuildingItem(player.buildings.defense),
+      value: renderBuildingItem(currentPlayer.buildings.defense),
       description: "Used to defend against attackers.",
     },
     {
       label: "Equipment",
-      value: renderBuildingItem(player.buildings.equipment),
+      value: renderBuildingItem(currentPlayer.buildings.equipment),
       description: "Used to increase/modify equipment.",
     },
     {
       label: "Quest",
-      value: renderBuildingItem(player.buildings.quest),
+      value: renderBuildingItem(currentPlayer.buildings.quest),
       description: "Used to gain quests.",
     },
     {
       label: "Movement",
-      value: renderBuildingItem(player.buildings.movement),
+      value: renderBuildingItem(currentPlayer.buildings.movement),
       description: "Used to increase board moevement.",
     },
   ];
@@ -329,7 +330,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
       const equipableItems =
         type === "Equipment Cards"
           ? (content as EquipmentItem[])
-          : player.inventory.equipment.filter(
+          : currentPlayer.inventory.equipment.filter(
               (item) => item.slot.toLowerCase() === type.toLowerCase()
             );
       setCurrentEquipableItems(equipableItems);
@@ -346,13 +347,13 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
         equipableItems={currentEquipableItems}
         questItems={currentQuestItem}
         treasureItems={currentTreasureItem}
-        player={player}
+        player={currentPlayer}
         updatePlayerData={updatePlayerData}
       />
 
       <div className="playerMenuContainer">
         <div className="modalHeader">
-          <h2>{player?.username}'s Menu</h2>
+          <h2>{currentPlayer?.username}'s Menu</h2>
           <button className="closeButton" onClick={onClose}>
             <IonIcon icon={closeOutline} />
           </button>
@@ -361,7 +362,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
           <IonItem>
             <div className="victoryPointsCards">
               <h3 className="victoryPointsCard">
-                Victory Points {player?.victoryPoints}
+                Victory Points {currentPlayer?.victoryPoints}
               </h3>
             </div>
           </IonItem>

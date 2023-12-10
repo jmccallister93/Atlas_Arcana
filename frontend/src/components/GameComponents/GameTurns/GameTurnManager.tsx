@@ -9,22 +9,25 @@ import MapPhase from "./MapPhase";
 import CombatPhase from "./CombatPhase";
 import TitanPhase from "./TitanPhase";
 import socket from "../../../context/SocketClient/socketClient";
+import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
 
-interface GameTurnManagerProps {
-  currentPlayerTurn: string;
-  currentPhase: string;
-  turnOrder: string[];
-  currentPlayer: PlayerInfo | undefined;
-  sessionId: string;
-}
+interface GameTurnManagerProps {}
 
-const GameTurnManager: React.FC<GameTurnManagerProps> = ({
-  currentPlayerTurn,
-  currentPhase,
-  turnOrder,
-  currentPlayer,
-  sessionId
-}) => {
+const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
+  // Get Game state
+  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const auth = useAuth();
+  // Player info
+  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
+  const currentPlayer = players.find(
+    (player) => player.username === auth.username
+  );
+  // States that were being passed
+  const turnOrder = gameState.gameState.turnOrder;
+  const currentPhase = gameState.gameState.currentPhase;
+  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
+
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
   const [phaseAction, setPhaseAction] =
@@ -60,7 +63,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       currentPlayerTurn: newCurrentPlayerTurn,
     };
 
-    socket.emit("updateCurrentPlayerTurn",sessionId, partialUpdate);
+    socket.emit("updateCurrentPlayerTurn", sessionId, partialUpdate);
   };
 
   // Socket emit for current phase
@@ -72,7 +75,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       currentPhase: newCurrentPhase,
     };
 
-    socket.emit("updateCurrentPhase", sessionId,partialUpdate);
+    socket.emit("updateCurrentPhase", sessionId, partialUpdate);
   };
 
   // Phase order
@@ -122,11 +125,10 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({
       } else {
         nextPlayerTurn = currentPlayerTurn;
       }
-    } 
+    }
 
-    emitCurrentPlayerTurnUpdate(sessionId,nextPlayerTurn)
-    emitCurrentPhaseUpdate(sessionId,nextPhase)
-
+    emitCurrentPlayerTurnUpdate(gameState.sessionId, nextPlayerTurn);
+    emitCurrentPhaseUpdate(gameState.sessionId, nextPhase);
   };
   // Switch Case phase
   // useEffect(() => {
