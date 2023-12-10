@@ -526,25 +526,5 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     </>
   );
 };
-const areEqual = (prevProps: any, nextProps: any) => {
-  if (prevProps.currentPlayer?.username !== nextProps.currentPlayer?.username) {
-    return false; // Re-render if currentPlayer changes
-  }
 
-  // Compare specific parts of gameState
-  if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
-    return false; // Not equal, should re-render
-  }
-  if (prevProps.tileGrid !== nextProps.tileGrid) {
-    return false;
-  }
-  if (prevProps.titans !== nextProps.titans) {
-    return false; // Not equal, should re-render
-  }
-  if (prevProps.players !== nextProps.players) {
-    return false; // Not equal, should re-render
-  }
-
-  return true; // Props are equal, don't re-render
-};
-export default React.memo(GameBoard, areEqual);
+export default GameBoard;

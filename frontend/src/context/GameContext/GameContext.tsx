@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { GameSessionInfo, PlayerInfo } from "../../components/GameComponents/Interfaces";
+import {
+  GameSessionInfo,
+  PlayerInfo,
+} from "../../components/GameComponents/Interfaces";
 import socket, {
   onGameStateUpdate,
   offGameStateUpdate,
@@ -28,8 +31,8 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
   switch (action.type) {
     case "UPDATE_GAME_STATE":
       return { ...state, ...action.payload };
-      case "UPDATE_PLAYER_DATA":
-      const updatedPlayers = state.players.map(player => 
+    case "UPDATE_PLAYER_DATA":
+      const updatedPlayers = state.players.map((player) =>
         player.username === action.payload.username ? action.payload : player
       );
       return { ...state, players: updatedPlayers };
@@ -55,12 +58,21 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       dispatch({ type: "UPDATE_GAME_STATE", payload: newSession });
     };
 
-    // Subscribe to game state updates
+    // Subscribe to game initial state
     socket.on("matchFound", handleInitialGameState);
+
+    // Handler for game state updates
+    const handleGameStateUpdate = (updatedState: GameSessionInfo) => {
+      dispatch({ type: "UPDATE_GAME_STATE", payload: updatedState });
+    };
+
+    // Subscribe to game state updates from the server
+    socket.on("updateGameState", handleGameStateUpdate);
 
     // Clean up the listener when the component unmounts
     return () => {
       socket.off("matchFound", handleInitialGameState);
+      socket.off("updateGameState", handleGameStateUpdate);
     };
   }, []);
 
@@ -90,7 +102,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       });
     }
   };
-  
+  useEffect(() => {
+    console.log("From Gamecontext gameState:", gameState);
+  }, [gameState]);
+
   return (
     <GameContext.Provider
       value={{ gameState, emitGameStateUpdate, updatePlayerData }}

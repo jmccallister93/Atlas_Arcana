@@ -34,6 +34,8 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     useState<ReactComponentOrElement | null>();
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
 
+  
+
   // Render advance phase for player who's turn it is
   useEffect(() => {
     if (currentPlayer?.username === currentPlayerTurn) {
