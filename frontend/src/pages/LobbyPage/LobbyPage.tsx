@@ -60,16 +60,19 @@ const LobbyPage = () => {
   }, []);
 
   // Join matchmaking
-// Join matchmaking
-const joinMatchmaking = async () => {
-  setSearchingForGame(true);
-  try {
-    console.log("Attempting to join matchmaking queue", { userId: token, username });
-    socket.emit("joinMatchmaking", { userId: token, username });
-  } catch (error) {
-    console.error("Error joining matchmaking:", error);
-  }
-};
+  // Join matchmaking
+  const joinMatchmaking = async () => {
+    setSearchingForGame(true);
+    try {
+      console.log("Attempting to join matchmaking queue", {
+        userId: token,
+        username,
+      });
+      socket.emit("joinMatchmaking", { userId: token, username });
+    } catch (error) {
+      console.error("Error joining matchmaking:", error);
+    }
+  };
 
   // Leave matchmaking
   const leaveMatchmaking = () => {
@@ -102,112 +105,116 @@ const joinMatchmaking = async () => {
   }, [isLoggedIn, token, username]);
 
   // Handle match found event
-  useEffect(() => {
-    const handleMatchFound = (gameSessionInfo: GameSessionInfo) => {
-      console.log("Match found! Game session info:", gameSessionInfo);
-      setSearchingForGame(false);
-      setMatchFound(true);
+// Handle match found event
+useEffect(() => {
+  const handleMatchFound = () => {
+    console.log("Match found! Redirecting to multiplayer game page");
+    setSearchingForGame(false);
 
-      // Redirect after a 5-second delay
-      setTimeout(() => {
-        history.push("/multiGame", { gameSessionInfo });
-        setMatchFound(false);
-      }, 5000);
-    }; 
+    // Redirect after a 5-second delay
+    setTimeout(() => {
+      history.push("/multiGame");
+    }, 5000);
+  };
 
-    socket.on("matchFound", handleMatchFound);
+  socket.on("matchFound", handleMatchFound);
 
-    return () => {
-      socket.off("matchFound", handleMatchFound);
-    };
-  }, [history, socket]);
+  return () => {
+    socket.off("matchFound", handleMatchFound);
+  };
+}, [history, socket]);
+
 
   return (
-    <GameProvider>
-    <IonPage>
-      {isLoggedIn ? (
-        <IonContent fullscreen={true} className="ion-padding">
-          <div className={gps.topMargin}></div>
-          <h1>Game Lobby</h1>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="12" size-md="6">
-                {/* CALL ON SINGLEPLAYER FROM HERE SEPERATE COMPONENET, START GAME */}
-                <IonCard button={true} routerLink="/singleplayer">
-                  <IonCardHeader>
-                    <IonCardTitle>Single Player Game</IonCardTitle>
-                    <IonCardSubtitle>Play solo</IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    Challenge yourself in a single player game.
-                    <div style={{ textAlign: "center" }}>
-                      <IonButton>Start Game</IonButton>
-                    </div>
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-
-              {/* CALL ON MULTIPLAYER QUE FROM HERE SEPERATE COMPONENET */}
-              <IonCol size="12" size-md="6">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardTitle>Multiplayer Game</IonCardTitle>
-                    <IonCardSubtitle>Join a multiplayer battle</IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    Dive into intense multiplayer action.
-                    {searchingForGame ? (
+   
+      <IonPage>
+        {isLoggedIn ? (
+          <IonContent fullscreen={true} className="ion-padding">
+            <div className={gps.topMargin}></div>
+            <h1>Game Lobby</h1>
+            <IonGrid>
+              <IonRow>
+                <IonCol size="12" size-md="6">
+                  {/* CALL ON SINGLEPLAYER FROM HERE SEPERATE COMPONENET, START GAME */}
+                  <IonCard button={true} routerLink="/singleplayer">
+                    <IonCardHeader>
+                      <IonCardTitle>Single Player Game</IonCardTitle>
+                      <IonCardSubtitle>Play solo</IonCardSubtitle>
+                    </IonCardHeader>
+                    <IonCardContent>
+                      Challenge yourself in a single player game.
                       <div style={{ textAlign: "center" }}>
-                        <IonSpinner name="crescent" />
-                        <p>Searching for game...</p>
-                        <IonButton onClick={leaveMatchmaking} color="danger">
-                          Leave Que
-                        </IonButton>
+                        <IonButton>Start Game</IonButton>
                       </div>
-                    ) : matchFound ? ( // Check if match is found
-                      <div style={{ textAlign: "center", color: "green" }}>
-                        <h2>Match Found!</h2>
-                        <p>Joining game...</p>
-                      </div>
-                    ) : (
-                      <div style={{ textAlign: "center" }}>
-                        <IonButton onClick={joinMatchmaking}>
-                          Start Search
-                        </IonButton>
-                      </div>
-                    )}
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
+                    </IonCardContent>
+                  </IonCard>
+                </IonCol>
 
-              <IonCol size="12" size-md="6">
-                <IonCard>
-                  <IonCardHeader>
-                    <IonCardTitle>Players Online</IonCardTitle>
-                    <IonCardSubtitle>Current online players</IonCardSubtitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    {onlineUsers} players are currently online.
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
+                {/* CALL ON MULTIPLAYER QUE FROM HERE SEPERATE COMPONENET */}
+                <IonCol size="12" size-md="6">
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Multiplayer Game</IonCardTitle>
+                      <IonCardSubtitle>
+                        Join a multiplayer battle
+                      </IonCardSubtitle>
+                    </IonCardHeader>
+                    <IonCardContent>
+                      Dive into intense multiplayer action.
+                      {searchingForGame ? (
+                        <div style={{ textAlign: "center" }}>
+                          <IonSpinner name="crescent" />
+                          <p>Searching for game...</p>
+                          <IonButton onClick={leaveMatchmaking} color="danger">
+                            Leave Que
+                          </IonButton>
+                        </div>
+                      ) : matchFound ? ( // Check if match is found
+                        <div style={{ textAlign: "center", color: "green" }}>
+                          <h2>Match Found!</h2>
+                          <p>Joining game...</p>
+                        </div>
+                      ) : (
+                        <div style={{ textAlign: "center" }}>
+                          <IonButton onClick={joinMatchmaking}>
+                            Start Search
+                          </IonButton>
+                        </div>
+                      )}
+                    </IonCardContent>
+                  </IonCard>
+                </IonCol>
 
-              {/* Add additional tiles here */}
-            </IonRow>
-          </IonGrid>
-        </IonContent>
-      ) : (
-        <IonContent>
-          <div className={gps.topMargin}></div>
-          <IonCard button routerLink="/login">
-            <IonCardHeader>
-              <IonCardTitle>Please Login to continue to Dashboard</IonCardTitle>
-            </IonCardHeader>
-          </IonCard>
-        </IonContent>
-      )}
-    </IonPage>
-    </GameProvider>
+                <IonCol size="12" size-md="6">
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Players Online</IonCardTitle>
+                      <IonCardSubtitle>Current online players</IonCardSubtitle>
+                    </IonCardHeader>
+                    <IonCardContent>
+                      {onlineUsers} players are currently online.
+                    </IonCardContent>
+                  </IonCard>
+                </IonCol>
+
+                {/* Add additional tiles here */}
+              </IonRow>
+            </IonGrid>
+          </IonContent>
+        ) : (
+          <IonContent>
+            <div className={gps.topMargin}></div>
+            <IonCard button routerLink="/login">
+              <IonCardHeader>
+                <IonCardTitle>
+                  Please Login to continue to Dashboard
+                </IonCardTitle>
+              </IonCardHeader>
+            </IonCard>
+          </IonContent>
+        )}
+      </IonPage>
+   
   );
 };
 

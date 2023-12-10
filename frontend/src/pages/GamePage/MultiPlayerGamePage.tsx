@@ -260,7 +260,7 @@ const MultiPlayerGamePage = () => {
           </div>
         </IonContent>
       </IonPage>
-   
+      
   );
 };
 

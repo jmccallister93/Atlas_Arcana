@@ -45,12 +45,14 @@ import SinglePlayerGamePage from "./pages/GamePage/SinglePlayerGamePage";
 setupIonicReact();
 import io from "socket.io-client";
 import { useState } from "react";
+import { GameProvider } from "./context/GameContext/GameContext";
 
 
 
 const App: React.FC = () => (
   
   <AuthProvider>
+     <GameProvider>
     <IonApp>
       <IonReactRouter>
         <Navbar />
@@ -74,6 +76,7 @@ const App: React.FC = () => (
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
+    </GameProvider>
   </AuthProvider>
 );
 

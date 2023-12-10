@@ -51,7 +51,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         socket.off("matchFound", handleInitialGameState);
     };
   }, []);
-    console.log(gameState)
+    console.log("GameState from gamecontext:",gameState)
+    useEffect(() => {
+        console.log("gameState changed:", gameState);
+      }, [gameState]);
+      
   const updateGameState = (updatedData: Partial<GameSessionInfo>) => {
     dispatch({ type: "UPDATE_GAME_STATE", payload: updatedData });
     // Here, also handle your socket.emit or Redis server updates
