@@ -29,8 +29,10 @@ export const useGameContext = () => {
 
 const gameReducer = (state: GameSessionInfo, action: any) => {
   switch (action.type) {
+    case "INITIAL_GAME_STATE":
+      return{ ...state, ...action.payload };
     case "UPDATE_GAME_STATE":
-      return { ...state, ...action.payload };
+      return {state, ...action.payload };
     case "UPDATE_PLAYER_DATA":
       const updatedPlayers = state.players.map((player) =>
         player.username === action.payload.username ? action.payload : player
@@ -55,26 +57,30 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   // initial state
   useEffect(() => {
     const handleInitialGameState = (newSession: GameSessionInfo) => {
-      dispatch({ type: "UPDATE_GAME_STATE", payload: newSession });
+      dispatch({ type: "INITIAL_GAME_STATE", payload: newSession });
     };
 
     // Subscribe to game initial state
     socket.on("matchFound", handleInitialGameState);
 
+    // Clean up the listener when the component unmounts
+    return () => {
+      socket.off("matchFound", handleInitialGameState);
+     
+    };
+  }, []);
+
+  useEffect(() => {
     // Handler for game state updates
     const handleGameStateUpdate = (updatedState: GameSessionInfo) => {
       dispatch({ type: "UPDATE_GAME_STATE", payload: updatedState });
     };
-
-    // Subscribe to game state updates from the server
-    socket.on("updateGameState", handleGameStateUpdate);
-
-    // Clean up the listener when the component unmounts
-    return () => {
-      socket.off("matchFound", handleInitialGameState);
+        // Subscribe to game state updates from the server
+        socket.on("updateGameState", handleGameStateUpdate);
+    return() => {
       socket.off("updateGameState", handleGameStateUpdate);
-    };
-  }, []);
+    }
+  },[])
 
   const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
     if (gameState) {
@@ -103,7 +109,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
   };
   useEffect(() => {
-    console.log("From Gamecontext sessionId:", gameState.sessionId);
+    console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
 
   return (

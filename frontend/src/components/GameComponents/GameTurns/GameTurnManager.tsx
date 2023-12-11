@@ -34,8 +34,6 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     useState<ReactComponentOrElement | null>();
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
 
-  
-
   // Render advance phase for player who's turn it is
   useEffect(() => {
     if (currentPlayer?.username === currentPlayerTurn) {
@@ -55,158 +53,143 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       setGamePhaseButton(null);
     }
   }, [currentPlayerTurn, gameState.players]);
-  //@@@@@@@@@Above is what is causing to re-render on gameState.players@@@@@@@@@ 
+  //@@@@@@@@@Above is what is causing to re-render on gameState.players@@@@@@@@@
 
-// Socket emit for current player turn
-const emitCurrentPlayerTurnUpdate = (newCurrentPlayerTurn: string, sessionId: string) => {
-  const payload = {
-    sessionId: sessionId,
-    partialUpdate: {
-      currentPlayerTurn: newCurrentPlayerTurn,
-    }
-  };
-
-  socket.emit("updateCurrentPlayerTurn", payload);
-};
-
-// Socket emit for current phase
-const emitCurrentPhaseUpdate = (newCurrentPhase: string, sessionId: string) => {
- 
-  const payload = {
-    sessionId: sessionId,
-    partialUpdate: {
-      currentPhase: newCurrentPhase,
-    }
-  };
-console.log("Payload from currentphase:", payload)
-  socket.emit("updateCurrentPhase", payload);
-};
-
-  // Phase order
-  //Advance PHase
+  // Function to advance to the next phase and/or player turn
   const advancePhase = () => {
     if (!currentPlayer) {
       console.error("Current player is undefined");
       return;
     }
+  
     if (currentPlayer.strongHold === undefined) {
       setShowStrongholdAlert(true);
       return;
     }
+  
+    const currentPhaseIndex = phaseOrder.indexOf(currentPhase);
+    let nextPhaseIndex = currentPhaseIndex;
+    let nextPhase = currentPhase;
+    let nextPlayerTurn = currentPlayerTurn;
+  
+    // Determine if it's the setup phase
     const isSetupPhase = currentPhase === "Setup";
-    let nextPhase, nextPlayerTurn;
-
+  
     if (isSetupPhase) {
-      // Find the next player who needs to complete the setup phase
-      const currentPlayerIndex = turnOrder.findIndex(
-        (player) => player === currentPlayerTurn
+      // Find the index of the current player in the turn order
+      const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
+        player => player === currentPlayerTurn
       );
-
-      const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
-      nextPlayerTurn = turnOrder[nextPlayerIndex];
-
-      // If we have looped back to the first player, setup is complete
+      // Calculate the index of the next player
+      const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+      nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+  
+      // Check if we've looped back to the first player
       if (nextPlayerIndex === 0) {
-        nextPhase = phaseOrder[0]; // Assuming 'Draw' is the first phase after setup
+        // If so, setup is complete, move to the next phase
+        nextPhaseIndex = (nextPhaseIndex + 1) % phaseOrder.length;
+        nextPhase = phaseOrder[nextPhaseIndex];
       } else {
+        // Otherwise, remain in the setup phase
         nextPhase = "Setup";
       }
     } else {
-      // Existing logic for normal game phases
-      const currentPhaseIndex = phaseOrder.indexOf(
-        currentPhase ?? phaseOrder[0]
-      );
-      const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
+      // Logic for non-setup phases
+      nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
       nextPhase = phaseOrder[nextPhaseIndex];
-
-      // Move to next player if the phase has wrapped around
+  
+      // Move to the next player if we're back at the first phase
       if (nextPhase === phaseOrder[0]) {
-        const currentPlayerIndex = turnOrder.findIndex(
-          (player) => player === currentPlayerTurn
+        const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
+          player => player === currentPlayerTurn
         );
-        const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
-        nextPlayerTurn = turnOrder[nextPlayerIndex];
-      } else {
-        nextPlayerTurn = currentPlayerTurn;
+        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
+        nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
       }
     }
-
-    emitCurrentPlayerTurnUpdate(nextPlayerTurn, gameState.sessionId);
-    emitCurrentPhaseUpdate(nextPhase, gameState.sessionId);
+  
+    // Update the game state with the new phase and player turn
+    const updatedGameState = {
+      ...gameState.gameState,
+      currentPhase: nextPhase,
+      currentPlayerTurn: nextPlayerTurn
+    };
+  
+    emitGameStateUpdate({ gameState: updatedGameState });
   };
+  
   // Switch Case phase
-  // useEffect(() => {
-  //   if (currentPlayerTurn === currentPlayer?.username) {
-
-  //     switch (currentPhase) {
-  //       case "Draw":
-  //         setPhaseAction(
-  //           <DrawPhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       case "Trade":
-  //         setPhaseAction(
-  //           <TradePhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       case "Rest":
-  //         setPhaseAction(
-  //           <RestPhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       case "Map":
-  //         setPhaseAction(
-  //           <MapPhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       case "Combat":
-  //         setPhaseAction(
-  //           <CombatPhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       case "Titan":
-  //         setPhaseAction(
-  //           <TitanPhase
-  //             currentPhase = {currentPhase}
-  //             players={players}
-  //             emitGameStateUpdate={emitGameStateUpdate}
-  //             currentPlayer={currentPlayer}
-  //           />
-  //         );
-  //         break;
-  //       default:
-  //         // Optional: handle any case where currentPhase doesn't match any of the cases
-  //         break;
-  //     }
-  //   } else {
-  //     setPhaseAction(null);
-  //   }
-  // }, [ currentPlayerTurn, currentPlayer]);
+  useEffect(() => {
+    // if (currentPlayerTurn === currentPlayer?.username) {
+    //   switch (currentPhase) {
+    //     case "Draw":
+    //       setPhaseAction(
+    //         <DrawPhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     case "Trade":
+    //       setPhaseAction(
+    //         <TradePhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     case "Rest":
+    //       setPhaseAction(
+    //         <RestPhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     case "Map":
+    //       setPhaseAction(
+    //         <MapPhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     case "Combat":
+    //       setPhaseAction(
+    //         <CombatPhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     case "Titan":
+    //       setPhaseAction(
+    //         <TitanPhase
+    //           currentPhase = {currentPhase}
+    //           players={players}
+    //           emitGameStateUpdate={emitGameStateUpdate}
+    //           currentPlayer={currentPlayer}
+    //         />
+    //       );
+    //       break;
+    //     default:
+    //       // Optional: handle any case where currentPhase doesn't match any of the cases
+    //       break;
+    //   }
+    // } else {
+    //   setPhaseAction(null);
+    // }
+  }, [currentPlayerTurn, currentPlayer]);
 
   return (
     <>
@@ -230,24 +213,4 @@ console.log("Payload from currentphase:", payload)
   );
 };
 
-const areEqual = (prevProps: any, nextProps: any) => {
-  if (prevProps.playerNames !== nextProps.playerNames) {
-    return false;
-  }
-  if (prevProps.currentPlayerTurn !== nextProps.currentPlayerTurn) {
-    return false;
-  }
-  if (prevProps.currentPhase !== nextProps.currentPhase) {
-    return false;
-  }
-  if (prevProps.turnOrder !== nextProps.turnOrder) {
-    return false;
-  }
-  if (prevProps.currentPlayer !== nextProps.currentPlayer) {
-    return false;
-  }
-
-  return true; // Props are equal, don't re-render
-};
-
-export default React.memo(GameTurnManager, areEqual);
+export default GameTurnManager;

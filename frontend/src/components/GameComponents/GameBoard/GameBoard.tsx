@@ -443,16 +443,16 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   // Place stronghold
   const placeStronghold = () => {
-    // console.log(
-    //   "Selected Stronghold x",
-    //   selectedStrongholdCoordinates.x,
-    //   "Selected Stronghold y",
-    //   selectedStrongholdCoordinates.y,
-    //   "Selected Tile",
-    //   selectedTile,
-    //   "currentPlayer:",
-    //   currentPlayer
-    // );
+    console.log(
+      "Selected Stronghold x",
+      selectedStrongholdCoordinates.x,
+      "Selected Stronghold y",
+      selectedStrongholdCoordinates.y,
+      "Selected Tile",
+      selectedTile,
+      "currentPlayer:",
+      currentPlayer
+    );
     if (
       currentPlayer &&
       isValidStrongholdPlacement(

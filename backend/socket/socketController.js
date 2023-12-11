@@ -138,7 +138,6 @@ module.exports = function (socket, io) {
       const updatedState = await gameSessionManager.getGameState(sessionId);
       // Broadcast the updated state to all players in the session
       console.log("Broadcasting updated state to session:", sessionId);
-      //AAAAAAAAAAAAAAAAAAAAAAAAAAAAA 
       io.to(sessionId)
       .emit("updateGameState", updatedState.gameState); // Emit the gameState part
     } catch (error) {
@@ -159,9 +158,6 @@ module.exports = function (socket, io) {
       // Update the currentPlayerTurn
       gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
   
-      // Save or process the updated game state as needed
-      // (This step depends on how your gameSessionManager handles state updates)
-  
       // Broadcast the updated state to all players in the session
       io.to(sessionId).emit("updateGameState", gameState);
     } catch (error) {
@@ -181,9 +177,6 @@ module.exports = function (socket, io) {
     
         // Update the currentPhase
         gameState.currentPhase = partialUpdate.currentPhase;
-    
-        // Save or process the updated game state as needed
-        // (This step depends on how your gameSessionManager handles state updates)
     
         // Broadcast the updated state to all players in the session
         io.to(sessionId).emit("updateGameState", gameState);
