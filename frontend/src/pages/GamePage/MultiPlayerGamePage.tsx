@@ -80,9 +80,6 @@ const MultiPlayerGamePage = () => {
         {/* Turn Manager */}
         <GameTurnManager />
 
-        {/* Turn Count */}
-        <h4 className="pageHeader">Turn Number: </h4>
-
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
 

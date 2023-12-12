@@ -107,6 +107,15 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         );
         const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
         nextPlayerTurn = turnOrder[nextPlayerIndex];
+
+        // Check if a full cycle is completed
+        if (
+          nextPlayerIndex === 0 &&
+          currentPhaseIndex === phaseOrder.length - 1
+        ) {
+          // Increment turnsCompleted by 1
+          gameState.gameState.turnsCompleted += 1;
+        }
       }
 
       gameState.gameState.currentPhase = nextPhase;
@@ -200,6 +209,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       ) : (
         <></>
       )}
+      <h4 className="pageHeader">Turn Number: {gameState.gameState.turnsCompleted}</h4>
 
       <IonAlert
         isOpen={showStrongholdAlert}
@@ -208,6 +218,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         message={"Please place your Stronghold before advancing the turn."}
         buttons={["OK"]}
       />
+
     </>
   );
 };
