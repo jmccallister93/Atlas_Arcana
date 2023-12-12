@@ -5,14 +5,17 @@ import stronghold1 from "./GameTiles/stronghold1.png";
 import stronghold2 from "./GameTiles/stronghold2.png";
 import stronghold3 from "./GameTiles/stronghold3.png";
 import stronghold4 from "./GameTiles/stronghold4.png";
+import { TileInfo } from "./GameBoard";
 
 interface StrongholdCanvasProps {
+    tileGrid: string[];
   players: PlayerInfo[];
   tileSize: number;
   onStrongholdPlaced: (x: number, y: number) => void;
 }
 
 const StrongholdCanvas: React.FC<StrongholdCanvasProps> = ({
+    tileGrid,
   players,
   tileSize,
   onStrongholdPlaced
@@ -59,7 +62,6 @@ const StrongholdCanvas: React.FC<StrongholdCanvasProps> = ({
         if (p.mouseX >= 0 && p.mouseX < p.width && p.mouseY >= 0 && p.mouseY < p.height) {
           const x = Math.floor(p.mouseX / tileSize);
           const y = Math.floor(p.mouseY / tileSize);
-          onStrongholdPlaced(x, y); // Callback for placing a stronghold
         }
       };
     };

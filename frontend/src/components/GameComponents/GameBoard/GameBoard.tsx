@@ -31,6 +31,7 @@ import TileAlerts from "./TileAlerts";
 import TileGrid from "./BackgroundCanvas";
 import BackgroundCanvas from "./BackgroundCanvas";
 import StrongholdCanvas from "./StrongholdCanvas";
+import BackgroundCanvasTest from "./Phaertest";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -73,7 +74,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   );
   // States that were being passed
   const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
-  const [tileGrid, setTileGrid] = useState<string[]>(
+  const [tileGrid, setTileGrid] = useState<string[][]>(
     gameState.gameState.tileGrid
   );
   const titans = gameState.gameState.titans;
@@ -354,18 +355,19 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   return (
     <>
       <div className="canvasWrapper">
-        <BackgroundCanvas
+        <BackgroundCanvasTest
           tileGrid={tileGrid}
-          // titans={titans}
-          // players={gameState.players}
+          titans={titans}
+          players={gameState.players}
           tileSize={tileSize}
           handleTileSelection={handleTileSelection}
         />
-        <StrongholdCanvas 
+        {/* <StrongholdCanvas 
+        tileGrid={tileGrid}
         players={gameState.players}
         tileSize={tileSize}
         onStrongholdPlaced={placeStronghold}
-        />
+        /> */}
       </div>
 
       <TileModal
