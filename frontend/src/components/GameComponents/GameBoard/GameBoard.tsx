@@ -356,8 +356,8 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       <div className="canvasWrapper">
         <BackgroundCanvas
           tileGrid={tileGrid}
-          titans={titans}
-          players={gameState.players}
+          // titans={titans}
+          // players={gameState.players}
           tileSize={tileSize}
           handleTileSelection={handleTileSelection}
         />

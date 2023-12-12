@@ -39,16 +39,16 @@ const StrongholdCanvas: React.FC<StrongholdCanvasProps> = ({
       };
 
       p.draw = () => {
-        (p as any).clear();
+        p.clear(0, 0, 0, 0);
         players.forEach((player, index) => {
-          if (player.strongHold) {
-            const strongholdImg = strongholdImages[index % strongholdImages.length];
-            p.image(
-              strongholdImg,
-              player.strongHold.col * tileSize,
-              player.strongHold.row * tileSize,
-              tileSize,
-              tileSize
+            if (player.strongHold) {
+              const strongholdImg = strongholdImages[index % strongholdImages.length];
+              p.image(
+                strongholdImg,
+                player.strongHold.col * tileSize,
+                player.strongHold.row * tileSize,
+                tileSize,
+                tileSize
             );
           }
         });
@@ -71,7 +71,7 @@ const StrongholdCanvas: React.FC<StrongholdCanvasProps> = ({
     };
   }, [players, tileSize, onStrongholdPlaced]);
 
-  return <div ref={canvasRef}></div>;
+  return <div ref={canvasRef} className="strongholdCanvas"></div>;
 };
 
 export default StrongholdCanvas;
