@@ -53,7 +53,11 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       setGamePhaseButton(null);
     }
   }, [currentPlayerTurn, gameState.players]);
-  //@@@@@@@@@Above is what is causing to re-render on gameState.players@@@@@@@@@
+
+  // Example function to check if all strongholds are placed
+  const areAllStrongholdsPlaced = (players: PlayerInfo[]) => {
+    return players.every((player) => player.strongHold !== undefined);
+  };
 
   // Function to advance to the next phase and/or player turn
   const advancePhase = () => {
@@ -61,63 +65,58 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       console.error("Current player is undefined");
       return;
     }
-  
-    if (currentPlayer.strongHold === undefined) {
-      setShowStrongholdAlert(true);
-      return;
-    }
-  
-    const currentPhaseIndex = phaseOrder.indexOf(currentPhase);
-    let nextPhaseIndex = currentPhaseIndex;
-    let nextPhase = currentPhase;
-    let nextPlayerTurn = currentPlayerTurn;
-  
-    // Determine if it's the setup phase
-    const isSetupPhase = currentPhase === "Setup";
-  
+
+    // Check if Setup Phase is active
+    const isSetupPhase = gameState.gameState.setupPhase;
+
     if (isSetupPhase) {
-      // Find the index of the current player in the turn order
-      const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-        player => player === currentPlayerTurn
+      // Check if current player has not placed a stronghold
+      if (currentPlayer.strongHold === undefined) {
+        setShowStrongholdAlert(true);
+        return;
+      }
+
+      // Logic to handle Setup Phase
+      const currentPlayerIndex = turnOrder.findIndex(
+        (player) => player === currentPlayerTurn
       );
-      // Calculate the index of the next player
-      const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-      nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
-  
-      // Check if we've looped back to the first player
+      const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
+      const nextPlayerTurn = turnOrder[nextPlayerIndex];
+
       if (nextPlayerIndex === 0) {
-        // If so, setup is complete, move to the next phase
-        nextPhaseIndex = (nextPhaseIndex + 1) % phaseOrder.length;
-        nextPhase = phaseOrder[nextPhaseIndex];
+        // Check if all strongholds are placed
+        if (areAllStrongholdsPlaced(gameState.players)) {
+          gameState.gameState.setupPhase = false; // End setup phase
+          gameState.gameState.currentPhase = phaseOrder[0]; // Start with the first phase
+          gameState.gameState.currentPlayerTurn = turnOrder[0]; // Reset to the first player in turn order
+        }
       } else {
-        // Otherwise, remain in the setup phase
-        nextPhase = "Setup";
+        gameState.gameState.currentPlayerTurn = nextPlayerTurn; // Move to the next player in setup
       }
     } else {
       // Logic for non-setup phases
-      nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
-      nextPhase = phaseOrder[nextPhaseIndex];
-  
+      const currentPhaseIndex = phaseOrder.indexOf(currentPhase);
+      let nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length;
+      let nextPhase = phaseOrder[nextPhaseIndex];
+      let nextPlayerTurn = currentPlayerTurn;
+
       // Move to the next player if we're back at the first phase
       if (nextPhase === phaseOrder[0]) {
-        const currentPlayerIndex = gameState.gameState.turnOrder.findIndex(
-          player => player === currentPlayerTurn
+        const currentPlayerIndex = turnOrder.findIndex(
+          (player) => player === currentPlayerTurn
         );
-        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.gameState.turnOrder.length;
-        nextPlayerTurn = gameState.gameState.turnOrder[nextPlayerIndex];
+        const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
+        nextPlayerTurn = turnOrder[nextPlayerIndex];
       }
+
+      gameState.gameState.currentPhase = nextPhase;
+      gameState.gameState.currentPlayerTurn = nextPlayerTurn;
     }
-  
+
     // Update the game state with the new phase and player turn
-    const updatedGameState = {
-      ...gameState.gameState,
-      currentPhase: nextPhase,
-      currentPlayerTurn: nextPlayerTurn
-    };
-  
-    emitGameStateUpdate({ gameState: updatedGameState });
+    emitGameStateUpdate({ gameState: gameState.gameState });
   };
-  
+
   // Switch Case phase
   useEffect(() => {
     // if (currentPlayerTurn === currentPlayer?.username) {

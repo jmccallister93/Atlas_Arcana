@@ -1,6 +1,7 @@
 export interface GameSessionInfo {
   sessionId: string;
   gameState: {
+    setupPhase: boolean;
     currentPhase: string;
     currentPlayerTurn: string;
     turnOrder: string[];

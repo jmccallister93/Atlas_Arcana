@@ -45,16 +45,19 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     gameState.gameState.tileGrid
   );
   const titans = gameState.gameState.titans;
+
   const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
+
   useEffect(() => {
-    if (gameState?.gameState.currentPhase) {
-      if (gameState?.gameState.currentPhase === "Setup") {
-        setHasSetupCompleted(false);
-      } else {
-        setHasSetupCompleted(true);
-      }
+    console.log("FIRED");
+    // Only proceed if setup has not been completed yet
+
+    if (gameState.gameState.setupPhase) {
+      setHasSetupCompleted(false);
+    } else {
+      setHasSetupCompleted(true);
     }
-  }, [gameState.gameState.currentPhase]);
+  }, [gameState.gameState.setupPhase]);
 
   interface TileInfo {
     type: string;
@@ -157,6 +160,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
             p.fill(color);
             p.rect(x * tileSize, y * tileSize, tileSize, tileSize);
           }
+          console.log("Board rendered");
         }
         // Draw titan tokens
         titans?.forEach(({ titanName, row, col }) => {
@@ -232,7 +236,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         canvasRef.current.removeEventListener("click", handleClick);
       }
     };
-  }, [tileGrid, titans, gameState.players]);
+  }, []);
 
   // Calculate distance of tiles
   const calculateDistance = (

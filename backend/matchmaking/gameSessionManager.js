@@ -80,6 +80,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       turnOrder,
       currentPlayerTurn,
       tileGrid,
+      setupPhase: true,
       currentPhase,
       turnsCompleted: 0,
       titans: titanPosition,
