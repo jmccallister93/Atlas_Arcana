@@ -27,6 +27,7 @@ import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import TileModal from "./TileModal";
+import TileAlerts from "./TileAlerts";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -82,7 +83,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
   }, [gameState.gameState.setupPhase]);
 
-  
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
@@ -498,19 +498,18 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         </div>
       </div>
 
-      <TileModal 
+      <TileModal
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
         setShowTileDetails={setShowTileDetails}
         isStrongholdPlacementMode={isStrongholdPlacementMode}
         placeStronghold={placeStronghold}
       />
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        header={"Alert"}
-        message={alertMessage}
-        buttons={["OK"]}
+      <TileAlerts
+        showAlert={showAlert}
+        setShowAlert={setShowAlert}
+        alertMessage={alertMessage}
+        selectedTile={selectedTile}
       />
     </>
   );
