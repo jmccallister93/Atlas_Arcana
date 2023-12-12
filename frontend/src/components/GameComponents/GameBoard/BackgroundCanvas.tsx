@@ -14,8 +14,9 @@ import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
 import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import { PlayerInfo, TitanInfo } from "../Interfaces";
+import { TileCoordinate } from "./GameBoard";
 
-interface TileGridProps {
+interface BackgroundCanvasProps {
   tileGrid: string[];
   titans: TitanInfo[]; // Replace with the correct type for titans
   players: PlayerInfo[];
@@ -23,7 +24,8 @@ interface TileGridProps {
   handleTileSelection: (x: number, y: number) => void;
 }
 
-const TileGrid: React.FC<TileGridProps> = ({
+
+const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({
   tileGrid,
   titans,
   players,
@@ -88,6 +90,7 @@ const TileGrid: React.FC<TileGridProps> = ({
           grassland: "#00BC53", // Lime Green
         };
 
+
         for (let x = 0; x < tileGrid.length; x++) {
           for (let y = 0; y < tileGrid[x].length; y++) {
             let tileType = tileGrid[x][y];
@@ -95,7 +98,6 @@ const TileGrid: React.FC<TileGridProps> = ({
             p.fill(color);
             p.rect(x * tileSize, y * tileSize, tileSize, tileSize);
           }
-          console.log("Board rendered");
         }
         // Draw titan tokens
         titans?.forEach(({ titanName, row, col }) => {
@@ -177,4 +179,4 @@ const TileGrid: React.FC<TileGridProps> = ({
   return <div ref={canvasRef}></div>;
 };
 
-export default TileGrid;
+export default BackgroundCanvas;

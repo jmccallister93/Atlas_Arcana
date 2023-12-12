@@ -28,7 +28,9 @@ import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
-import TileGrid from "./TileGrid";
+import TileGrid from "./BackgroundCanvas";
+import BackgroundCanvas from "./BackgroundCanvas";
+import StrongholdCanvas from "./StrongholdCanvas";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -52,6 +54,11 @@ export interface TileInfo {
     col: number;
   } | null;
   titanImage: string;
+}
+
+export interface TileCoordinate {
+  x: number;
+  y: number;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
@@ -84,11 +91,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
   }, [gameState.gameState.setupPhase]);
 
-  const mouseCoords = useRef({ x: 0, y: 0 });
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [seed, setSeed] = useState<number | null>(null);
-  const [width, setWidth] = useState(720);
-  const [height, setHeight] = useState(720);
   const [tileSize, setTileSize] = useState(30);
 
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
@@ -99,147 +101,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     useState({ x: 0, y: 0 });
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
-  // Main UseEffect
-  // useEffect(() => {
-  //   if (!tileGrid) return;
-  //   const sketch = (p: p5) => {
-  //     let desertImg: Image,
-  //       forestImg: Image,
-  //       grasslandImg: Image,
-  //       tundraImg: Image,
-  //       oasisImg: Image,
-  //       fireTitanImg: Image, // Titan token images
-  //       iceTitanImg: Image,
-  //       stoneTitanImg: Image,
-  //       stormTitanImg: Image,
-  //       stronghold1Img: Image,
-  //       stronghold2Img: Image,
-  //       stronghold3Img: Image,
-  //       stronghold4Img: Image;
-
-  //     //   Preload images
-  //     p.preload = () => {
-  //       desertImg = p.loadImage(desert);
-  //       forestImg = p.loadImage(forest);
-  //       grasslandImg = p.loadImage(grassland);
-  //       tundraImg = p.loadImage(tundra);
-  //       oasisImg = p.loadImage(oasis);
-  //       fireTitanImg = p.loadImage(fireTitanToken);
-  //       iceTitanImg = p.loadImage(iceTitanToken);
-  //       stoneTitanImg = p.loadImage(stoneTitanToken);
-  //       stormTitanImg = p.loadImage(stormTitanToken);
-  //       stronghold1Img = p.loadImage(stronghold1);
-  //       stronghold2Img = p.loadImage(stronghold2);
-  //       stronghold3Img = p.loadImage(stronghold3);
-  //       stronghold4Img = p.loadImage(stronghold4);
-  //     };
-
-  //     // Setup canvas
-  //     p.setup = () => {
-  //       let canvas = p.createCanvas(width, height); // Create the P5 canvas
-  //       p.noLoop();
-  //       if (canvasRef.current) {
-  //         canvas.parent(canvasRef.current); // Assign P5 canvas to the div
-  //       }
-  //     };
-
-  //     // Draw everything
-  //     p.draw = () => {
-  //       p.background(255);
-
-  //       const tileTypeToColor: any = {
-  //         forest: "#095300", // Dark Green
-  //         desert: "#F9DA70", // Sandy Color
-  //         oasis: "#005fcc", // Dark Turquoise
-  //         tundra: "#D9D9D9", // Silver
-  //         grassland: "#00BC53", // Lime Green
-  //       };
-
-  //       for (let x = 0; x < tileGrid.length; x++) {
-  //         for (let y = 0; y < tileGrid[x].length; y++) {
-  //           let tileType = tileGrid[x][y];
-  //           let color = tileTypeToColor[tileType] || "#FFFFFF";
-  //           p.fill(color);
-  //           p.rect(x * tileSize, y * tileSize, tileSize, tileSize);
-  //         }
-  //         console.log("Board rendered");
-  //       }
-  //       // Draw titan tokens
-  //       titans?.forEach(({ titanName, row, col }) => {
-  //         let img;
-  //         switch (titanName) {
-  //           case "Fire Titan":
-  //             img = fireTitanImg;
-  //             break;
-  //           case "Ice Titan":
-  //             img = iceTitanImg;
-  //             break;
-  //           case "Stone Titan":
-  //             img = stoneTitanImg;
-  //             break;
-  //           case "Storm Titan":
-  //             img = stormTitanImg;
-  //             break;
-  //           // Add cases for other titans as needed
-  //         }
-  //         if (img) {
-  //           p.image(img, col * tileSize, row * tileSize, tileSize, tileSize);
-  //         }
-  //       });
-
-  //       // Draw player strongholds
-  //       const strongholdImages = [
-  //         stronghold1Img,
-  //         stronghold2Img,
-  //         stronghold3Img,
-  //         stronghold4Img,
-  //       ];
-
-  //       gameState.players.forEach((player, index) => {
-  //         if (player.strongHold) {
-  //           let strongholdImg =
-  //             strongholdImages[index % strongholdImages.length];
-
-  //           p.image(
-  //             strongholdImg,
-  //             player.strongHold.col * tileSize,
-  //             player.strongHold.row * tileSize,
-  //             tileSize,
-  //             tileSize
-  //           );
-  //         }
-  //       });
-  //     };
-  //   };
-
-  //   let myp5 = new p5(sketch);
-
-  //   // Handle clicking on a tile
-  //   const handleClick = (e: MouseEvent) => {
-  //     if (canvasRef.current) {
-  //       const rect = canvasRef.current.getBoundingClientRect();
-  //       mouseCoords.current = {
-  //         x: e.clientX - rect.left,
-  //         y: e.clientY - rect.top,
-  //       };
-  //       handleTileSelection();
-  //     }
-  //   };
-  //   if (canvasRef.current) {
-  //     canvasRef.current.addEventListener("click", handleClick);
-  //   }
-
-  //   return () => {
-  //     if (myp5) {
-  //       myp5.remove();
-  //     }
-  //     if (canvasRef.current) {
-  //       // Remove the event listener when the component unmounts
-  //       canvasRef.current.removeEventListener("click", handleClick);
-  //     }
-  //   };
-  // }, []);
 
   // Calculate distance of tiles
   const calculateDistance = (
@@ -478,7 +339,9 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
           p.username === updatedPlayer.username ? updatedPlayer : p
         ),
       };
+      // Emit the update to server
       emitGameStateUpdate(updatedGameState);
+
     } else {
       setAlertMessage(
         "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
@@ -491,12 +354,17 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   return (
     <>
       <div className="canvasWrapper">
-        <TileGrid
+        <BackgroundCanvas
           tileGrid={tileGrid}
           titans={titans}
           players={gameState.players}
           tileSize={tileSize}
           handleTileSelection={handleTileSelection}
+        />
+        <StrongholdCanvas 
+        players={gameState.players}
+        tileSize={tileSize}
+        onStrongholdPlaced={placeStronghold}
         />
       </div>
 
