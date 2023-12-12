@@ -26,8 +26,31 @@ import TileMenuDetails, { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
+import TileModal from "./TileModal";
 
 interface GameBoardProps {}
+export interface TileInfo {
+  type: string;
+  x: number;
+  y: number;
+  image: string;
+  monsterBonuses: string;
+  buildingBonuses: string;
+  buildings: BuildingInfo[] | null;
+  players: PlayerInfo | null;
+  stronghold: StrongholdInfo | null;
+  titan: {
+    titanName: string;
+    rank: number;
+    health: number;
+    offense: number;
+    defense: number;
+    stamina: number;
+    row: number;
+    col: number;
+  } | null;
+  titanImage: string;
+}
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
   // Get Game state
@@ -59,28 +82,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
   }, [gameState.gameState.setupPhase]);
 
-  interface TileInfo {
-    type: string;
-    x: number;
-    y: number;
-    image: string;
-    monsterBonuses: string;
-    buildingBonuses: string;
-    buildings: BuildingInfo[] | null;
-    players: PlayerInfo | null;
-    stronghold: StrongholdInfo | null;
-    titan: {
-      titanName: string;
-      rank: number;
-      health: number;
-      offense: number;
-      defense: number;
-      stamina: number;
-      row: number;
-      col: number;
-    } | null;
-    titanImage: string;
-  }
+  
   const mouseCoords = useRef({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const [seed, setSeed] = useState<number | null>(null);
@@ -496,31 +498,13 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         </div>
       </div>
 
-      <IonModal
-        isOpen={showTileDetails}
-        onDidDismiss={() => setShowTileDetails(false)}
-      >
-        <IonContent>
-          <div className="modalHeader">
-            <h2>Details</h2>
-            <button
-              className="closeButton"
-              onClick={() => setShowTileDetails(false)}
-            >
-              <IonIcon icon={closeOutline} />
-            </button>
-          </div>
-          <TileMenuDetails
-            selectedTile={selectedTile}
-            showTileDetails={showTileDetails}
-            setShowTileDetails={setShowTileDetails}
-            isStrongholdPlacementMode={isStrongholdPlacementMode}
-            placeStronghold={placeStronghold}
-          />
-
-          <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
-        </IonContent>
-      </IonModal>
+      <TileModal 
+        selectedTile={selectedTile}
+        showTileDetails={showTileDetails}
+        setShowTileDetails={setShowTileDetails}
+        isStrongholdPlacementMode={isStrongholdPlacementMode}
+        placeStronghold={placeStronghold}
+      />
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}

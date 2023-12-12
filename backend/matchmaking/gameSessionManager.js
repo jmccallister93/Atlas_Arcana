@@ -82,7 +82,7 @@ async function createGameSession(playerOneData, playerTwoData) {
       tileGrid,
       setupPhase: true,
       currentPhase,
-      turnsCompleted: 0,
+      turnsCompleted: 1,
       titans: titanPosition,
       equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
       questCardCount: [], // Counter for quest cards
