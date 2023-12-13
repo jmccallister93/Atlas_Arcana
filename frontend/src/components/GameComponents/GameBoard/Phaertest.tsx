@@ -97,16 +97,16 @@ const BackgroundCanvasTest: React.FC<BackgroundCanvasProps> = ({
             );
             graphics.fillStyle(color.color, 1); // Set the fill color for the tile
             graphics.fillRect(
-              colIndex * tileSize,
               rowIndex * tileSize,
+              colIndex * tileSize,
               tileSize,
               tileSize
             ); // Draw the filled rectangle
 
             graphics.lineStyle(2, 0x000000, 1); // Set the line style for the border
             graphics.strokeRect(
-              colIndex * tileSize,
-              rowIndex * tileSize,
+                rowIndex * tileSize,
+                colIndex * tileSize,
               tileSize,
               tileSize
             ); // Draw the border
@@ -117,12 +117,12 @@ const BackgroundCanvasTest: React.FC<BackgroundCanvasProps> = ({
         titans.forEach(titan => {
             const titanImageKey = titanNameToImageKey[titan.titanName];
             if (titanImageKey) {
-                console.log("Fioore")
+              
               this.add.sprite(
                 titan.row * tileSize,
                 titan.col * tileSize,
                 titanImageKey
-              ).setDisplaySize(tileSize, tileSize);
+              ).setDisplaySize(tileSize, tileSize).setOrigin(0,0);
             }
           });
         // Strongholds
@@ -135,16 +135,19 @@ const BackgroundCanvasTest: React.FC<BackgroundCanvasProps> = ({
                 player.strongHold.row * tileSize,
                 strongholdKey
               )
-              .setDisplaySize(tileSize, tileSize); // Add the stronghold sprite
+              .setDisplaySize(tileSize, tileSize).setOrigin(0,0); // Add the stronghold sprite
           }
         });
 
         // Mouse click
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-          const xIndex = Math.floor(pointer.x / tileSize);
-          const yIndex = Math.floor(pointer.y / tileSize);
-          handleTileSelection(xIndex, yIndex);
-        });
+            // Calculate the correct tile indices based on pointer position
+            const xIndex = Math.floor((pointer.x - this.cameras.main.scrollX) / tileSize);
+            const yIndex = Math.floor((pointer.y - this.cameras.main.scrollY) / tileSize);
+          
+            handleTileSelection(xIndex, yIndex);
+          });
+          
       }
     }
     return () => {
