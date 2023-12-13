@@ -29,9 +29,9 @@ import { useAuth } from "../../../context/AuthContext/AuthContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import TileGrid from "./BackgroundCanvas";
-import BackgroundCanvas from "./BackgroundCanvas";
+
 import StrongholdCanvas from "./StrongholdCanvas";
-import BackgroundCanvasTest from "./Phaertest";
+import BackgroundCanvas from "./PhaserMap";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -355,7 +355,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   return (
     <>
       <div className="canvasWrapper">
-        <BackgroundCanvasTest
+        <BackgroundCanvas
           tileGrid={tileGrid}
           titans={titans}
           players={gameState.players}

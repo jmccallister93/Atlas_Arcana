@@ -26,7 +26,7 @@ interface BackgroundCanvasProps {
   handleTileSelection: (x: number, y: number) => void;
 }
 
-const BackgroundCanvasTest: React.FC<BackgroundCanvasProps> = ({
+const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({
   tileGrid,
   titans,
   players,
@@ -155,7 +155,7 @@ const BackgroundCanvasTest: React.FC<BackgroundCanvasProps> = ({
     };
   }, [tileGrid, tileSize, handleTileSelection]);
 
-  return <div ref={gameRef} className="backgroundCanvas"></div>;
+  return <div ref={gameRef} ></div>;
 };
 
-export default BackgroundCanvasTest;
+export default BackgroundCanvas;

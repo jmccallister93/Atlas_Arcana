@@ -21,7 +21,6 @@ const TileModal: React.FC<TileModalProps> = ({
 }) => {
   return (
     <>
-      ({" "}
       <IonModal
         isOpen={showTileDetails}
         onDidDismiss={() => setShowTileDetails(false)}
@@ -48,7 +47,6 @@ const TileModal: React.FC<TileModalProps> = ({
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
         </IonContent>
       </IonModal>
-      )
     </>
   );
 };
