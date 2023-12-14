@@ -36,11 +36,11 @@ const {gameState} = useGameContext()
   useEffect(() => {
     if (!gameState) return;
     // Welcome players
-    const players = gameState?.players || [];
+    const players = gameState.players || [];
     const playerNames = players.map((player) => player.username).join(", ");
 
     // Map each username in the turnOrder to a message object
-    const turnOrder = gameState?.gameState?.turnOrder || [];
+    const turnOrder = gameState.turnOrder || [];
     const turnOrderMessages = turnOrder.map(
       (username: string, index: number) => ({
         message: username,

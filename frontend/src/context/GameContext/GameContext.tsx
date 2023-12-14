@@ -46,7 +46,7 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
     case "INITIAL_GAME_STATE":
       return{ ...state, ...action.payload };
     case "UPDATE_GAME_STATE":
-      return {state, ...action.payload };
+      return {...state, ...action.payload };
     case "UPDATE_PLAYER_DATA":
       const updatedPlayers = state.players.map((player) =>
         player.username === action.payload.username ? action.payload : player
