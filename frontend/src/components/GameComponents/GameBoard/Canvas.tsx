@@ -26,13 +26,14 @@ interface BackgroundCanvasProps {
   handleTileSelection: (x: number, y: number) => void;
 }
 
-const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({
+const Canvas: React.FC<BackgroundCanvasProps> = ({
   tileGrid,
   titans,
   players,
   tileSize,
   handleTileSelection,
 }) => {
+  // console.log("Canvas Rendered")
   const gameRef = useRef<HTMLDivElement>(null);
   let game: Phaser.Game;
 
@@ -158,4 +159,4 @@ const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({
   return <div ref={gameRef} ></div>;
 };
 
-export default BackgroundCanvas;
+export default Canvas;

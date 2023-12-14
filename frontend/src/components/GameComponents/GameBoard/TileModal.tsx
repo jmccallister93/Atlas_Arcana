@@ -8,7 +8,6 @@ interface TileModalProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  isStrongholdPlacementMode: boolean;
   placeStronghold: () => void;
 }
 
@@ -16,9 +15,10 @@ const TileModal: React.FC<TileModalProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  isStrongholdPlacementMode,
   placeStronghold,
 }) => {
+ 
+  // console.log("Tile Modal Rendered")
   return (
     <>
       <IonModal
@@ -40,7 +40,6 @@ const TileModal: React.FC<TileModalProps> = ({
               selectedTile={selectedTile}
               showTileDetails={showTileDetails}
               setShowTileDetails={setShowTileDetails}
-              isStrongholdPlacementMode={isStrongholdPlacementMode}
               placeStronghold={placeStronghold}
             />
           )}

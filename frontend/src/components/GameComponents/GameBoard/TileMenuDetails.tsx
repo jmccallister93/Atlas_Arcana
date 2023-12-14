@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IonContent, IonIcon, IonModal, IonButton } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
-
+import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
 
 interface Titan {
   titanName: string;
@@ -39,7 +40,7 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  isStrongholdPlacementMode: boolean;
+  // isStrongholdPlacementMode: boolean;
   placeStronghold: () => void;
 }
 
@@ -47,9 +48,30 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  isStrongholdPlacementMode,
+  // isStrongholdPlacementMode,
   placeStronghold,
 }) => {
+  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const auth = useAuth();
+  useGameContext;
+  const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
+    useState(false);
+  const currentPlayer = gameState.players.find(
+    (player) => player.username === auth.username
+  );
+  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
+
+  // Check if stronghold is placed and if cuurrent player turn
+  useEffect(() => {
+    if (
+      gameState.gameState.setupPhase &&
+      currentPlayer?.username === currentPlayerTurn
+    ) {
+      setIsStrongholdPlacementMode(true);
+    } else {
+      setIsStrongholdPlacementMode(false);
+    }
+  }, [gameState.gameState.setupPhase, currentPlayer]);
   return (
     <IonModal
       isOpen={showTileDetails}

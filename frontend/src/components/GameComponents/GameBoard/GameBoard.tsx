@@ -28,10 +28,9 @@ import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
-import TileGrid from "./BackgroundCanvas";
+import TileGrid from "./Canvas";
 
-import StrongholdCanvas from "./StrongholdCanvas";
-import BackgroundCanvas from "./PhaserMap";
+import Canvas from "./Canvas";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -63,6 +62,7 @@ export interface TileCoordinate {
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
+  // console.log("GameBoard Rendered");
   // Get Game state
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -78,26 +78,10 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     gameState.gameState.tileGrid
   );
   const titans = gameState.gameState.titans;
-
-  const [hasSetupCompleted, setHasSetupCompleted] = useState(false);
-
-  useEffect(() => {
-    console.log("FIRED");
-    // Only proceed if setup has not been completed yet
-
-    if (gameState.gameState.setupPhase) {
-      setHasSetupCompleted(false);
-    } else {
-      setHasSetupCompleted(true);
-    }
-  }, [gameState.gameState.setupPhase]);
-
   const [tileSize, setTileSize] = useState(30);
-
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
-  const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
-    useState(false);
+
   const [selectedStrongholdCoordinates, setSelectedStrongholdCoordinates] =
     useState({ x: 0, y: 0 });
   const [showAlert, setShowAlert] = useState(false);
@@ -114,6 +98,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   };
   // Validate stronghold placement
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
+    console.log("Is valid stronghold rendered")
     // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
@@ -141,15 +126,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
     return true; // Valid placement
   };
-
-  // Check if stronghold is placed and if cuurrent player turn
-  useEffect(() => {
-    if (!hasSetupCompleted && currentPlayer?.username === currentPlayerTurn) {
-      setIsStrongholdPlacementMode(true);
-    } else {
-      setIsStrongholdPlacementMode(false);
-    }
-  }, [currentPlayer]);
 
   // Handle Selected tile
   // Modified handleTileSelection to accept coordinates
@@ -355,7 +331,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   return (
     <>
       <div className="canvasWrapper">
-        <BackgroundCanvas
+        <Canvas
           tileGrid={tileGrid}
           titans={titans}
           players={gameState.players}
@@ -374,7 +350,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
         setShowTileDetails={setShowTileDetails}
-        isStrongholdPlacementMode={isStrongholdPlacementMode}
         placeStronghold={placeStronghold}
       />
       <TileAlerts
@@ -387,4 +362,4 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   );
 };
 
-export default GameBoard;
+export default React.memo(GameBoard);
