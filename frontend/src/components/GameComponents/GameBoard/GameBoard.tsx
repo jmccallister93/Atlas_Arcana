@@ -31,6 +31,7 @@ import TileAlerts from "./TileAlerts";
 import TileGrid from "./Canvas";
 
 import Canvas from "./Canvas";
+import StrongholdPlacement from "./StrongholdPlacement";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -98,7 +99,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   };
   // Validate stronghold placement
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
-    console.log("Is valid stronghold rendered")
+    console.log("Is valid stronghold rendered");
     // Check distance from titans
     for (let titan of titans ?? []) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
@@ -318,7 +319,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       };
       // Emit the update to server
       emitGameStateUpdate(updatedGameState);
-
     } else {
       setAlertMessage(
         "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
@@ -330,21 +330,13 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   return (
     <>
-      <div className="canvasWrapper">
-        <Canvas
-          tileGrid={tileGrid}
-          titans={titans}
-          players={gameState.players}
-          tileSize={tileSize}
-          handleTileSelection={handleTileSelection}
-        />
-        {/* <StrongholdCanvas 
+      <Canvas
         tileGrid={tileGrid}
+        titans={titans}
         players={gameState.players}
         tileSize={tileSize}
-        onStrongholdPlaced={placeStronghold}
-        /> */}
-      </div>
+        handleTileSelection={handleTileSelection}
+      />
 
       <TileModal
         selectedTile={selectedTile}
@@ -352,11 +344,16 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         setShowTileDetails={setShowTileDetails}
         placeStronghold={placeStronghold}
       />
+
       <TileAlerts
         showAlert={showAlert}
         setShowAlert={setShowAlert}
         alertMessage={alertMessage}
         selectedTile={selectedTile}
+      />
+
+      <StrongholdPlacement 
+      selectedTile={selectedTile}
       />
     </>
   );

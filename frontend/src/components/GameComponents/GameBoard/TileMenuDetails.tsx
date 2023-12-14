@@ -4,6 +4,7 @@ import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
+import StrongholdPlacement from "./StrongholdPlacement";
 
 interface Titan {
   titanName: string;
@@ -22,7 +23,7 @@ export interface StrongholdInfo {
   ownerUsername: string; // Add this to store the owner's username
 }
 
-interface TileInfo {
+export interface TileInfo {
   type: string;
   x: number;
   y: number;
@@ -40,16 +41,12 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  // isStrongholdPlacementMode: boolean;
-  placeStronghold: () => void;
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  // isStrongholdPlacementMode,
-  placeStronghold,
 }) => {
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -72,6 +69,8 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
       setIsStrongholdPlacementMode(false);
     }
   }, [gameState.gameState.setupPhase, currentPlayer]);
+
+
   return (
     <IonModal
       isOpen={showTileDetails}
@@ -91,10 +90,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
           <>
             {/* Stronghold Palcement */}
             {isStrongholdPlacementMode ? (
-              <>
-                <p>Place Stronghold on Tile?</p>
-                <IonButton onClick={placeStronghold}>Confirm</IonButton>
-              </>
+              <StrongholdPlacement selectedTile={selectedTile} />
             ) : null}
 
             {/* titan details */}

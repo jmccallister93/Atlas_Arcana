@@ -40,7 +40,6 @@ const TileModal: React.FC<TileModalProps> = ({
               selectedTile={selectedTile}
               showTileDetails={showTileDetails}
               setShowTileDetails={setShowTileDetails}
-              placeStronghold={placeStronghold}
             />
           )}
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

@@ -18,6 +18,8 @@ import stronghold3 from "./GameTiles/stronghold3.png";
 import stronghold4 from "./GameTiles/stronghold4.png";
 import { PlayerInfo, TitanInfo } from "../Interfaces";
 
+import "./GameBoard.scss";
+
 interface BackgroundCanvasProps {
   tileGrid: string[][];
   titans: TitanInfo[];
@@ -156,7 +158,7 @@ const Canvas: React.FC<BackgroundCanvasProps> = ({
     };
   }, [tileGrid, tileSize, handleTileSelection]);
 
-  return <div ref={gameRef} ></div>;
+  return <div className="canvasWrapper"><div ref={gameRef} ></div></div>;
 };
 
 export default Canvas;
