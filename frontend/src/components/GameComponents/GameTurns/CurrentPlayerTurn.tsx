@@ -11,14 +11,14 @@ const CurrentPlayerTurn: React.FC<CurrentPlayerTurnProps> = ({
   onPlayerTurnChange,
 }) => {
   const [currentPlayerTurn, setCurrentPlayerTurn] = useState<string>(
-    gameState.gameState.currentPlayerTurn
+    gameState.currentPlayerTurn
   );
   // Turn order
   useEffect(() => {
-    const newTurn = gameState.gameState.currentPlayerTurn;
+    const newTurn = gameState.currentPlayerTurn;
     setCurrentPlayerTurn(newTurn);
     onPlayerTurnChange(newTurn); // Call the callback function
-  }, [gameState.gameState.currentPlayerTurn, onPlayerTurnChange]);
+  }, [gameState.currentPlayerTurn, onPlayerTurnChange]);
   
   return (
     <h4 className="pageHeader">Current Player Turn: {currentPlayerTurn}</h4>
@@ -27,8 +27,8 @@ const CurrentPlayerTurn: React.FC<CurrentPlayerTurnProps> = ({
 
 const areEqual = (prevProps: any, nextProps: any) => {
   if (
-    prevProps.gameState.gameState.currentPlayerTurn !==
-    nextProps.gameState.gameState.currentPlayerTurn
+    prevProps.gameState.currentPlayerTurn !==
+    nextProps.gameState.currentPlayerTurn
   ) {
     return false; // Re-render if currentPlayer changes
   }

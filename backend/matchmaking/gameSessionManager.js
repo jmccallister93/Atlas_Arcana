@@ -76,19 +76,17 @@ async function createGameSession(playerOneData, playerTwoData) {
   const newSession = {
     sessionId,
     players,
-    gameState: {
-      turnOrder,
-      currentPlayerTurn,
-      tileGrid,
-      setupPhase: true,
-      currentPhase,
-      turnsCompleted: 1,
-      titans: titanPosition,
-      equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
-      questCardCount: [], // Counter for quest cards
-      treasureCardCount: [],
-      worldEventCardCount: [], // Counter for world event cards
-    },
+    turnOrder,
+    currentPlayerTurn,
+    tileGrid,
+    setupPhase: true,
+    currentPhase,
+    turnsCompleted: 1,
+    titans: titanPosition,
+    equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
+    questCardCount: [], // Counter for quest cards
+    treasureCardCount: [],
+    worldEventCardCount: [], // Counter for world event cards
   };
   console.log(
     "createGameSession - New session created:",
@@ -104,13 +102,13 @@ const updateGameState = async (io, sessionId, newState) => {
     if (!sessionData) {
       throw new Error("Session not found");
     }
-    console.log("Existing GameState before merge:", sessionData.gameState);
+    console.log("Existing GameState before merge:", sessionData);
     console.log("NewState to merge:", JSON.stringify(newState));
 
-    const updatedGameState = { ...sessionData.gameState, ...newState };
+    const updatedGameState = { ...sessionData, ...newState };
     console.log("Updated GameState after merge:", updatedGameState);
 
-    sessionData.gameState = updatedGameState;
+    sessionData = updatedGameState;
     await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
     console.log("Emitting updated game state to session:", sessionId);
@@ -308,11 +306,11 @@ async function drawPhaseCardDraw(player, sessionId) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     card = equipmentCards[randomIndex];
   } while (
-    sessionData.gameState.equipmentCardCount.includes(card.equipmentName)
+    sessionData.equipmentCardCount.includes(card.equipmentName)
   );
 
   player.inventory.equipment.push(card);
-  sessionData.gameState.equipmentCardCount.push(card.equipmentName);
+  sessionData.equipmentCardCount.push(card.equipmentName);
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
   return card;

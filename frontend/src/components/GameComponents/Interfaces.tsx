@@ -1,21 +1,18 @@
 export interface GameSessionInfo {
   sessionId: string;
-  gameState: {
-    setupPhase: boolean;
-    currentPhase: string;
-    currentPlayerTurn: string;
-    turnOrder: string[];
-    tileGrid: [];
-    turnsCompleted: number;
-    titans: TitanInfo[];
-    equipmentCardCount: [], 
-    questCardCount: [], 
-    treasureCardCount: [],
-    worldEventCardCount: [], 
-  };
+  setupPhase: boolean;
+  currentPhase: string;
+  currentPlayerTurn: string;
+  turnOrder: string[];
+  tileGrid: [];
+  turnsCompleted: number;
+  titans: TitanInfo[];
+  equipmentCardCount: [];
+  questCardCount: [];
+  treasureCardCount: [];
+  worldEventCardCount: [];
   players: PlayerInfo[];
 }
-
 
 export interface TitanInfo {
   titanName: string;
@@ -24,8 +21,8 @@ export interface TitanInfo {
   offense: number;
   defense: number;
   stamina: number;
-  row: number; // Added position information
-  col: number; // Added position information
+  row: number;
+  col: number;
 }
 
 export interface LocationState {
@@ -97,11 +94,3 @@ export interface PlayerInfo {
     quests: QuestItem[];
   };
 }
-
-// export interface GameState {
-//   totalTurns: number;
-//   playerTurn: string;
-//   gamePhase: string;
-//   playerPool: Array<string>;
-//   timer: string;
-// }

@@ -24,9 +24,9 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     (player) => player.username === auth.username
   );
   // States that were being passed
-  const turnOrder = gameState.gameState.turnOrder;
-  const currentPhase = gameState.gameState.currentPhase;
-  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
+  const turnOrder = gameState.turnOrder;
+  const currentPhase = gameState.currentPhase;
+  const currentPlayerTurn = gameState.currentPlayerTurn;
 
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
   const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
@@ -67,7 +67,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     }
 
     // Check if Setup Phase is active
-    const isSetupPhase = gameState.gameState.setupPhase;
+    const isSetupPhase = gameState.setupPhase;
 
     if (isSetupPhase) {
       // Check if current player has not placed a stronghold
@@ -86,12 +86,12 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       if (nextPlayerIndex === 0) {
         // Check if all strongholds are placed
         if (areAllStrongholdsPlaced(gameState.players)) {
-          gameState.gameState.setupPhase = false; // End setup phase
-          gameState.gameState.currentPhase = phaseOrder[0]; // Start with the first phase
-          gameState.gameState.currentPlayerTurn = turnOrder[0]; // Reset to the first player in turn order
+          gameState.setupPhase = false; // End setup phase
+          gameState.currentPhase = phaseOrder[0]; // Start with the first phase
+          gameState.currentPlayerTurn = turnOrder[0]; // Reset to the first player in turn order
         }
       } else {
-        gameState.gameState.currentPlayerTurn = nextPlayerTurn; // Move to the next player in setup
+        gameState.currentPlayerTurn = nextPlayerTurn; // Move to the next player in setup
       }
     } else {
       // Logic for non-setup phases
@@ -114,16 +114,16 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
           currentPhaseIndex === phaseOrder.length - 1
         ) {
           // Increment turnsCompleted by 1
-          gameState.gameState.turnsCompleted += 1;
+          gameState.turnsCompleted += 1;
         }
       }
 
-      gameState.gameState.currentPhase = nextPhase;
-      gameState.gameState.currentPlayerTurn = nextPlayerTurn;
+      gameState.currentPhase = nextPhase;
+      gameState.currentPlayerTurn = nextPlayerTurn;
     }
 
     // Update the game state with the new phase and player turn
-    emitGameStateUpdate({ gameState: gameState.gameState });
+    emitGameStateUpdate(gameState);
   };
 
   // Switch Case phase
@@ -209,7 +209,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
       ) : (
         <></>
       )}
-      <h4 className="pageHeader">Turn Number: {gameState.gameState.turnsCompleted}</h4>
+      <h4 className="pageHeader">Turn Number: {gameState.turnsCompleted}</h4>
 
       <IonAlert
         isOpen={showStrongholdAlert}

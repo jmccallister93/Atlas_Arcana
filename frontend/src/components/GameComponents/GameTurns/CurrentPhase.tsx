@@ -11,14 +11,14 @@ const CurrentPhase: React.FC<CurrentPhaseProps> = ({
   onPhaseChange,
 }) => {
   const [currentPhase, setCurrentPhase] = useState<string>(
-    gameState.gameState.currentPhase
+    gameState.currentPhase
   );
   // Turn order
   useEffect(() => {
-    const newPhase = gameState.gameState.currentPhase;
+    const newPhase = gameState.currentPhase;
     setCurrentPhase(newPhase);
     onPhaseChange(newPhase); // Call the callback function
-  }, [gameState.gameState.currentPhase, onPhaseChange]);
+  }, [gameState.currentPhase, onPhaseChange]);
   
   return (
     <h4 className="pageHeader">Current Phase: {currentPhase}</h4>
@@ -27,8 +27,8 @@ const CurrentPhase: React.FC<CurrentPhaseProps> = ({
 
 const areEqual = (prevProps: any, nextProps: any) => {
   if (
-    prevProps.gameState.gameState.currentPhase !==
-    nextProps.gameState.gameState.currentPhase
+    prevProps.gameState.currentPhase !==
+    nextProps.gameState.currentPhase
   ) {
     return false; // Re-render if currentPlayer changes
   }

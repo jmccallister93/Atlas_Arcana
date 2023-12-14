@@ -56,19 +56,19 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
-  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
+  const currentPlayerTurn = gameState.currentPlayerTurn;
 
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (
-      gameState.gameState.setupPhase &&
+      gameState.setupPhase &&
       currentPlayer?.username === currentPlayerTurn
     ) {
       setIsStrongholdPlacementMode(true);
     } else {
       setIsStrongholdPlacementMode(false);
     }
-  }, [gameState.gameState.setupPhase, currentPlayer]);
+  }, [gameState.setupPhase, currentPlayer]);
 
 
   return (

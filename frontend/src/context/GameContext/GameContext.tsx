@@ -41,7 +41,7 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
     case "SET_CURRENT_PLAYER_TURN":
       return {
         ...state,
-        gameState: { ...state.gameState, currentPlayerTurn: action.payload },
+        gameState: { ...state, currentPlayerTurn: action.payload },
       };
     default:
       return state;

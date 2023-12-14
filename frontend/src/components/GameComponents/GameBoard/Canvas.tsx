@@ -27,10 +27,10 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const { gameState } = useGameContext();
-  const titans = gameState.gameState.titans;
+  const titans = gameState.titans;
   const players = gameState.players;
   const [tileGrid, ] = useState<string[][]>(
-    gameState.gameState.tileGrid
+    gameState.tileGrid
   );
 
   // console.log("Canvas Rendered")

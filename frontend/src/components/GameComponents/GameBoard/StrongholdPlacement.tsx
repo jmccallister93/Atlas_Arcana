@@ -31,7 +31,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   };
 
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
-    for (let titan of gameState.gameState.titans) {
+    for (let titan of gameState.titans) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
       if (distance <= 6) return false;
     }

@@ -139,7 +139,7 @@ module.exports = function (socket, io) {
       // Broadcast the updated state to all players in the session
       console.log("Broadcasting updated state to session:", sessionId);
       io.to(sessionId)
-      .emit("updateGameState", updatedState.gameState); // Emit the gameState part
+      .emit("updateGameState", updatedState); // Emit the gameState part
     } catch (error) {
       console.error("Error updating game state:", error);
       // Optionally, emit  an error message back to the client

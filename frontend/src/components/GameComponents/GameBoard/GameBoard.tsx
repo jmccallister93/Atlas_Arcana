@@ -50,9 +50,9 @@ const GameBoard: React.FC = () => {
   // Get Game state
   const { gameState } = useGameContext();
   const [tileGrid, ] = useState<string[][]>(
-    gameState.gameState.tileGrid
+    gameState.tileGrid
   );
-  const titans = gameState.gameState.titans;
+  const titans = gameState.titans;
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
