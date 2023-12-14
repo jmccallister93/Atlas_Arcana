@@ -12,7 +12,7 @@ import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
-import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import Canvas from "./Canvas";
@@ -49,10 +49,12 @@ const GameBoard: React.FC = () => {
   console.log("GameBoard Rendered");
   // Get Game state
   const { gameState } = useGameContext();
-  const [tileGrid, ] = useState<string[][]>(
-    gameState.tileGrid
-  );
-  const titans = gameState.titans;
+  // const [tileGrid, ] = useState<string[][]>(
+  //   gameState.tileGrid
+  // );
+  // const titans = gameState.titans;
+  const titans = useGameStatePart(state => state.titans);
+  const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);

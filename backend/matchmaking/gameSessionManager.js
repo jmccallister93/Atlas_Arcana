@@ -102,13 +102,13 @@ const updateGameState = async (io, sessionId, newState) => {
     if (!sessionData) {
       throw new Error("Session not found");
     }
-    console.log("Existing GameState before merge:", sessionData);
+    console.log("Existing GameState before merge:", sessionData.gameState);
     console.log("NewState to merge:", JSON.stringify(newState));
 
-    const updatedGameState = { ...sessionData, ...newState };
+    const updatedGameState = { ...sessionData.gameState, ...newState };
     console.log("Updated GameState after merge:", updatedGameState);
 
-    sessionData = updatedGameState;
+    sessionData.gameState = updatedGameState;
     await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
     console.log("Emitting updated game state to session:", sessionId);
@@ -306,11 +306,11 @@ async function drawPhaseCardDraw(player, sessionId) {
     const randomIndex = Math.floor(Math.random() * equipmentCards.length);
     card = equipmentCards[randomIndex];
   } while (
-    sessionData.equipmentCardCount.includes(card.equipmentName)
+    sessionData.gameState.equipmentCardCount.includes(card.equipmentName)
   );
 
   player.inventory.equipment.push(card);
-  sessionData.equipmentCardCount.push(card.equipmentName);
+  sessionData.gameState.equipmentCardCount.push(card.equipmentName);
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
   return card;
