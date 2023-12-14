@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
+import React, { createContext, useContext, useReducer, useEffect, useMemo } from "react";
 import {
   GameSessionInfo,
   PlayerInfo,
@@ -15,8 +15,22 @@ interface GameState {
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
+
+
 // Create the context
 const GameContext = createContext<GameState | undefined>(undefined);
+
+
+type Selector<T> = (state: GameSessionInfo) => T;
+
+ export const useGameStatePart = <T extends unknown>(selector: Selector<T>): T => {
+  const { gameState } = useGameContext()
+
+  // The useMemo hook will only recompute the selected state if gameState changes
+  const selectedState = useMemo(() => selector(gameState), [gameState]);
+
+  return selectedState;
+};
 
 // Helper hook to use the context
 export const useGameContext = () => {
@@ -112,11 +126,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
 
+  
+
   return (
     <GameContext.Provider
-      value={{ gameState, emitGameStateUpdate, updatePlayerData }}
+      value={{ gameState, emitGameStateUpdate, updatePlayerData,  }}
     >
       {children}
     </GameContext.Provider>
   );
 };
+
+
