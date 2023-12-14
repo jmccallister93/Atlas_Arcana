@@ -8,14 +8,12 @@ interface TileModalProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  placeStronghold: () => void;
 }
 
 const TileModal: React.FC<TileModalProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  placeStronghold,
 }) => {
  
   // console.log("Tile Modal Rendered")

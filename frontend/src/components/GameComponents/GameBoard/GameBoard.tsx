@@ -1,37 +1,21 @@
-import React, { useRef, useEffect, useState } from "react";
-import p5, { Image } from "p5";
+import React, { useState } from "react";
+
 import desert from "./GameTiles/desertTile.png";
 import forest from "./GameTiles/forestTile.png";
 import grassland from "./GameTiles/grasslandTile.png";
 import tundra from "./GameTiles/tundraTile.png";
 import oasis from "./GameTiles/oasisTile.png";
-import stronghold1 from "./GameTiles/stronghold1.png";
-import stronghold2 from "./GameTiles/stronghold2.png";
-import stronghold3 from "./GameTiles/stronghold3.png";
-import stronghold4 from "./GameTiles/stronghold4.png";
-import {
-  IonAlert,
-  IonButton,
-  IonContent,
-  IonIcon,
-  IonModal,
-} from "@ionic/react";
-import { closeOutline } from "ionicons/icons";
 import fireTitanToken from "../Titans/Tokens/fire_titan_token.png";
 import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
 import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
-import TileMenuDetails, { StrongholdInfo } from "./TileMenuDetails";
+import { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
-import { useAuth } from "../../../context/AuthContext/AuthContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
-import TileGrid from "./Canvas";
-
 import Canvas from "./Canvas";
-import StrongholdPlacement from "./StrongholdPlacement";
 
 interface GameBoardProps {}
 export interface TileInfo {
@@ -63,18 +47,9 @@ export interface TileCoordinate {
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
-  // console.log("GameBoard Rendered");
+  console.log("GameBoard Rendered");
   // Get Game state
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
-  const auth = useAuth();
-  // Player info
-  // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
-  // useEffect(() => {setPlayers(gameState.players)},[gameState.players])
-  const currentPlayer = gameState.players.find(
-    (player) => player.username === auth.username
-  );
-  // States that were being passed
-  const currentPlayerTurn = gameState.gameState.currentPlayerTurn;
   const [tileGrid, setTileGrid] = useState<string[][]>(
     gameState.gameState.tileGrid
   );
@@ -82,54 +57,11 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [tileSize, setTileSize] = useState(30);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
-
-  const [selectedStrongholdCoordinates, setSelectedStrongholdCoordinates] =
-    useState({ x: 0, y: 0 });
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  // Calculate distance of tiles
-  const calculateDistance = (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ): number => {
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-  };
-  // Validate stronghold placement
-  const isValidStrongholdPlacement = (x: number, y: number): boolean => {
-    console.log("Is valid stronghold rendered");
-    // Check distance from titans
-    for (let titan of titans ?? []) {
-      const distance = calculateDistance(x, y, titan.col, titan.row);
-
-      if (distance <= 6) {
-        return false; // Too close to a titan
-      }
-    }
-
-    // Check distance from other players' strongholds
-    for (let player of gameState.players ?? []) {
-      if (player.strongHold && player.username !== currentPlayer?.username) {
-        const distance = calculateDistance(
-          x,
-          y,
-          player.strongHold.col,
-          player.strongHold.row
-        );
-
-        if (distance <= 6) {
-          return false; // Too close to another player's stronghold
-        }
-      }
-    }
-
-    return true; // Valid placement
-  };
 
   // Handle Selected tile
-  // Modified handleTileSelection to accept coordinates
   const handleTileSelection = (xIndex: number, yIndex: number) => {
     if (
       xIndex < 0 ||
@@ -140,8 +72,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       console.error("Selected tile is out of bounds.");
       return;
     }
-
-    setSelectedStrongholdCoordinates({ x: xIndex, y: yIndex });
     onTileSelect(tileGrid[xIndex][yIndex], xIndex, yIndex);
   };
 
@@ -284,49 +214,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setShowTileDetails(true);
   };
 
-  // Place stronghold
-  const placeStronghold = () => {
-    console.log(
-      "Selected Stronghold x",
-      selectedStrongholdCoordinates.x,
-      "Selected Stronghold y",
-      selectedStrongholdCoordinates.y,
-      "Selected Tile",
-      selectedTile,
-      "currentPlayer:",
-      currentPlayer
-    );
-    if (
-      currentPlayer &&
-      isValidStrongholdPlacement(
-        selectedStrongholdCoordinates.x,
-        selectedStrongholdCoordinates.y
-      )
-    ) {
-      const updatedPlayer = {
-        ...currentPlayer,
-        strongHold: {
-          col: selectedStrongholdCoordinates.x,
-          row: selectedStrongholdCoordinates.y,
-        },
-      };
-      //HERERERERERER
-      const updatedGameState = {
-        // ...gameState,
-        players: gameState.players?.map((p) =>
-          p.username === updatedPlayer.username ? updatedPlayer : p
-        ),
-      };
-      // Emit the update to server
-      emitGameStateUpdate(updatedGameState);
-    } else {
-      setAlertMessage(
-        "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
-      );
-      setShowAlert(true);
-      return;
-    }
-  };
 
   return (
     <>
@@ -342,7 +229,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
         setShowTileDetails={setShowTileDetails}
-        placeStronghold={placeStronghold}
       />
 
       <TileAlerts
@@ -352,9 +238,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         selectedTile={selectedTile}
       />
 
-      <StrongholdPlacement 
-      selectedTile={selectedTile}
-      />
+   
     </>
   );
 };

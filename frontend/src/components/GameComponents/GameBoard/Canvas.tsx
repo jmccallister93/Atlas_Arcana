@@ -20,7 +20,7 @@ import { PlayerInfo, TitanInfo } from "../Interfaces";
 
 import "./GameBoard.scss";
 
-interface BackgroundCanvasProps {
+interface CanvasProps {
   tileGrid: string[][];
   titans: TitanInfo[];
   players: PlayerInfo[];
@@ -28,7 +28,7 @@ interface BackgroundCanvasProps {
   handleTileSelection: (x: number, y: number) => void;
 }
 
-const Canvas: React.FC<BackgroundCanvasProps> = ({
+const Canvas: React.FC<CanvasProps> = ({
   tileGrid,
   titans,
   players,
