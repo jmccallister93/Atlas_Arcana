@@ -17,7 +17,6 @@ import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import Canvas from "./Canvas";
 
-interface GameBoardProps {}
 export interface TileInfo {
   type: string;
   x: number;
@@ -46,19 +45,18 @@ export interface TileCoordinate {
   y: number;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({}) => {
+const GameBoard: React.FC = () => {
   console.log("GameBoard Rendered");
   // Get Game state
-  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
-  const [tileGrid, setTileGrid] = useState<string[][]>(
+  const { gameState } = useGameContext();
+  const [tileGrid, ] = useState<string[][]>(
     gameState.gameState.tileGrid
   );
   const titans = gameState.gameState.titans;
-  const [tileSize, setTileSize] = useState(30);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertMessage, ] = useState("");
   // Handle Selected tile
   const handleTileSelection = (x: number, y: number) => {
     if (

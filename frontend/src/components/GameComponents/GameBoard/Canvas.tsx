@@ -25,18 +25,17 @@ interface CanvasProps {
   handleTileSelection: (x: number, y: number) => void;
 }
 
-const Canvas: React.FC<CanvasProps> = ({
-  handleTileSelection,
-}) => {
-  const {gameState, emitGameStateUpdate} = useGameContext()
-  const titans = gameState.gameState.titans
-  const players = gameState.players
-  const [tileGrid, setTileGrid] = useState<string[][]>(
+const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
+  const { gameState } = useGameContext();
+  const titans = gameState.gameState.titans;
+  const players = gameState.players;
+  const [tileGrid, ] = useState<string[][]>(
     gameState.gameState.tileGrid
   );
+
   // console.log("Canvas Rendered")
   const gameRef = useRef<HTMLDivElement>(null);
-  const tileSize = 30
+  const tileSize = 30;
   let game: Phaser.Game;
 
   useEffect(() => {
@@ -82,15 +81,15 @@ const Canvas: React.FC<CanvasProps> = ({
         };
 
         interface TitanImageKeys {
-            [key: string]: string;
-          }
-          
-          const titanNameToImageKey: { [key: string]: string } = {
-            "Fire Titan": "fireTitan",
-            "Ice Titan": "iceTitan",
-            "Stone Titan": "stoneTitan",
-            "Storm Titan": "stormTitan",
-          };
+          [key: string]: string;
+        }
+
+        const titanNameToImageKey: { [key: string]: string } = {
+          "Fire Titan": "fireTitan",
+          "Ice Titan": "iceTitan",
+          "Stone Titan": "stoneTitan",
+          "Storm Titan": "stormTitan",
+        };
 
         // Tile Grid
         tileGrid.forEach((row: string[], rowIndex: number) => {
@@ -108,8 +107,8 @@ const Canvas: React.FC<CanvasProps> = ({
 
             graphics.lineStyle(2, 0x000000, 1); // Set the line style for the border
             graphics.strokeRect(
-                rowIndex * tileSize,
-                colIndex * tileSize,
+              rowIndex * tileSize,
+              colIndex * tileSize,
               tileSize,
               tileSize
             ); // Draw the border
@@ -117,17 +116,15 @@ const Canvas: React.FC<CanvasProps> = ({
         });
 
         // Titans
-        titans.forEach(titan => {
-            const titanImageKey = titanNameToImageKey[titan.titanName];
-            if (titanImageKey) {
-              
-              this.add.sprite(
-                titan.row * tileSize,
-                titan.col * tileSize,
-                titanImageKey
-              ).setDisplaySize(tileSize, tileSize).setOrigin(0,0);
-            }
-          });
+        titans.forEach((titan) => {
+          const titanImageKey = titanNameToImageKey[titan.titanName];
+          if (titanImageKey) {
+            this.add
+              .sprite(titan.row * tileSize, titan.col * tileSize, titanImageKey)
+              .setDisplaySize(tileSize, tileSize)
+              .setOrigin(0, 0);
+          }
+        });
         // Strongholds
         players.forEach((player, index) => {
           if (player.strongHold) {
@@ -138,19 +135,23 @@ const Canvas: React.FC<CanvasProps> = ({
                 player.strongHold.row * tileSize,
                 strongholdKey
               )
-              .setDisplaySize(tileSize, tileSize).setOrigin(0,0); // Add the stronghold sprite
+              .setDisplaySize(tileSize, tileSize)
+              .setOrigin(0, 0); // Add the stronghold sprite
           }
         });
 
         // Mouse click
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-            // Calculate the correct tile indices based on pointer position
-            const xIndex = Math.floor((pointer.x - this.cameras.main.scrollX) / tileSize);
-            const yIndex = Math.floor((pointer.y - this.cameras.main.scrollY) / tileSize);
-          
-            handleTileSelection(xIndex, yIndex);
-          });
-          
+          // Calculate the correct tile indices based on pointer position
+          const xIndex = Math.floor(
+            (pointer.x - this.cameras.main.scrollX) / tileSize
+          );
+          const yIndex = Math.floor(
+            (pointer.y - this.cameras.main.scrollY) / tileSize
+          );
+
+          handleTileSelection(xIndex, yIndex);
+        });
       }
     }
     return () => {
@@ -158,7 +159,11 @@ const Canvas: React.FC<CanvasProps> = ({
     };
   }, [tileGrid, tileSize, handleTileSelection]);
 
-  return <div className="canvasWrapper"><div ref={gameRef} ></div></div>;
+  return (
+    <div className="canvasWrapper">
+      <div ref={gameRef}></div>
+    </div>
+  );
 };
 
 export default Canvas;
