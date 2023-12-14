@@ -24,7 +24,6 @@ interface CanvasProps {
   tileGrid: string[][];
   titans: TitanInfo[];
   players: PlayerInfo[];
-  tileSize: number;
   handleTileSelection: (x: number, y: number) => void;
 }
 
@@ -32,11 +31,11 @@ const Canvas: React.FC<CanvasProps> = ({
   tileGrid,
   titans,
   players,
-  tileSize,
   handleTileSelection,
 }) => {
   // console.log("Canvas Rendered")
   const gameRef = useRef<HTMLDivElement>(null);
+  const tileSize = 30
   let game: Phaser.Game;
 
   useEffect(() => {
