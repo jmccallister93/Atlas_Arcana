@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Phaser from "phaser";
 import p5, { Image } from "p5";
 import desert from "./GameTiles/desertTile.png";
@@ -19,20 +19,21 @@ import stronghold4 from "./GameTiles/stronghold4.png";
 import { PlayerInfo, TitanInfo } from "../Interfaces";
 
 import "./GameBoard.scss";
+import { useGameContext } from "../../../context/GameContext/GameContext";
 
 interface CanvasProps {
-  tileGrid: string[][];
-  titans: TitanInfo[];
-  players: PlayerInfo[];
   handleTileSelection: (x: number, y: number) => void;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
-  tileGrid,
-  titans,
-  players,
   handleTileSelection,
 }) => {
+  const {gameState, emitGameStateUpdate} = useGameContext()
+  const titans = gameState.gameState.titans
+  const players = gameState.players
+  const [tileGrid, setTileGrid] = useState<string[][]>(
+    gameState.gameState.tileGrid
+  );
   // console.log("Canvas Rendered")
   const gameRef = useRef<HTMLDivElement>(null);
   const tileSize = 30
