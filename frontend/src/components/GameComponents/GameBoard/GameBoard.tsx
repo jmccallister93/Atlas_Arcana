@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import desert from "./GameTiles/desertTile.png";
 import forest from "./GameTiles/forestTile.png";
@@ -57,7 +57,7 @@ const GameBoard: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, ] = useState("");
   // Handle Selected tile
-  const handleTileSelection = (x: number, y: number) => {
+  const handleTileSelection = useCallback((x: number, y: number) => {
     if (
       x < 0 ||
       x >= tileGrid.length ||
@@ -68,7 +68,7 @@ const GameBoard: React.FC = () => {
       return;
     }
     onTileSelect(tileGrid[x][y], x, y);
-  };
+  }, [tileGrid, titans, players, setSelectedTile, setShowTileDetails])
 
   // Updated function to check entities on a tile
   const checkEntitiesOnTile = (x: number, y: number) => {
