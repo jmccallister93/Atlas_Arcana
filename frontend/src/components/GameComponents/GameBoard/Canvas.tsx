@@ -19,8 +19,10 @@ import stronghold4 from "./GameTiles/stronghold4.png";
 import { PlayerInfo, TitanInfo } from "../Interfaces";
 
 import "./GameBoard.scss";
-import { useGameContext, useGameStatePart, } from "../../../context/GameContext/GameContext";
-
+import {
+  useGameContext,
+  useGameStatePart,
+} from "../../../context/GameContext/GameContext";
 
 interface CanvasProps {
   handleTileSelection: (x: number, y: number) => void;
@@ -28,10 +30,10 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   // const { gameState } = useGameContext();
-  const players = useGameStatePart(state => state.players as PlayerInfo[]);
-  const titans = useGameStatePart(state => state.titans as TitanInfo[]);
-  const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
-  console.log("Canvas Rendered")
+  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
+  console.log("Canvas Rendered");
   const gameRef = useRef<HTMLDivElement>(null);
   const tileSize = 30;
   let game: Phaser.Game;
@@ -138,18 +140,93 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           }
         });
 
-        // Mouse click
-        this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-          // Calculate the correct tile indices based on pointer position
-          const xIndex = Math.floor(
-            (pointer.x - this.cameras.main.scrollX) / tileSize
-          );
-          const yIndex = Math.floor(
-            (pointer.y - this.cameras.main.scrollY) / tileSize
-          );
+        // Mouse events
+        let isDragging = false;
+        let dragStartX = this.cameras.main.scrollX;
+        let dragStartY = this.cameras.main.scrollY;
+        let pointerDownTime = 0;
+        const clickThreshold = 200; // Time in milliseconds, e.g., 200ms
+        const movementThreshold = 50; // Movement in pixels, e.g., 10px
+        // Define initial zoom level
+        let zoomLevel = 1;
+        let initialDistance = 0;
+        let isPointerDown = false;
+        const sceneCenterX = this.game.config.width as number / 2;
+        const sceneCenterY = this.game.config.height as number / 2;
+        
 
-          handleTileSelection(xIndex, yIndex);
+        this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+          // Update dragStartX and dragStartY on pointer down
+          dragStartX = pointer.x + this.cameras.main.scrollX;
+          dragStartY = pointer.y + this.cameras.main.scrollY;
+          pointerDownTime = this.time.now;
+          isDragging = false;
+          isPointerDown = true;
         });
+
+        this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
+          if (!isDragging && isPointerDown) {
+            if (
+              this.time.now - pointerDownTime > clickThreshold ||
+              Math.abs(pointer.x - (dragStartX - this.cameras.main.scrollX)) >
+                movementThreshold ||
+              Math.abs(pointer.y - (dragStartY - this.cameras.main.scrollY)) >
+                movementThreshold
+            ) {
+              isDragging = true;
+              // Dragging logic: Adjust camera scroll based on pointer movement
+              this.cameras.main.scrollX = dragStartX - pointer.x;
+              this.cameras.main.scrollY = dragStartY - pointer.y;
+            }
+          }
+        });
+
+        this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+          if (!isDragging && this.time.now - pointerDownTime < clickThreshold) {
+            // Quick click logic: Calculate the correct tile indices based on pointer position
+            const xIndex = Math.floor(
+              (pointer.x - this.cameras.main.scrollX) / tileSize
+            );
+            const yIndex = Math.floor(
+              (pointer.y - this.cameras.main.scrollY) / tileSize
+            );
+            handleTileSelection(xIndex, yIndex);
+          }
+          isDragging = false;
+          isPointerDown = false;
+        });
+
+        // Add zoom in/out controls
+        this.input.on(
+          "wheel",
+          (
+            pointer: Phaser.Input.Pointer,
+            gameObjects: Phaser.GameObjects.GameObject[],
+            deltaX: number,
+            deltaY: number,
+            deltaZ: number
+          ) => {
+            const oldZoom = zoomLevel;
+
+            // Adjust zoom level based on scroll wheel, clamping between 1 and your max zoom level
+            zoomLevel += deltaY * -0.001;
+            zoomLevel = Phaser.Math.Clamp(zoomLevel, 1, 10);
+            this.cameras.main.setZoom(zoomLevel);
+
+            if (zoomLevel === 1) {
+              // Center the camera when zoomed out fully
+              this.cameras.main.centerOn(sceneCenterX, sceneCenterY);
+            } else if (oldZoom !== zoomLevel) {
+              // Adjust the camera position to zoom towards the pointer position
+              const offsetX =
+                (pointer.x - this.cameras.main.width / 2) / oldZoom;
+              const offsetY =
+                (pointer.y - this.cameras.main.height / 2) / oldZoom;
+              this.cameras.main.scrollX -= offsetX * (1 - 1 / zoomLevel);
+              this.cameras.main.scrollY -= offsetY * (1 - 1 / zoomLevel);
+            }
+          }
+        );
       }
     }
     return () => {
