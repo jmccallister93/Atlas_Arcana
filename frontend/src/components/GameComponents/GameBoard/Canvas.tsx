@@ -19,7 +19,7 @@ import stronghold4 from "./GameTiles/stronghold4.png";
 import { PlayerInfo, TitanInfo } from "../Interfaces";
 
 import "./GameBoard.scss";
-import { useGameContext, } from "../../../context/GameContext/GameContext";
+import { useGameContext, useGameStatePart, } from "../../../context/GameContext/GameContext";
 
 
 interface CanvasProps {
@@ -27,15 +27,10 @@ interface CanvasProps {
 }
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
-  const { gameState } = useGameContext();
-  const titans = gameState.titans;
-  const players = gameState.players;
-  const [tileGrid, ] = useState<string[][]>(
-    gameState.tileGrid
-  );
-  // const titans = useGameStatePart(state => state.titans);
-  // const players = useGameStatePart(state => state.players);
-  // const tileGrid = useGameStatePart(state => state.tileGrid);
+  // const { gameState } = useGameContext();
+  const players = useGameStatePart(state => state.players as PlayerInfo[]);
+  const titans = useGameStatePart(state => state.titans as TitanInfo[]);
+  const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
   console.log("Canvas Rendered")
   const gameRef = useRef<HTMLDivElement>(null);
   const tileSize = 30;

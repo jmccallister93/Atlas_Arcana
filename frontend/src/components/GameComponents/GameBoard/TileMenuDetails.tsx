@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { IonContent, IonIcon, IonModal, IonButton } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
-import { useGameContext } from "../../../context/GameContext/GameContext";
+import {
+  useGameContext,
+  useGameStatePart,
+} from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import StrongholdPlacement from "./StrongholdPlacement";
 
@@ -48,28 +51,29 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   showTileDetails,
   setShowTileDetails,
 }) => {
-  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  // const { gameState } = useGameContext();
   const auth = useAuth();
-  useGameContext;
+  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const currentPlayerTurn = useGameStatePart(
+    (state) => state.currentPlayerTurn as string
+  );
+  const setupPhase = useGameStatePart(
+    (state) => state.setupPhase as boolean
+  );
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
-  const currentPlayer = gameState.players.find(
+  const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
-  const currentPlayerTurn = gameState.currentPlayerTurn;
 
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
-    if (
-      gameState.setupPhase &&
-      currentPlayer?.username === currentPlayerTurn
-    ) {
+    if (setupPhase && currentPlayer?.username === currentPlayerTurn) {
       setIsStrongholdPlacementMode(true);
     } else {
       setIsStrongholdPlacementMode(false);
     }
-  }, [gameState.setupPhase, currentPlayer]);
-
+  }, [setupPhase, currentPlayer]);
 
   return (
     <IonModal

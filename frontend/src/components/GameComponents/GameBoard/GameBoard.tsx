@@ -11,7 +11,7 @@ import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import { StrongholdInfo } from "./TileMenuDetails";
-import { BuildingInfo, GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { BuildingInfo, GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces";
 import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
@@ -47,13 +47,10 @@ export interface TileCoordinate {
 
 const GameBoard: React.FC = () => {
   console.log("GameBoard Rendered");
-  // Get Game state
-  const { gameState } = useGameContext();
-  // const [tileGrid, ] = useState<string[][]>(
-  //   gameState.tileGrid
-  // );
-  // const titans = gameState.titans;
-  const titans = useGameStatePart(state => state.titans);
+  // Get Game state componenets
+  // const { gameState } = useGameContext();
+  const players = useGameStatePart(state => state.players as PlayerInfo[]);
+  const titans = useGameStatePart(state => state.titans as TitanInfo[]);
   const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
@@ -103,7 +100,7 @@ const GameBoard: React.FC = () => {
       }
     }
     // Determine the image URL based on the titan's name
-    gameState.players?.forEach((player) => {
+    players?.forEach((player) => {
       // Check for player
       if (player.row === y && player.col === x) {
         playerOnTile = player;
