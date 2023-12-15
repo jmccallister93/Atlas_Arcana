@@ -56,6 +56,8 @@ const GameBoard: React.FC = () => {
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, ] = useState("");
+
+
   // Handle Selected tile
   const handleTileSelection = useCallback((x: number, y: number) => {
     if (
@@ -99,7 +101,7 @@ const GameBoard: React.FC = () => {
           break;
       }
     }
-    // Determine the image URL based on the titan's name
+    // Determine the image URL based on the player's name
     players?.forEach((player) => {
       // Check for player
       if (player.row === y && player.col === x) {

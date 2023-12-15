@@ -151,9 +151,8 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
         let zoomLevel = 1;
         let initialDistance = 0;
         let isPointerDown = false;
-        const sceneCenterX = this.game.config.width as number / 2;
-        const sceneCenterY = this.game.config.height as number / 2;
-        
+        const sceneCenterX = (this.game.config.width as number) / 2;
+        const sceneCenterY = (this.game.config.height as number) / 2;
 
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
           // Update dragStartX and dragStartY on pointer down
@@ -195,7 +194,6 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           isDragging = false;
           isPointerDown = false;
         });
-
         // Add zoom in/out controls
         this.input.on(
           "wheel",

@@ -1,43 +1,21 @@
 import {
-  IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
   IonIcon,
   IonPage,
 } from "@ionic/react";
-import gps from "../GlobalPageStyles.module.scss";
-import { useEffect, useState } from "react";
-import socket from "../../context/SocketClient/socketClient";
-import { useLocation } from "react-router";
+import { useState } from "react";
 
 import GameBoard from "../../components/GameComponents/GameBoard/GameBoard";
 import "./MultiPlayerGamePage.scss";
 import { addCircleOutline, arrowForwardCircleOutline } from "ionicons/icons";
 import WelcomeModal from "../../components/GameComponents/WelcomeModal";
-import {
-  LocationState,
-  PlayerInfo,
-  GameSessionInfo,
-  EquipmentItem,
-  TitanInfo,
-} from "../../components/GameComponents/Interfaces";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
-import { useAuth } from "../../context/AuthContext/AuthContext";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
-import {
-  GameProvider,
-  useGameContext,
-} from "../../context/GameContext/GameContext";
+
 
 const MultiPlayerGamePage = () => {
-  // Must have variables
-  const { gameState } = useGameContext();
-  const auth = useAuth();
-
-  // Show Welcome Modal
+    // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
 
   // Player Menu

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IonButton, IonAlert } from "@ionic/react";
 import { GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces"; // Adjust the import paths based on your project structure
-import { useGameContext } from "../../../context/GameContext/GameContext";
+import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import { TileInfo } from "./TileMenuDetails";
 
@@ -12,12 +12,14 @@ interface StrongholdPlacementProps {
 const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
 }) => {
-  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const {emitGameStateUpdate} = useGameContext()
+  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
   const auth = useAuth();
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const currentPlayer = gameState.players.find(
+  const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
 
@@ -31,12 +33,12 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   };
 
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
-    for (let titan of gameState.titans) {
+    for (let titan of titans) {
       const distance = calculateDistance(x, y, titan.col, titan.row);
       if (distance <= 6) return false;
     }
 
-    for (let player of gameState.players) {
+    for (let player of players) {
       if (player.strongHold && player.username !== currentPlayer?.username) {
         const distance = calculateDistance(
           x,
@@ -66,7 +68,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
           },
         };
         const updatedGameState = {
-          players: gameState.players?.map((p) =>
+          players: players?.map((p) =>
             p.username === updatedPlayer.username ? updatedPlayer : p
           ),
         };
