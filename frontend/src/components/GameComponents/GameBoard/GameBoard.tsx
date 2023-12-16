@@ -12,7 +12,7 @@ import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces";
-import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
+import { useGameBoard, useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import Canvas from "./Canvas";
@@ -48,23 +48,11 @@ export interface TileCoordinate {
 interface GameBoardProps{
 }
 
-// const usePlayerBoardData = () => {
-//   const players = useGameStatePart(state => state.players as PlayerInfo[]);
-//   return useMemo(() => {
-//     return players.map(player => ({
-//       username: player.username,
-//       strongHold: player.strongHold,
-//       buildings: player.buildings,
-//       // position: { row: player.row, col: player.col }, // Assuming these are directly on the player object
-//     }));
-//   }, [players]);
-// };
-
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
   console.log("GameBoard Rendered");
   // Get Game state componenets
   // const { gameState } = useGameContext();
-  
+  const { gameBoard, updateGameBoard } = useGameBoard();
   const playerData = useGameStatePart(state =>
     state.players.map(({ username, strongHold, buildings }) => ({
       username,
@@ -72,8 +60,8 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       buildings,
     }))
   );
-  // const titans = useGameStatePart(state => state.titans as TitanInfo[]);
-  // const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
+  const titans = useGameStatePart(state => state.titans as TitanInfo[]);
+  const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -82,16 +70,16 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   // Handle Selected tile
   const handleTileSelection = useCallback((x: number, y: number) => {
-    // if (
-    //   x < 0 ||
-    //   x >= tileGrid.length ||
-    //   y < 0 ||
-    //   y >= tileGrid[x].length
-    // ) {
-    //   console.error("Selected tile is out of bounds.");
-    //   return;
-    // }
-    // onTileSelect(tileGrid[x][y], x, y);
+    if (
+      x < 0 ||
+      x >= tileGrid.length ||
+      y < 0 ||
+      y >= tileGrid[x].length
+    ) {
+      console.error("Selected tile is out of bounds.");
+      return;
+    }
+    onTileSelect(tileGrid[x][y], x, y);
   }, [   setSelectedTile, setShowTileDetails])
   // tileGrid,
 
@@ -103,27 +91,27 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     let titanOnTile = null;
     let titanImageUrl = "";
     // Check for titans
-    // const foundTitan = titans?.find(
-    //   (titan) => titan.row === y && titan.col === x
-    // );
-    // if (foundTitan) {
-    //   titanOnTile = foundTitan;
-    //   // Determine the image URL based on the titan's name
-    //   switch (titanOnTile.titanName) {
-    //     case "Fire Titan":
-    //       titanImageUrl = fireTitanToken;
-    //       break;
-    //     case "Ice Titan":
-    //       titanImageUrl = iceTitanToken;
-    //       break;
-    //     case "Stone Titan":
-    //       titanImageUrl = stoneTitanToken;
-    //       break;
-    //     case "Storm Titan":
-    //       titanImageUrl = stormTitanToken;
-    //       break;
-    //   }
-    // }
+    const foundTitan = titans?.find(
+      (titan) => titan.row === y && titan.col === x
+    );
+    if (foundTitan) {
+      titanOnTile = foundTitan;
+      // Determine the image URL based on the titan's name
+      switch (titanOnTile.titanName) {
+        case "Fire Titan":
+          titanImageUrl = fireTitanToken;
+          break;
+        case "Ice Titan":
+          titanImageUrl = iceTitanToken;
+          break;
+        case "Stone Titan":
+          titanImageUrl = stoneTitanToken;
+          break;
+        case "Storm Titan":
+          titanImageUrl = stormTitanToken;
+          break;
+      }
+    }
     // Determine the image URL based on the player's name
     playerData?.forEach((player) => {
       // Check for player

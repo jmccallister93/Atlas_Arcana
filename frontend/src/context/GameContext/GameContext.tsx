@@ -6,6 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import {
+  GameBoard,
   GameSessionInfo,
   PlayerInfo,
 } from "../../components/GameComponents/Interfaces";
@@ -30,7 +31,10 @@ export const useGameStatePart = <T,>(
   selector: (state: GameSessionInfo) => T
 ): T => {
   const { gameState } = useGameContext();
-  const selectedState = useMemo(() => selector(gameState), [gameState, selector]);
+  const selectedState = useMemo(
+    () => selector(gameState),
+    [gameState, selector]
+  );
 
   return selectedState;
 };
@@ -42,6 +46,20 @@ export const useGameContext = () => {
     throw new Error("useGameContext must be used within a GameProvider");
   }
   return context;
+};
+
+// Game board updates
+export const useGameBoard = () => {
+  const { gameState, emitGameStateUpdate } = useGameContext();
+
+  const gameBoard = gameState.gameBoard; // Get the game board from gameState
+
+  // Function to update the game board state
+  const updateGameBoard = (updatedGameBoard: Partial<GameBoard>) => {
+    emitGameStateUpdate({ gameBoard: { ...gameBoard, ...updatedGameBoard } });
+  };
+
+  return { gameBoard, updateGameBoard };
 };
 
 const gameReducer = (state: GameSessionInfo, action: any) => {
@@ -56,6 +74,11 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           player.username === action.payload.username ? action.payload : player
         );
         return { ...state, players: updatedPlayers };
+      case "UPDATE_GAME_BOARD":
+        return {
+          ...state,
+          gameBoard: { ...state.gameBoard, ...action.payload },
+        };
       case "SET_CURRENT_PLAYER_TURN":
         return {
           ...state,
@@ -127,6 +150,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       });
     }
   };
+
   useEffect(() => {
     console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
@@ -136,9 +160,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }, [gameState]);
 
   return (
-    <GameContext.Provider
-      value={providerValue}
-    >
+    <GameContext.Provider value={providerValue}>
       {children}
     </GameContext.Provider>
   );
