@@ -8,14 +8,12 @@ interface TileModalProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  
 }
 
 const TileModal: React.FC<TileModalProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-
 }) => {
  
   console.log("Tile Modal Rendered")
@@ -50,4 +48,4 @@ const TileModal: React.FC<TileModalProps> = ({
   );
 };
 
-export default TileModal;
+export default React.memo(TileModal);

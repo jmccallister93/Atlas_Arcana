@@ -95,8 +95,15 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       (updatedPlayer[statKey] as number) = newStatValue;
 
       updatedPlayer.equippedItems[slot] = [itemToEquip];
-
-      updatePlayerData(updatedPlayer);
+      const newPlayer = {
+        ...player,
+        [statKey]: newStatValue,
+        equippedItems: {
+          ...player.equippedItems,
+          [slot]: [itemToEquip],
+        },
+      };
+      updatePlayerData(newPlayer);
     }
   };
   //   Unequip item
@@ -146,26 +153,30 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
 
   // Function to check if a specific type of building is present
   const isBuildingPresent = (buildingType: string): boolean => {
-    return Array.isArray(player.buildings.equipment) && player.buildings.equipment.some(
-      building => building.type === buildingType && building.count > 0
+    return (
+      Array.isArray(player.buildings.equipment) &&
+      player.buildings.equipment.some(
+        (building) => building.type === buildingType && building.count > 0
+      )
     );
   };
-  
 
   // Updated handleRankUpGear to work with a specific item
   const handleRankUpGear = (
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
-      // Check if the item is equipped
-  const isEquipped = Object.values(player.equippedItems).flat().some(
-    equippedItem => equippedItem.equipmentName === item.equipmentName
-  );
+    // Check if the item is equipped
+    const isEquipped = Object.values(player.equippedItems)
+      .flat()
+      .some(
+        (equippedItem) => equippedItem.equipmentName === item.equipmentName
+      );
 
-  if (isEquipped) {
-    alert("Item must be unequipped to rank up.");
-    return; // Exit the function if the item is equipped
-  }
+    if (isEquipped) {
+      alert("Item must be unequipped to rank up.");
+      return; // Exit the function if the item is equipped
+    }
     // Directly check prerequisites
     const hasWhetstone = player.inventory.treasures.some(
       (treasure) => treasure.treasureName === "Whetstone"
@@ -206,7 +217,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           alert("No Whetstone available for rank up.");
           return; // Exit if no Whetstone is found
         }
-        
       }
 
       // Upgrade the selected item to Rank 2
@@ -293,15 +303,17 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
-      // Check if the item is equipped
-  const isEquipped = Object.values(player.equippedItems).flat().some(
-    equippedItem => equippedItem.equipmentName === item.equipmentName
-  );
+    // Check if the item is equipped
+    const isEquipped = Object.values(player.equippedItems)
+      .flat()
+      .some(
+        (equippedItem) => equippedItem.equipmentName === item.equipmentName
+      );
 
-  if (isEquipped) {
-    alert("Item must be unequipped to attune.");
-    return; // Exit the function if the item is equipped
-  }
+    if (isEquipped) {
+      alert("Item must be unequipped to attune.");
+      return; // Exit the function if the item is equipped
+    }
     // Directly check prerequisites
     const emberTypes = [
       "Ember Fire",
@@ -310,10 +322,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
       "Ember Stone",
     ];
     const availableEmbers = player.inventory.treasures.filter((treasure) =>
-  emberTypes.includes(treasure.treasureName)
-);
+      emberTypes.includes(treasure.treasureName)
+    );
 
-const hasAttunementShrine = isBuildingPresent("attunementShrine");
+    const hasAttunementShrine = isBuildingPresent("attunementShrine");
     const hasResources = player.inventory.resources > 3;
     const attunePrereq =
       availableEmbers.length > 0 || (hasAttunementShrine && hasResources);
@@ -391,12 +403,12 @@ const hasAttunementShrine = isBuildingPresent("attunementShrine");
       "Ember Wind",
       "Ember Stone",
     ];
-// This is the same as the second scenario, so the same logic applies.
-const availableEmbers = player.inventory.treasures.filter((treasure) =>
-  emberTypes.includes(treasure.treasureName)
-);
+    // This is the same as the second scenario, so the same logic applies.
+    const availableEmbers = player.inventory.treasures.filter((treasure) =>
+      emberTypes.includes(treasure.treasureName)
+    );
 
-const hasAttunementShrine = isBuildingPresent("attunementShrine");
+    const hasAttunementShrine = isBuildingPresent("attunementShrine");
     const hasResources = player.inventory.resources > 3;
 
     // Add a button for each available Ember type

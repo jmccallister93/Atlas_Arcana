@@ -14,7 +14,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
   onShowStrongholdAlert
 }) => {
-  const {emitGameStateUpdate} = useGameContext()
+  const {updatePlayerData} = useGameContext()
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
   const auth = useAuth();
@@ -79,7 +79,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
           ),
         };
         // Emit the update to server
-        emitGameStateUpdate(updatedGameState);
+        updatePlayerData(updatedPlayer);
       
       } else {
         onShowStrongholdAlert(
@@ -99,4 +99,4 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   );
 };
 
-export default StrongholdPlacement;
+export default React.memo(StrongholdPlacement);

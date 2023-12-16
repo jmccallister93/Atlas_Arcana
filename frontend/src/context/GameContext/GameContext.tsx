@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useMemo,
+} from "react";
 import {
   GameSessionInfo,
   PlayerInfo,
@@ -15,16 +21,15 @@ interface GameState {
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
 }
 
-
-
 // Create the context
 const GameContext = createContext<GameState | undefined>(undefined);
 
-
 type Selector<T> = (state: GameSessionInfo) => T;
 
- export const useGameStatePart = <T extends unknown>(selector: Selector<T>): T => {
-  const { gameState } = useGameContext()
+export const useGameStatePart = <T extends unknown>(
+  selector: Selector<T>
+): T => {
+  const { gameState } = useGameContext();
 
   // The useMemo hook will only recompute the selected state if gameState changes
   const selectedState = useMemo(() => selector(gameState), [gameState]);
@@ -42,24 +47,27 @@ export const useGameContext = () => {
 };
 
 const gameReducer = (state: GameSessionInfo, action: any) => {
-  switch (action.type) {
-    case "INITIAL_GAME_STATE":
-      return{ ...state, ...action.payload };
-    case "UPDATE_GAME_STATE":
-      return {...state, ...action.payload };
-    case "UPDATE_PLAYER_DATA":
-      const updatedPlayers = state.players.map((player) =>
-        player.username === action.payload.username ? action.payload : player
-      );
-      return { ...state, players: updatedPlayers };
-    case "SET_CURRENT_PLAYER_TURN":
-      return {
-        ...state,
-        gameState: { ...state, currentPlayerTurn: action.payload },
-      };
-    default:
-      return state;
-  }
+  const newState = (() => {
+    switch (action.type) {
+      case "INITIAL_GAME_STATE":
+        return { ...state, ...action.payload };
+      case "UPDATE_GAME_STATE":
+        return { ...state, ...action.payload };
+      case "UPDATE_PLAYER_DATA":
+        const updatedPlayers = state.players.map((player) =>
+          player.username === action.payload.username ? action.payload : player
+        );
+        return { ...state, players: updatedPlayers };
+      case "SET_CURRENT_PLAYER_TURN":
+        return {
+          ...state,
+          gameState: { ...state, currentPlayerTurn: action.payload },
+        };
+      default:
+        return state;
+    }
+  })();
+  return newState;
 };
 
 interface GameProviderProps {
@@ -80,7 +88,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     // Clean up the listener when the component unmounts
     return () => {
       socket.off("matchFound", handleInitialGameState);
-     
     };
   }, []);
 
@@ -89,12 +96,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const handleGameStateUpdate = (updatedState: GameSessionInfo) => {
       dispatch({ type: "UPDATE_GAME_STATE", payload: updatedState });
     };
-        // Subscribe to game state updates from the server
-        socket.on("updateGameState", handleGameStateUpdate);
-    return() => {
+    // Subscribe to game state updates from the server
+    socket.on("updateGameState", handleGameStateUpdate);
+    return () => {
       socket.off("updateGameState", handleGameStateUpdate);
-    }
-  },[])
+    };
+  }, []);
 
   const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
     if (gameState) {
@@ -126,15 +133,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
 
-  
-
   return (
     <GameContext.Provider
-      value={{ gameState, emitGameStateUpdate, updatePlayerData,  }}
+      value={{ gameState, emitGameStateUpdate, updatePlayerData }}
     >
       {children}
     </GameContext.Provider>
   );
 };
-
-

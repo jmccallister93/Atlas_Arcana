@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import desert from "./GameTiles/desertTile.png";
 import forest from "./GameTiles/forestTile.png";
@@ -48,11 +48,23 @@ export interface TileCoordinate {
 interface GameBoardProps{
 }
 
+const usePlayerBoardData = (players: PlayerInfo[]) => {
+  return useMemo(() => {
+    return players.map(player => ({
+      username: player.username,
+      strongHold: player.strongHold,
+      buildings: player.buildings,
+      // position: { row: player.row, col: player.col }, // Assuming these are directly on the player object
+    }));
+  }, [players]);
+};
+
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
   console.log("GameBoard Rendered");
   // Get Game state componenets
   // const { gameState } = useGameContext();
   const players = useGameStatePart(state => state.players as PlayerInfo[]);
+  const playerBoardData = usePlayerBoardData(players);
   const titans = useGameStatePart(state => state.titans as TitanInfo[]);
   const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
@@ -105,11 +117,11 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       }
     }
     // Determine the image URL based on the player's name
-    players?.forEach((player) => {
+    playerBoardData?.forEach((player) => {
       // Check for player
-      if (player.row === y && player.col === x) {
-        playerOnTile = player;
-      }
+      // if (player.row === y && player.col === x) {
+      //   playerOnTile = player;
+      // }
 
       if (
         player.strongHold &&

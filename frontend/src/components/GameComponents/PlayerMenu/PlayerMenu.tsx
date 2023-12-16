@@ -11,7 +11,10 @@ import "./PlayerMenu.scss";
 import { IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import PlayerMenuDetails from "./PlayerMenuDetails";
-import { useGameContext } from "../../../context/GameContext/GameContext";
+import {
+  useGameContext,
+  useGameStatePart,
+} from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 
 interface PlayerMenuProps {
@@ -21,11 +24,13 @@ interface PlayerMenuProps {
 
 const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   // Context vars
-  const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const { updatePlayerData } = useGameContext();
   const auth = useAuth();
   // Get Player data
-  const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
-  const currentPlayer = players.find((player) => player.username === auth.username);
+  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const currentPlayer = players.find(
+    (player) => player.username === auth.username
+  );
   // Local States
   const [showDetails, setShowDetails] = useState(false);
   const [currentDetailType, setCurrentDetailType] = useState<string>("");

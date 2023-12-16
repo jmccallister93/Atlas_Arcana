@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { IonContent, IonIcon, IonModal, IonButton, IonAlert } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
@@ -54,7 +54,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
  
 }) => {
   // const { gameState } = useGameContext();
-  console.log("TMD Renderd")
 
   const auth = useAuth();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
@@ -64,12 +63,13 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const setupPhase = useGameStatePart((state) => state.setupPhase as boolean);
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
-  const currentPlayer = players.find(
-    (player) => player.username === auth.username
-  );
+    const currentPlayer = useMemo(() => {
+      return players.find(player => player.username === auth.username);
+    }, [players, auth.username]);
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 
+  console.log("TMD rendered")
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (setupPhase && currentPlayer?.username === currentPlayerTurn) {
@@ -212,4 +212,4 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   );
 };
 
-export default TileMenuDetails;
+export default React.memo(TileMenuDetails);

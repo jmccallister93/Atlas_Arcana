@@ -231,7 +231,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     return () => {
       game.destroy(true);
     };
-  }, [tileGrid, tileSize, handleTileSelection]);
+  }, [tileGrid, tileSize, handleTileSelection]); //
 
   return (
     <div className="canvasWrapper">
@@ -240,4 +240,4 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   );
 };
 
-export default Canvas;
+export default React.memo(Canvas);
