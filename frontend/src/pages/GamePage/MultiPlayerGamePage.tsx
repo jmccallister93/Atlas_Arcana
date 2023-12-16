@@ -12,6 +12,7 @@ import WelcomeModal from "../../components/GameComponents/WelcomeModal";
 import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
+import UpdateNotifications from "../../components/GameComponents/GameBar/UpdateNotification";
 
 
 const MultiPlayerGamePage = () => {
@@ -51,6 +52,8 @@ const MultiPlayerGamePage = () => {
 
         {/* Title */}
         <h1 className="pageHeader">Multiplayer Game</h1>
+
+
 
         {/* Players in Game */}
         <PlayersInGame />
