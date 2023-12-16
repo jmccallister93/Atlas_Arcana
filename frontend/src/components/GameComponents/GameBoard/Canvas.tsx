@@ -33,10 +33,11 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
-  console.log("Canvas Rendered");
   const gameRef = useRef<HTMLDivElement>(null);
   const tileSize = 30;
   let game: Phaser.Game;
+
+  console.log("Canvas Rendered");
 
   useEffect(() => {
     if (gameRef.current) {

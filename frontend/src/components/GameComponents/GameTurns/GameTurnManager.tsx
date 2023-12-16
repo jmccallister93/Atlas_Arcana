@@ -17,10 +17,10 @@ import { useAuth } from "../../../context/AuthContext/AuthContext";
 import UpdateNotifications from "../GameBar/UpdateNotification";
 
 interface GameTurnManagerProps {
-  gameTurnManagerAlert: boolean
+
 }
 
-const GameTurnManager: React.FC<GameTurnManagerProps> = ({gameTurnManagerAlert}) => {
+const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   // Get Game state
   const { emitGameStateUpdate } = useGameContext();
   const auth = useAuth();

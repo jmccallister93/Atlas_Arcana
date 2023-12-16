@@ -1,8 +1,4 @@
-import {
-  IonContent,
-  IonIcon,
-  IonPage,
-} from "@ionic/react";
+import { IonContent, IonIcon, IonPage } from "@ionic/react";
 import { useState } from "react";
 
 import GameBoard from "../../components/GameComponents/GameBoard/GameBoard";
@@ -14,21 +10,18 @@ import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnM
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
 import UpdateNotifications from "../../components/GameComponents/GameBar/UpdateNotification";
 
-
 const MultiPlayerGamePage = () => {
-    // Show Welcome Modal
+  // Show Welcome Modal
   const [showModal, setShowModal] = useState<boolean>(true);
 
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<string>();
-  const [gameTurnManagerAlert, setGameTurnManagerAlert] = useState<boolean>(true)
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
-  console.log("MPGP Rendered")
+  console.log("MPGP Rendered");
   return (
     <IonPage>
       {/* Welcome Modal */}
@@ -54,15 +47,11 @@ const MultiPlayerGamePage = () => {
         {/* Title */}
         <h1 className="pageHeader">Multiplayer Game</h1>
 
-
-
         {/* Players in Game */}
         <PlayersInGame />
 
         {/* Turn Manager */}
-        <GameTurnManager 
-        gameTurnManagerAlert={gameTurnManagerAlert}
-        />
+        <GameTurnManager />
 
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
@@ -72,8 +61,7 @@ const MultiPlayerGamePage = () => {
 
         {/* GameBoard */}
         <div className="gameBoardContainer">
-          <GameBoard 
-          setGameTurnManagerAlert={setGameTurnManagerAlert}/>
+          <GameBoard />
         </div>
       </IonContent>
     </IonPage>

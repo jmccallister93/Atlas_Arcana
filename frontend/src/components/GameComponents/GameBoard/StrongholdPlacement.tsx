@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { IonButton, IonAlert } from "@ionic/react";
 import { GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces"; // Adjust the import paths based on your project structure
 import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
@@ -7,24 +7,27 @@ import { TileInfo } from "./TileMenuDetails";
 
 interface StrongholdPlacementProps {
   selectedTile: TileInfo | null;
-  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>
+  onShowStrongholdAlert: (message: string) => void
 }
 
 const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
-  setGameTurnManagerAlert
+  onShowStrongholdAlert
 }) => {
   const {emitGameStateUpdate} = useGameContext()
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
   const auth = useAuth();
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+ 
   
+  console.log("STHLDP rendered")
 
-  const currentPlayer = players.find(
-    (player) => player.username === auth.username
-  );
+  const currentPlayer = useMemo(() => {
+    return players.find(player => player.username === auth.username);
+  }, [players, auth.username]);
+
+  // Memoize the stronghold of the current player
+  const currentStrongHold = useMemo(() => currentPlayer?.strongHold, [currentPlayer]);
 
   const calculateDistance = (
     x1: number,
@@ -77,12 +80,12 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
         };
         // Emit the update to server
         emitGameStateUpdate(updatedGameState);
-        setGameTurnManagerAlert(false)
+      
       } else {
-        setAlertMessage(
+        onShowStrongholdAlert(
           "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
         );
-        setShowAlert(true);
+        
         return;
       }
     }
@@ -91,12 +94,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   return (
     <>
       <IonButton onClick={placeStronghold}>Place Stronghold</IonButton>
-      <IonAlert
-        isOpen={showAlert}
-        onDidDismiss={() => setShowAlert(false)}
-        message={alertMessage}
-        buttons={["OK"]}
-      />
+
     </>
   );
 };

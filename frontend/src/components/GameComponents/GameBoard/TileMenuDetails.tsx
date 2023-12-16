@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { IonContent, IonIcon, IonModal, IonButton } from "@ionic/react";
+import { IonContent, IonIcon, IonModal, IonButton, IonAlert } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { BuildingInfo, PlayerInfo } from "../Interfaces";
 import {
@@ -44,16 +44,18 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>;
+  
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  setGameTurnManagerAlert,
+ 
 }) => {
   // const { gameState } = useGameContext();
+  console.log("TMD Renderd")
+
   const auth = useAuth();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const currentPlayerTurn = useGameStatePart(
@@ -65,6 +67,8 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const currentPlayer = players.find(
     (player) => player.username === auth.username
   );
+  const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
+  const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
@@ -74,6 +78,11 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
       setIsStrongholdPlacementMode(false);
     }
   }, [setupPhase, currentPlayer]);
+
+  const handleShowStrongholdAlert = (message: string) => {
+    setStrongholdAlertMessage(message);
+    setShowStrongholdAlert(true);
+  };
 
   return (
     <IonModal
@@ -96,7 +105,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             {isStrongholdPlacementMode ? (
               <StrongholdPlacement
                 selectedTile={selectedTile}
-                setGameTurnManagerAlert={setGameTurnManagerAlert}
+                onShowStrongholdAlert={handleShowStrongholdAlert}
               />
             ) : null}
 
@@ -192,6 +201,12 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
           </>
         )}
         <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
+        <IonAlert
+        isOpen={showStrongholdAlert}
+        onDidDismiss={() => setShowStrongholdAlert(false)}
+        message={strongholdAlertMessage}
+        buttons={["OK"]}
+      />
       </IonContent>
     </IonModal>
   );

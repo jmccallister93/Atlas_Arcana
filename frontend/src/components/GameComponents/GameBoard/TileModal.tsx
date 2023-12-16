@@ -8,17 +8,17 @@ interface TileModalProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>
+  
 }
 
 const TileModal: React.FC<TileModalProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
-  setGameTurnManagerAlert
+
 }) => {
  
-  // console.log("Tile Modal Rendered")
+  console.log("Tile Modal Rendered")
   return (
     <>
       <IonModal
@@ -40,7 +40,7 @@ const TileModal: React.FC<TileModalProps> = ({
               selectedTile={selectedTile}
               showTileDetails={showTileDetails}
               setShowTileDetails={setShowTileDetails}
-              setGameTurnManagerAlert={setGameTurnManagerAlert}
+            
             />
           )}
           <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>

@@ -69,6 +69,7 @@ export interface PlayerInfo {
   stamina: number;
   movement: number;
   build: number;
+  strongHoldPlaced: boolean;
   strongHold: {
     col: number;
     row: number;
