@@ -22,6 +22,7 @@ const MultiPlayerGamePage = () => {
   // Player Menu
   const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>();
+  const [gameTurnManagerAlert, setGameTurnManagerAlert] = useState<boolean>(true)
 
   // Open and close playermenu
   const togglePlayerMenu = () => {
@@ -59,7 +60,9 @@ const MultiPlayerGamePage = () => {
         <PlayersInGame />
 
         {/* Turn Manager */}
-        <GameTurnManager />
+        <GameTurnManager 
+        gameTurnManagerAlert={gameTurnManagerAlert}
+        />
 
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
@@ -69,7 +72,8 @@ const MultiPlayerGamePage = () => {
 
         {/* GameBoard */}
         <div className="gameBoardContainer">
-          <GameBoard />
+          <GameBoard 
+          setGameTurnManagerAlert={setGameTurnManagerAlert}/>
         </div>
       </IonContent>
     </IonPage>

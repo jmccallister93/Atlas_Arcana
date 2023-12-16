@@ -7,10 +7,12 @@ import { TileInfo } from "./TileMenuDetails";
 
 interface StrongholdPlacementProps {
   selectedTile: TileInfo | null;
+  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
+  setGameTurnManagerAlert
 }) => {
   const {emitGameStateUpdate} = useGameContext()
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
@@ -18,6 +20,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   const auth = useAuth();
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  
 
   const currentPlayer = players.find(
     (player) => player.username === auth.username
@@ -74,6 +77,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
         };
         // Emit the update to server
         emitGameStateUpdate(updatedGameState);
+        setGameTurnManagerAlert(false)
       } else {
         setAlertMessage(
           "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."

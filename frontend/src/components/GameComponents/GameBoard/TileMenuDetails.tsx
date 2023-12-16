@@ -44,12 +44,14 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
+  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
+  setGameTurnManagerAlert,
 }) => {
   // const { gameState } = useGameContext();
   const auth = useAuth();
@@ -57,9 +59,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const currentPlayerTurn = useGameStatePart(
     (state) => state.currentPlayerTurn as string
   );
-  const setupPhase = useGameStatePart(
-    (state) => state.setupPhase as boolean
-  );
+  const setupPhase = useGameStatePart((state) => state.setupPhase as boolean);
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
   const currentPlayer = players.find(
@@ -94,7 +94,10 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
           <>
             {/* Stronghold Palcement */}
             {isStrongholdPlacementMode ? (
-              <StrongholdPlacement selectedTile={selectedTile} />
+              <StrongholdPlacement
+                selectedTile={selectedTile}
+                setGameTurnManagerAlert={setGameTurnManagerAlert}
+              />
             ) : null}
 
             {/* titan details */}

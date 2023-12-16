@@ -45,7 +45,11 @@ export interface TileCoordinate {
   y: number;
 }
 
-const GameBoard: React.FC = () => {
+interface GameBoardProps{
+  setGameTurnManagerAlert: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GameBoard: React.FC<GameBoardProps> = ({setGameTurnManagerAlert}) => {
   console.log("GameBoard Rendered");
   // Get Game state componenets
   // const { gameState } = useGameContext();
@@ -56,7 +60,7 @@ const GameBoard: React.FC = () => {
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, ] = useState("");
-
+ 
 
   // Handle Selected tile
   const handleTileSelection = useCallback((x: number, y: number) => {
@@ -221,6 +225,7 @@ const GameBoard: React.FC = () => {
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
         setShowTileDetails={setShowTileDetails}
+        setGameTurnManagerAlert={setGameTurnManagerAlert}
       />
 
       <TileAlerts
