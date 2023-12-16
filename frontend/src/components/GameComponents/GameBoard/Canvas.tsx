@@ -30,9 +30,15 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   // const { gameState } = useGameContext();
-  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
-  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
-  const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
+  const playerData = useGameStatePart(state => {
+    return state.players.map(({ username, strongHold, buildings }) => ({
+      username,
+      strongHold,
+      buildings,
+    }));
+  });
+  // const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  // const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const gameRef = useRef<HTMLDivElement>(null);
   const tileSize = 30;
   let game: Phaser.Game;
@@ -92,42 +98,42 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           "Storm Titan": "stormTitan",
         };
 
-        // Tile Grid
-        tileGrid.forEach((row: string[], rowIndex: number) => {
-          row.forEach((tileType: string, colIndex: number) => {
-            const color = Phaser.Display.Color.HexStringToColor(
-              tileTypeToColor[tileType] || "#FFFFFF"
-            );
-            graphics.fillStyle(color.color, 1); // Set the fill color for the tile
-            graphics.fillRect(
-              rowIndex * tileSize,
-              colIndex * tileSize,
-              tileSize,
-              tileSize
-            ); // Draw the filled rectangle
+        // // Tile Grid
+        // tileGrid.forEach((row: string[], rowIndex: number) => {
+        //   row.forEach((tileType: string, colIndex: number) => {
+        //     const color = Phaser.Display.Color.HexStringToColor(
+        //       tileTypeToColor[tileType] || "#FFFFFF"
+        //     );
+        //     graphics.fillStyle(color.color, 1); // Set the fill color for the tile
+        //     graphics.fillRect(
+        //       rowIndex * tileSize,
+        //       colIndex * tileSize,
+        //       tileSize,
+        //       tileSize
+        //     ); // Draw the filled rectangle
 
-            graphics.lineStyle(2, 0x000000, 1); // Set the line style for the border
-            graphics.strokeRect(
-              rowIndex * tileSize,
-              colIndex * tileSize,
-              tileSize,
-              tileSize
-            ); // Draw the border
-          });
-        });
+        //     graphics.lineStyle(2, 0x000000, 1); // Set the line style for the border
+        //     graphics.strokeRect(
+        //       rowIndex * tileSize,
+        //       colIndex * tileSize,
+        //       tileSize,
+        //       tileSize
+        //     ); // Draw the border
+        //   });
+        // });
 
-        // Titans
-        titans.forEach((titan) => {
-          const titanImageKey = titanNameToImageKey[titan.titanName];
-          if (titanImageKey) {
-            this.add
-              .sprite(titan.row * tileSize, titan.col * tileSize, titanImageKey)
-              .setDisplaySize(tileSize, tileSize)
-              .setOrigin(0, 0);
-          }
-        });
+        // // Titans
+        // titans.forEach((titan) => {
+        //   const titanImageKey = titanNameToImageKey[titan.titanName];
+        //   if (titanImageKey) {
+        //     this.add
+        //       .sprite(titan.row * tileSize, titan.col * tileSize, titanImageKey)
+        //       .setDisplaySize(tileSize, tileSize)
+        //       .setOrigin(0, 0);
+        //   }
+        // });
         // Strongholds
-        players.forEach((player, index) => {
+        playerData.forEach((player, index) => {
           if (player.strongHold) {
             const strongholdKey = `stronghold${(index % 4) + 1}`; // Cycle through stronghold images
             this.add
@@ -231,7 +237,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     return () => {
       game.destroy(true);
     };
-  }, [tileGrid, tileSize, handleTileSelection]); //
+  }, [ tileSize, handleTileSelection]); //
 
   return (
     <div className="canvasWrapper">

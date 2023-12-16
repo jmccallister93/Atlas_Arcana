@@ -95,3 +95,9 @@ export interface PlayerInfo {
     quests: QuestItem[];
   };
 }
+
+export interface GameBoard {
+  playerPositions: [{}]
+  titanPositions: [{}]
+  strongholdPositions: [{}]
+}

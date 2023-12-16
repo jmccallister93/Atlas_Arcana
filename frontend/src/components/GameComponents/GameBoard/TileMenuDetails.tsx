@@ -56,7 +56,13 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   // const { gameState } = useGameContext();
 
   const auth = useAuth();
-  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const playerData = useGameStatePart(state => {
+    return state.players.map(({ username, strongHold, buildings }) => ({
+      username,
+      strongHold,
+      buildings,
+    }));
+  });
   const currentPlayerTurn = useGameStatePart(
     (state) => state.currentPlayerTurn as string
   );
@@ -64,8 +70,8 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
     const currentPlayer = useMemo(() => {
-      return players.find(player => player.username === auth.username);
-    }, [players, auth.username]);
+      return playerData.find(player => player.username === auth.username);
+    }, [playerData, auth.username]);
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 

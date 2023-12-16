@@ -26,13 +26,11 @@ const GameContext = createContext<GameState | undefined>(undefined);
 
 type Selector<T> = (state: GameSessionInfo) => T;
 
-export const useGameStatePart = <T extends unknown>(
-  selector: Selector<T>
+export const useGameStatePart = <T,>(
+  selector: (state: GameSessionInfo) => T
 ): T => {
   const { gameState } = useGameContext();
-
-  // The useMemo hook will only recompute the selected state if gameState changes
-  const selectedState = useMemo(() => selector(gameState), [gameState]);
+  const selectedState = useMemo(() => selector(gameState), [gameState, selector]);
 
   return selectedState;
 };
@@ -133,9 +131,13 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
 
+  const providerValue = useMemo(() => {
+    return { gameState, emitGameStateUpdate, updatePlayerData };
+  }, [gameState]);
+
   return (
     <GameContext.Provider
-      value={{ gameState, emitGameStateUpdate, updatePlayerData }}
+      value={providerValue}
     >
       {children}
     </GameContext.Provider>
