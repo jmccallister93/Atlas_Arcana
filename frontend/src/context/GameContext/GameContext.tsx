@@ -6,14 +6,69 @@ import React, {
   useMemo,
 } from "react";
 import {
+  BuildingPosition,
   GameBoard,
   GameSessionInfo,
   PlayerInfo,
+  PlayerPosition,
+  StrongholdPosition,
+  TitanPosition,
 } from "../../components/GameComponents/Interfaces";
 import socket, {
   onGameStateUpdate,
   offGameStateUpdate,
 } from "../SocketClient/socketClient";
+
+interface GameBoardState {
+  playerPositions: PlayerPosition[];
+  titanPositions: TitanPosition[];
+  buildingPositions: BuildingPosition[];
+  strongholdPositions: StrongholdPosition[];
+}
+
+const initialGameBoardState: GameBoardState = {
+  playerPositions: [],
+  titanPositions: [],
+  buildingPositions: [],
+  strongholdPositions: [],
+};
+
+const GameBoardContext = createContext<{
+  gameBoard: GameBoardState;
+  updateGameBoard: (partialState: Partial<GameBoardState>) => void;
+} | undefined>(undefined);
+
+export const useGameBoardContext = () => {
+  const context = useContext(GameBoardContext);
+  if (!context) {
+    throw new Error("useGameBoardContext must be used within a GameBoardProvider");
+  }
+  return context;
+};
+
+const gameBoardReducer = (state: GameBoardState, action: any): GameBoardState => {
+  switch (action.type) {
+    case "UPDATE_GAME_BOARD":
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
+
+export const GameBoardProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [gameBoard, dispatch] = useReducer(gameBoardReducer, initialGameBoardState);
+
+  const updateGameBoard = (partialState: Partial<GameBoardState>) => {
+    dispatch({ type: "UPDATE_GAME_BOARD", payload: partialState });
+  };
+
+  return (
+    <GameBoardContext.Provider value={{ gameBoard, updateGameBoard }}>
+      {children}
+    </GameBoardContext.Provider>
+  );
+};
+
 
 // Define the shape of your context
 interface GameState {
@@ -48,19 +103,6 @@ export const useGameContext = () => {
   return context;
 };
 
-// Game board updates
-export const useGameBoard = () => {
-  const { gameState, emitGameStateUpdate } = useGameContext();
-
-  const gameBoard = gameState.gameBoard; // Get the game board from gameState
-
-  // Function to update the game board state
-  const updateGameBoard = (updatedGameBoard: Partial<GameBoard>) => {
-    emitGameStateUpdate({ gameBoard: { ...gameBoard, ...updatedGameBoard } });
-  };
-
-  return { gameBoard, updateGameBoard };
-};
 
 const gameReducer = (state: GameSessionInfo, action: any) => {
   const newState = (() => {
@@ -74,11 +116,11 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           player.username === action.payload.username ? action.payload : player
         );
         return { ...state, players: updatedPlayers };
-      case "UPDATE_GAME_BOARD":
-        return {
-          ...state,
-          gameBoard: { ...state.gameBoard, ...action.payload },
-        };
+      // case "UPDATE_GAME_BOARD":
+      //   return {
+      //     ...state,
+      //     gameBoard: { ...state.gameBoard, ...action.payload },
+      //   };
       case "SET_CURRENT_PLAYER_TURN":
         return {
           ...state,

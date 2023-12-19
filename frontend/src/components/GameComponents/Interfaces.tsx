@@ -12,7 +12,6 @@ export interface GameSessionInfo {
   treasureCardCount: [];
   worldEventCardCount: [];
   players: PlayerInfo[];
-  gameBoard: GameBoard
 }
 
 export interface TitanInfo {
@@ -99,7 +98,30 @@ export interface PlayerInfo {
 
 export interface GameBoard {
   playerPositions: [{}]
-  titanPositions: [{}]
+  titanPositions: TitanPosition[]
   buildingPositions:[{}]
   strongholdPositions: [{}]
+}
+
+export interface PlayerPosition {
+  playerId: string;
+  x: number;
+  y: number;
+}
+export interface TitanPosition {
+  titanId: string;
+  x: number;
+  y: number;
+}
+export interface BuildingPosition {
+  buildingId: string;
+  owner: string;
+  x: number;
+  y: number;
+}
+export interface StrongholdPosition {
+  strongholdId: string;
+  owner: string;
+  x: number;
+  y: number;
 }

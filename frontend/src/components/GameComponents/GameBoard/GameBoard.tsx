@@ -12,7 +12,7 @@ import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
 import { StrongholdInfo } from "./TileMenuDetails";
 import { BuildingInfo, GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces";
-import { useGameBoard, useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
+import {  useGameBoardContext, useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import Canvas from "./Canvas";
@@ -52,7 +52,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   console.log("GameBoard Rendered");
   // Get Game state componenets
   // const { gameState } = useGameContext();
-  const { gameBoard, updateGameBoard } = useGameBoard();
+  const { gameBoard, updateGameBoard } = useGameBoardContext();
   const playerData = useGameStatePart(state =>
     state.players.map(({ username, strongHold, buildings }) => ({
       username,

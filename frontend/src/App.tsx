@@ -45,7 +45,7 @@ import SinglePlayerGamePage from "./pages/GamePage/SinglePlayerGamePage";
 setupIonicReact();
 import io from "socket.io-client";
 import { useState } from "react";
-import { GameProvider } from "./context/GameContext/GameContext";
+import { GameBoardProvider, GameProvider } from "./context/GameContext/GameContext";
 
 
 
@@ -53,6 +53,7 @@ const App: React.FC = () => (
   
   <AuthProvider>
      <GameProvider>
+      <GameBoardProvider>
     <IonApp>
       <IonReactRouter>
         <Navbar />
@@ -76,6 +77,7 @@ const App: React.FC = () => (
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
+    </GameBoardProvider>
     </GameProvider>
   </AuthProvider>
 );
