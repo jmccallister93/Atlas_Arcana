@@ -120,7 +120,6 @@ export interface BuildingPosition {
   y: number;
 }
 export interface StrongholdPosition {
-  strongholdId: string;
   owner: string;
   x: number;
   y: number;
