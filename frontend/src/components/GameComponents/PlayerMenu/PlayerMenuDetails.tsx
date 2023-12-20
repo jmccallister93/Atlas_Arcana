@@ -17,6 +17,7 @@ interface PlayerMenuDetailsProps {
   questItems?: any[];       // Object for a specific quest item
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
+  currentPlayer: PlayerInfo;
 }
 
 const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
@@ -29,6 +30,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
   questItems,
   player,
   updatePlayerData,
+  currentPlayer
 }) => {
 
   return (
@@ -84,6 +86,7 @@ const PlayerMenuDetails: React.FC<PlayerMenuDetailsProps> = ({
               equipableItems={equipableItems}
               player={player}
               updatePlayerData={updatePlayerData}
+              currentPlayer={currentPlayer}
             />
           </div>
         </IonModal>

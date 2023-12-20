@@ -3,17 +3,21 @@ import { IonModal, IonButton, IonIcon, IonAlert } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
 import { BuildingInfo, EquipmentItem, PlayerInfo } from "../Interfaces";
+import { useGameContext } from "../../../context/GameContext/GameContext";
 
 interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
   player: PlayerInfo;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
+  currentPlayer: PlayerInfo;
 }
 const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   equipableItems,
   player,
   updatePlayerData,
+  currentPlayer
 }) => {
+  const {gameState} = useGameContext();
   // State for the confirmation modal
   const [showRankUpConfirmation, setShowRankUpConfirmation] =
     useState<boolean>(false);

@@ -354,6 +354,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
         treasureItems={currentTreasureItem}
         player={currentPlayer}
         updatePlayerData={updatePlayerData}
+        currentPlayer={currentPlayer}
       />
 
       <div className="playerMenuContainer">
