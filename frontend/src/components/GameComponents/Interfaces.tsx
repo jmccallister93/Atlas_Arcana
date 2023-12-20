@@ -101,26 +101,31 @@ export interface GameBoard {
   titanPositions: TitanPosition[]
   buildingPositions:[{}]
   strongholdPositions: [{}]
+  tileGrid: TileGrid
 }
 
 export interface PlayerPosition {
-  playerId: string;
+  playerUsername: string;
   x: number;
   y: number;
 }
 export interface TitanPosition {
-  titanId: string;
+  titanName: string;
   x: number;
   y: number;
 }
 export interface BuildingPosition {
-  buildingId: string;
-  owner: string;
+  buildingName: string;
+  ownerName: string;
   x: number;
   y: number;
 }
 export interface StrongholdPosition {
-  owner: string;
+  ownerName: string;
   x: number;
   y: number;
+}
+
+export interface TileGrid {
+  tileGrid: string[][];
 }
