@@ -4,6 +4,7 @@ import { arrowBack } from "ionicons/icons";
 import "./PlayerMenu.scss";
 import { BuildingInfo, EquipmentItem, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
+import EquipGear from "./EquipGear";
 
 interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
@@ -15,9 +16,9 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   equipableItems,
   player,
   updatePlayerData,
-  currentPlayer
+  currentPlayer,
 }) => {
-  const {gameState} = useGameContext();
+  const { gameState } = useGameContext();
   // State for the confirmation modal
   const [showRankUpConfirmation, setShowRankUpConfirmation] =
     useState<boolean>(false);
@@ -34,126 +35,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   // EquipmentSlot type
   type EquipmentSlot = "weapon" | "armor" | "amulet" | "boots" | "gloves";
 
-  // StatUpdate type
-  type StatUpdate = {
-    stat: keyof PlayerInfo;
-    increment: number;
-  };
-
-  // Mapping from slot to stat update
-  const statUpdateMap: Record<EquipmentSlot, StatUpdate> = {
-    weapon: { stat: "offense", increment: 1 },
-    armor: { stat: "defense", increment: 1 },
-    amulet: { stat: "health", increment: 1 },
-    boots: { stat: "movement", increment: 1 },
-    gloves: { stat: "build", increment: 1 },
-  };
-  //   element update type
-  type ElementUpdate = {
-    stat: keyof PlayerInfo;
-    increment: number;
-  };
-  // Mapping from slot to stat update
-  const elementUpdateMap: Record<string, ElementUpdate> = {
-    Fire: { stat: "offense", increment: 1 },
-    Water: { stat: "health", increment: 1 },
-    Wind: { stat: "movement", increment: 1 },
-    Stone: { stat: "defense", increment: 1 },
-  };
-  // Equip item
-  const equipItem = (
-    itemToEquip: EquipmentItem,
-    player: PlayerInfo,
-    updatePlayerData: (player: PlayerInfo) => void
-  ) => {
-    let updatedPlayer = player;
-    const slot = itemToEquip.slot as EquipmentSlot;
-
-    if (Object.keys(statUpdateMap).includes(slot)) {
-      const update = statUpdateMap[slot];
-      let increment = update.increment;
-
-      if (itemToEquip.rank == 2) {
-        increment = 2;
-      } else if (itemToEquip.rank == 3) {
-        increment = 3;
-      }
-      const statKey = update.stat;
-      const currentStatValue = player[statKey] as number;
-      let newStatValue = currentStatValue + increment;
-
-      if (itemToEquip.element !== "none") {
-        const element = itemToEquip.element;
-        const elementUpdate = elementUpdateMap[element];
-        const elementStatKey = elementUpdate.stat;
-        const elementStatIncrement = elementUpdate.increment;
-
-        if (statKey === elementStatKey) {
-          newStatValue += elementStatIncrement;
-        } else {
-          (updatedPlayer[elementStatKey] as number) =
-            (player[elementStatKey] as number) + elementStatIncrement;
-        }
-      }
-
-      (updatedPlayer[statKey] as number) = newStatValue;
-
-      updatedPlayer.equippedItems[slot] = [itemToEquip];
-      const newPlayer = {
-        ...player,
-        [statKey]: newStatValue,
-        equippedItems: {
-          ...player.equippedItems,
-          [slot]: [itemToEquip],
-        },
-      };
-      updatePlayerData(newPlayer);
-    }
-  };
-  //   Unequip item
-  const unequipItem = (
-    itemToUnequip: EquipmentItem,
-    player: PlayerInfo,
-    updatePlayerData: (player: PlayerInfo) => void
-  ) => {
-    const slot = itemToUnequip.slot as EquipmentSlot;
-
-    if (Object.keys(statUpdateMap).includes(slot)) {
-      const update = statUpdateMap[slot];
-      let decrement = update.increment;
-
-      if (itemToUnequip.rank == 2) {
-        decrement += 1;
-      } else if (itemToUnequip.rank == 3) {
-        decrement += 2;
-      }
-
-      const statKey = update.stat;
-      const currentStatValue = player[statKey] as number;
-      let newStatValue = Math.max(currentStatValue - decrement, 0); // Prevent negative values
-
-      if (itemToUnequip.element !== "none") {
-        const elementUpdate = elementUpdateMap[itemToUnequip.element];
-        const elementStatKey = elementUpdate.stat;
-        const elementStatIncrement = elementUpdate.increment;
-
-        if (statKey === elementStatKey) {
-          newStatValue = Math.max(newStatValue - elementStatIncrement, 0);
-        } else {
-          (player[elementStatKey] as number) = Math.max(
-            (player[elementStatKey] as number) - elementStatIncrement,
-            0
-          );
-        }
-      }
-
-      (player[statKey] as number) = newStatValue;
-
-      player.equippedItems[slot] = [];
-
-      updatePlayerData(player);
-    }
-  };
 
   // Function to check if a specific type of building is present
   const isBuildingPresent = (buildingType: string): boolean => {
@@ -170,6 +51,12 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
+    if (
+      currentPlayer.username !== gameState.currentPlayerTurn &&
+      gameState.currentPhase !== "Rest"
+    ) {
+      return;
+    }
     // Check if the item is equipped
     const isEquipped = Object.values(player.equippedItems)
       .flat()
@@ -307,6 +194,12 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
+    if (
+      currentPlayer.username !== gameState.currentPlayerTurn &&
+      gameState.currentPhase !== "Rest"
+    ) {
+      return;
+    }
     // Check if the item is equipped
     const isEquipped = Object.values(player.equippedItems)
       .flat()
@@ -458,26 +351,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
 
             return (
               <div key={index} className="equipmentDetails">
-                <p>
-                  <strong>Name:</strong> {item.equipmentName}
-                  {isEquipped ? (
-                    <IonButton
-                      onClick={() =>
-                        unequipItem(item, player, updatePlayerData)
-                      }
-                      color="warning"
-                    >
-                      Unequip
-                    </IonButton>
-                  ) : (
-                    <IonButton
-                      onClick={() => equipItem(item, player, updatePlayerData)}
-                      color="success"
-                    >
-                      Equip
-                    </IonButton>
-                  )}
-                </p>
+                <EquipGear 
+                equipableItems={equipableItems}
+                player={player}
+                />
                 <p>
                   <strong>Rank:</strong> {item.rank}
                   <IonButton
