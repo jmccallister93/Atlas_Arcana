@@ -201,7 +201,6 @@ const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
       {" "}
       {equipableItems && equipableItems.length > 0 && (
         <div>
-          <h4>Equipable Items</h4>
           {equipableItems.map((item: any, index: any) => {
             // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
             const slot = item.slot as keyof PlayerInfo["equippedItems"];

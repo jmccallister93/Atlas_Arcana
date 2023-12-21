@@ -5,6 +5,7 @@ import "./PlayerMenu.scss";
 import { BuildingInfo, EquipmentItem, PlayerInfo } from "../Interfaces";
 import { useGameContext } from "../../../context/GameContext/GameContext";
 import EquipGear from "./EquipGear";
+import RankupGear from "./RankupGear";
 
 interface EquipmentMenuDetailsProps {
   equipableItems?: any[];
@@ -31,10 +32,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   const [showElementSelection, setShowElementSelection] =
     useState<boolean>(false);
   const elementTypes = ["Fire", "Water", "Wind", "Stone"];
-
-  // EquipmentSlot type
-  type EquipmentSlot = "weapon" | "armor" | "amulet" | "boots" | "gloves";
-
 
   // Function to check if a specific type of building is present
   const isBuildingPresent = (buildingType: string): boolean => {
@@ -340,22 +337,10 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
         <div>
           <h4>Equipable Items</h4>
           {equipableItems.map((item: any, index: any) => {
-            // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
-            const slot = item.slot as keyof PlayerInfo["equippedItems"];
-
-            // Check if the item is equipped
-            const isEquipped = player.equippedItems[slot]?.some(
-              (equippedItem) =>
-                equippedItem.equipmentName === item.equipmentName
-            );
-
             return (
               <div key={index} className="equipmentDetails">
-                <EquipGear 
-                equipableItems={equipableItems}
-                player={player}
-                />
-                <p>
+                <EquipGear equipableItems={equipableItems} player={player} />
+                {/* <p>
                   <strong>Rank:</strong> {item.rank}
                   <IonButton
                     color={"tertiary"}
@@ -363,7 +348,8 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
                   >
                     Rank Up
                   </IonButton>
-                </p>
+                </p> */}
+                <RankupGear equipableItems={equipableItems} player={player} />
                 <p>
                   <strong>Slot:</strong> {item.slot}
                 </p>
@@ -387,13 +373,13 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           })}
         </div>
       )}{" "}
-      <IonAlert
+      {/* <IonAlert
         isOpen={showRankUpConfirmation}
         onDidDismiss={() => setShowRankUpConfirmation(false)}
         header={"Rank Up Gear"}
         message={"Choose your rank up method:"}
         buttons={generateRankUpButtons()}
-      />
+      /> */}
       <IonAlert
         isOpen={showAttuneConfirmation}
         onDidDismiss={() => setShowAttuneConfirmation(false)}
