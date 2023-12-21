@@ -44,6 +44,17 @@ const RankupGear: React.FC<RankupGearProps> = ({ equipableItems, player }) => {
     event: React.MouseEvent<HTMLIonButtonElement>,
     item: EquipmentItem
   ) => {
+    if (currentPlayer?.username !== gameState.currentPlayerTurn) {
+        setAlertMessage("It's not your turn!");
+        setShowAlert(true);
+        return;
+      }
+  
+      if (gameState.currentPhase !== "Rest") {
+        setAlertMessage("It's not the Rest phase!");
+        setShowAlert(true);
+        return;
+      }
     // Check if the item is equipped
     const isEquipped = Object.values(player.equippedItems)
       .flat()
@@ -70,7 +81,6 @@ const RankupGear: React.FC<RankupGearProps> = ({ equipableItems, player }) => {
       setShowRankUpConfirmation(true);
     } else {
       setShowAlert(true);
-
       setAlertMessage("Missing Whetstone or Forge and Resources");
     }
   };
@@ -188,6 +198,7 @@ const RankupGear: React.FC<RankupGearProps> = ({ equipableItems, player }) => {
           <IonButton
             color={"tertiary"}
             onClick={(e) => handleRankUpGear(e, item)}
+            title="To rank up gear, must have Whetstone or Forge and 4 resources"
           >
             Rank Up
           </IonButton>
