@@ -1,0 +1,22 @@
+.gameturnMenuContainer {
+
+  .modalHeader {
+    display: flex;
+    justify-content: center; // Center horizontally
+    align-items: center; // Center vertically
+    position: relative;
+    padding: 10px;
+
+    .closeButton {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ffffff; // Change as needed
+      font-size: 1.5em; // Adjust size as needed
+
+      &:hover {
+        color: #666; // Change as needed
+      }
+    }
+  }
+}

@@ -128,75 +128,43 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
 
   // Switch Case phase
   useEffect(() => {
-    // if (currentPlayerTurn === currentPlayer?.username) {
-    //   switch (currentPhase) {
-    //     case "Draw":
-    //       setPhaseAction(
-    //         <DrawPhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     case "Trade":
-    //       setPhaseAction(
-    //         <TradePhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     case "Rest":
-    //       setPhaseAction(
-    //         <RestPhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     case "Map":
-    //       setPhaseAction(
-    //         <MapPhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     case "Combat":
-    //       setPhaseAction(
-    //         <CombatPhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     case "Titan":
-    //       setPhaseAction(
-    //         <TitanPhase
-    //           currentPhase = {currentPhase}
-    //           players={players}
-    //           emitGameStateUpdate={emitGameStateUpdate}
-    //           currentPlayer={currentPlayer}
-    //         />
-    //       );
-    //       break;
-    //     default:
-    //       // Optional: handle any case where currentPhase doesn't match any of the cases
-    //       break;
-    //   }
-    // } else {
-    //   setPhaseAction(null);
-    // }
+    if (currentPlayerTurn === currentPlayer?.username) {
+      switch (currentPhase) {
+        case "Draw":
+          setPhaseAction(<DrawPhase />);
+          break;
+        case "Trade":
+          setPhaseAction(
+            <TradePhase/>
+          );
+          break;
+        case "Rest":
+          setPhaseAction(
+            <RestPhase/>
+          );
+          break;
+        case "Map":
+          setPhaseAction(
+            <MapPhase/>
+          );
+          break;
+        case "Combat":
+          setPhaseAction(
+            <CombatPhase/>
+          );
+          break;
+        case "Titan":
+          setPhaseAction(
+            <TitanPhase/>
+          );
+          break;
+        default:
+          // Optional: handle any case where currentPhase doesn't match any of the cases
+          break;
+      }
+    } else {
+      setPhaseAction(null);
+    }
   }, [currentPlayerTurn, currentPlayer]);
 
   return (
@@ -218,7 +186,6 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         message={"Please place your Stronghold before advancing the turn."}
         buttons={["OK"]}
       />
-
     </>
   );
 };
