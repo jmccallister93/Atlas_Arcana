@@ -219,6 +219,7 @@ const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
                     <IonButton
                       onClick={() => handleUnequipAction(item)}
                       color="warning"
+                      title="To Equip or Unequip gear, must be your turn, in Rest Phase"
                     >
                       Unequip
                     </IonButton>
@@ -226,6 +227,7 @@ const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
                     <IonButton
                       onClick={() => handleEquipAction(item)}
                       color="success"
+                      title="To Equip or Unequip gear, must be your turn, in Rest Phase"
                     >
                       Equip
                     </IonButton>

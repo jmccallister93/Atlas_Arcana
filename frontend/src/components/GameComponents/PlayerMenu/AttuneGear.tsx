@@ -200,6 +200,7 @@ const AttuneGear: React.FC<AttuneGearProps> = ({ equipableItems, player }) => {
           <IonButton
             color={"tertiary"}
             onClick={(e) => handleAttuneGear(e, item)}
+            title="To attune gear, must have Emeber or Attunement Shrine and 4 resources"
           >
             Attune
           </IonButton>
