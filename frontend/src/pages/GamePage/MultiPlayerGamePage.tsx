@@ -63,7 +63,9 @@ const MultiPlayerGamePage = () => {
         <div className="gameBoardContainer">
           <GameBoard />
         </div>
+        <UpdateNotifications />
       </IonContent>
+      
     </IonPage>
   );
 };
