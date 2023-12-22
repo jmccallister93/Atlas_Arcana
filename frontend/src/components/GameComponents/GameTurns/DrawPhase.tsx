@@ -34,7 +34,19 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
     // Listen for the cardDrawn event
     socket.on("cardDrawn", (cardDrawn) => {
       console.log("Card drawn:", cardDrawn);
-      // Handle the drawn card here (e.g., update state, show modal, etc.)
+      
+      if(currentPlayer){
+        const newPlayer = {
+          ...currentPlayer,
+          inventory: {
+            ...currentPlayer.inventory,
+            equipment: [...currentPlayer.inventory.equipment, cardDrawn],
+          },
+        };
+        updatePlayerData(newPlayer);
+      }
+     
+
     });
 
     // Handle any errors
@@ -54,7 +66,7 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
       <IonModal
         isOpen={showCardDrawDetails}
         onDidDismiss={() => setShowCardDrawDetails(false)}
-        className="modalHeader"
+       
       >
         <button
           className="closeButton"
