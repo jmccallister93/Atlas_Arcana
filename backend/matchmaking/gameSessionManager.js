@@ -168,7 +168,7 @@ function initializePlayers(playerData) {
     equipmentCardCapacity: 5,
     treasureCardCapacity: 5,
     inventory: {
-      resources: [],
+      resources: 4,
       equipment: [],
       treasures: [],
       quests: [],
@@ -191,11 +191,7 @@ function determineTurnOrder(players) {
 function determineStartingCards(players) {
   let chosenEquipmentCards = [];
   players.forEach((player) => {
-    // Allocate 3 resources
-    for (let i = 0; i < 1; i++) {
-      player.inventory.resources.push(4);
-    }
-
+   
     // Allocate 1 random equipment card
     do {
       const randomIndex = Math.floor(Math.random() * equipmentCards.length);
@@ -279,35 +275,33 @@ function isPositionValid(titanPositions, row, col) {
 }
 
 //DRAW PHASE
-async function allocatedResources(players, sessionId) {
+async function allocateResources(player, sessionId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
-  const playerResources = [];
 
-  players.forEach(player => {
-    let farmCount = 0;
-    let ranchCount = 0;
-    let plantationCount = 0;
+  let farmCount = 0;
+  let ranchCount = 0;
+  let plantationCount = 0;
 
-    // Count each type of resource building
-    player.buildings.forEach(building => {
-      if (building.category === "resource") {
-        if (building.type === "farm") farmCount++;
-        else if (building.type === "ranch") ranchCount++;
-        else if (building.type === "plantation") plantationCount++;
-      }
-    });
-
-    // Allocate resources based on the count
-    const resourcesToAdd = farmCount * 1 + ranchCount * 2 + plantationCount * 3;
-    player.inventory.resources.push(resourcesToAdd);
-
-    playerResources.push(player.inventory.resources);
+  // Count each type of resource building for the single player
+  player.buildings.forEach(building => {
+    if (building.category === "resource") {
+      if (building.type === "farm") farmCount++;
+      else if (building.type === "ranch") ranchCount++;
+      else if (building.type === "plantation") plantationCount++;
+    }
   });
 
-  sessionData.gameState.players = players;
+  // Allocate resources based on the count, adding 1 default resource
+  // Set the resources directly as a number
+  player.inventory.resources = 1 + farmCount * 1 + ranchCount * 2 + plantationCount * 3;
+
+  // Update the player in the session data and save the changes
+  sessionData.gameState.player = player;
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
-  return playerResources;
+
+  return player.inventory.resources;
 }
+
 
 
 async function drawPhaseCardDraw(player, sessionId) {
@@ -355,5 +349,5 @@ module.exports = {
   endGameSession,
   getGameState,
   drawPhaseCardDraw,
-  allocatedResources,
+  allocateResources,
 };

@@ -5,7 +5,7 @@ import { closeOutline } from "ionicons/icons";
 import socket from "../../../../context/SocketClient/socketClient";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
-import "./GameTurn.scss";
+import "../GameTurn.scss";
 
 export interface DrawPhaseProps {}
 
@@ -19,7 +19,9 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
   const [isEquipmentCardDrawn, setIsEquipmentCardDrawn] = useState(false);
   const [equipmentCardDetails, setEquipmentCardDetails] =
     useState<EquipmentItem>();
-  const [resourcesAllocatedDetails, setResourcesAllocatedDetails] = useState<any>();
+  const [resourcesAllocatedDetails, setResourcesAllocatedDetails] =
+    useState<any>();
+  const [isResourcesAllocated, setIsResourcesAllocated] = useState(false);
 
   // Function to handle card draw
   const handleEquipmentCardDraw = () => {
@@ -31,17 +33,6 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
       });
     }
     setIsEquipmentCardDrawn(true);
-  };
-
-  // Function to handle resource allocation
-  const handleResourceAllocation = () => {
-    if (currentPlayer && gameState) {
-      // Emit allocateResources event with necessary data
-      socket.emit("allocateResources", {
-        sessionId: gameState.sessionId,
-        playerId: currentPlayer,
-      });
-    }
   };
 
   // Listen for cardDrawn event
@@ -74,17 +65,17 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
     };
   }, []);
 
-   // Listen for allocate resources event
-   useEffect(() => {
+  // Listen for allocate resources event
+  useEffect(() => {
     socket.on("resourcesAllocated", (resourcesAllocated) => {
-      console.log("resroucesAllocated", resourcesAllocated);
+      console.log("resourcesAllocated", resourcesAllocated);
       setResourcesAllocatedDetails(resourcesAllocated);
       if (currentPlayer) {
         const newPlayer = {
           ...currentPlayer,
           inventory: {
             ...currentPlayer.inventory,
-            resources: [...currentPlayer.inventory.resources, resourcesAllocated],
+            resources: currentPlayer.inventory.resources + resourcesAllocated,
           },
         };
         updatePlayerData(newPlayer);
@@ -103,9 +94,16 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
     };
   }, []);
 
-  useEffect(() => {
-    handleResourceAllocation();
-  }, []);
+  // Emit allocateResources event
+  const handleDrawResources = () => {
+    if (currentPlayer && gameState) {
+      socket.emit("allocateResources", {
+        sessionId: gameState.sessionId,
+        playerId: currentPlayer,
+      });
+    }
+    setIsResourcesAllocated(true);
+  };
 
   return (
     <div className="gameturnMenuContainer">
@@ -119,6 +117,20 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
         >
           <IonIcon icon={closeOutline} />
         </button>
+        <h1>Draw Phase</h1>
+        {isResourcesAllocated ? (
+          <>
+            <h2>Resources Allocated! {resourcesAllocatedDetails}</h2>
+          </>
+        ) : (
+          <>
+            {" "}
+            <IonButton onClick={handleDrawResources}>
+              Allocate Resources
+            </IonButton>{" "}
+          </>
+        )}
+
         {isEquipmentCardDrawn ? (
           <>
             <h2>Equipment Card Drawn!</h2>

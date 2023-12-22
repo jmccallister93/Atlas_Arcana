@@ -130,6 +130,24 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  function countBuildingsByCategory(buildingsArray: any[]) {
+    const categoryCounts: any = {};
+  
+    buildingsArray.forEach(building => {
+      const category = building.category; // Assuming each building has a 'category' property
+      if (category) {
+        if (!categoryCounts[category]) {
+          categoryCounts[category] = 0;
+        }
+        categoryCounts[category]++;
+      }
+    });
+  
+    return categoryCounts;
+  }
+  
+  
+
   // Get and display stats
   const stats = [
     {
@@ -227,7 +245,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
   const inventory = [
     {
       label: "Resources",
-      value: renderInventoryItem(currentPlayer.inventory.resources),
+      value: currentPlayer.inventory.resources,
       description: "Used to construct buildings.",
     },
     {
