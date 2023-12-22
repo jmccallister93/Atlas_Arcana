@@ -9,10 +9,17 @@ import { useAuth } from "../../../context/AuthContext/AuthContext";
 
 interface EquipGearProps {
   equipableItems: EquipmentItem[];
+  item: EquipmentItem;
   player: PlayerInfo;
+  isEquipped: boolean;
 }
 
-const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
+const EquipGear: React.FC<EquipGearProps> = ({
+  equipableItems,
+  item,
+  player,
+  isEquipped,
+}) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
@@ -198,42 +205,23 @@ const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
 
   return (
     <>
-      {" "}
-      {equipableItems && equipableItems.length > 0 && (
-        <div>
-          {equipableItems.map((item: any, index: any) => {
-            // Cast slot to keyof PlayerInfo["equippedItems"] to ensure type safety
-            const slot = item.slot as keyof PlayerInfo["equippedItems"];
-
-            // Check if the item is equipped
-            const isEquipped = player.equippedItems[slot]?.some(
-              (equippedItem) =>
-                equippedItem.equipmentName === item.equipmentName
-            );
-
-            return (
-              <><strong>Name:</strong> {item.equipmentName}
-                {isEquipped ? (
-                  <IonButton
-                    onClick={() => handleUnequipAction(item)}
-                    color="warning"
-                    title="To Equip or Unequip gear, must be your turn, in Rest Phase"
-                  >
-                    Unequip
-                  </IonButton>
-                ) : (
-                  <IonButton
-                    onClick={() => handleEquipAction(item)}
-                    color="success"
-                    title="To Equip or Unequip gear, must be your turn, in Rest Phase"
-                  >
-                    Equip
-                  </IonButton>
-                )}
-              </>
-            );
-          })}
-        </div>
+      <strong>Name:</strong> {item.equipmentName}
+      {isEquipped ? (
+        <IonButton
+          onClick={() => handleUnequipAction(item)}
+          color="warning"
+          title="To Equip or Unequip gear, must be your turn, in Rest Phase"
+        >
+          Unequip
+        </IonButton>
+      ) : (
+        <IonButton
+          onClick={() => handleEquipAction(item)}
+          color="success"
+          title="To Equip or Unequip gear, must be your turn, in Rest Phase"
+        >
+          Equip
+        </IonButton>
       )}
       <IonAlert
         isOpen={showAlert}

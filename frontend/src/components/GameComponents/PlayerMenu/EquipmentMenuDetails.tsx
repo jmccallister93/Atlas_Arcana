@@ -22,24 +22,34 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
     <>
       {" "}
       {equipableItems && equipableItems.length > 0 && (
+        
         <div>
           <h4>Equipable Items</h4>
+          <hr style={{color: "white", background: "white"}}/>
           {equipableItems.map((item: any, index: any) => {
+               const slot = item.slot as keyof PlayerInfo["equippedItems"];
+
+               // Check if the item is equipped
+               const isEquipped = player.equippedItems[slot]?.some(
+                 (equippedItem) =>
+                   equippedItem.equipmentName === item.equipmentName
+               );
             return (
               <div key={index} className="equipmentDetails">
-                <EquipGear equipableItems={item} player={player} />
+                <EquipGear equipableItems={equipableItems} item={item} player={player} isEquipped={isEquipped}/>
 
-                <RankupGear equipableItems={item} player={player} />
+                <RankupGear equipableItems={equipableItems} item={item} player={player} />
                 <p>
                   <strong>Slot:</strong> {item.slot}
                 </p>
                 <p>
                   <strong>Set:</strong> {item.set}
                 </p>
-                <AttuneGear equipableItems={item} player={player} />
+                <AttuneGear equipableItems={equipableItems} item={item} player={player} />
                 <p>
                   <strong>Bonus:</strong> {item.bonus}
                 </p>
+                <hr style={{color: "white", background: "white"}}/>
               </div>
             );
           })}

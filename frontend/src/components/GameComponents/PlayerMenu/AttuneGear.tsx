@@ -10,9 +10,14 @@ import { useAuth } from "../../../context/AuthContext/AuthContext";
 interface AttuneGearProps {
   equipableItems: EquipmentItem[];
   player: PlayerInfo;
+  item: EquipmentItem;
 }
 
-const AttuneGear: React.FC<AttuneGearProps> = ({ equipableItems, player }) => {
+const AttuneGear: React.FC<AttuneGearProps> = ({
+  equipableItems,
+  item,
+  player,
+}) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
@@ -194,18 +199,16 @@ const AttuneGear: React.FC<AttuneGearProps> = ({ equipableItems, player }) => {
 
   return (
     <>
-      {equipableItems.map((item, key) => (
-        <p>
-          <strong>Element:</strong> {item.element}
-          <IonButton
-            color={"tertiary"}
-            onClick={(e) => handleAttuneGear(e, item)}
-            title="To attune gear, must have Emeber or Attunement Shrine and 4 resources"
-          >
-            Attune
-          </IonButton>
-        </p>
-      ))}
+      <p>
+        <strong>Element:</strong> {item.element}
+        <IonButton
+          color={"tertiary"}
+          onClick={(e) => handleAttuneGear(e, item)}
+          title="To attune gear, must have Emeber or Attunement Shrine and 4 resources"
+        >
+          Attune
+        </IonButton>
+      </p>
 
       <IonAlert
         isOpen={showAttuneConfirmation}
