@@ -212,28 +212,25 @@ const EquipGear: React.FC<EquipGearProps> = ({ equipableItems, player }) => {
             );
 
             return (
-              <div key={index} className="equipmentDetails">
-                <p>
-                  <strong>Name:</strong> {item.equipmentName}
-                  {isEquipped ? (
-                    <IonButton
-                      onClick={() => handleUnequipAction(item)}
-                      color="warning"
-                      title="To Equip or Unequip gear, must be your turn, in Rest Phase"
-                    >
-                      Unequip
-                    </IonButton>
-                  ) : (
-                    <IonButton
-                      onClick={() => handleEquipAction(item)}
-                      color="success"
-                      title="To Equip or Unequip gear, must be your turn, in Rest Phase"
-                    >
-                      Equip
-                    </IonButton>
-                  )}
-                </p>
-              </div>
+              <><strong>Name:</strong> {item.equipmentName}
+                {isEquipped ? (
+                  <IonButton
+                    onClick={() => handleUnequipAction(item)}
+                    color="warning"
+                    title="To Equip or Unequip gear, must be your turn, in Rest Phase"
+                  >
+                    Unequip
+                  </IonButton>
+                ) : (
+                  <IonButton
+                    onClick={() => handleEquipAction(item)}
+                    color="success"
+                    title="To Equip or Unequip gear, must be your turn, in Rest Phase"
+                  >
+                    Equip
+                  </IonButton>
+                )}
+              </>
             );
           })}
         </div>

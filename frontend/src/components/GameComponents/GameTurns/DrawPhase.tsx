@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { EquipmentItem, GameSessionInfo, PlayerInfo } from "../Interfaces";
 import { IonButton, IonIcon, IonModal } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import socket from "../../../context/SocketClient/socketClient";
 import { useGameContext } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
-import "./GameTurn.scss"
+import "./GameTurn.scss";
 
 export interface DrawPhaseProps {}
 
@@ -15,27 +15,29 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [showCardDrawDetails, setShowCardDrawDetails] = useState(true);
+  const [isEquipmentCardDrawn, setIsEquipmentCardDrawn] = useState(false);
+  const [equipmentCardDetails, setEquipmentCardDetails] =
+    useState<EquipmentItem>();
 
   // Function to handle card draw
   const handleCardDraw = () => {
     if (currentPlayer && gameState) {
       // Emit drawCard event with necessary data
-      socket.emit("drawCard", {
+      socket.emit("drawEquipmentCard", {
         sessionId: gameState.sessionId,
         playerId: currentPlayer,
       });
     }
+    setIsEquipmentCardDrawn(true);
   };
 
   useEffect(() => {
     // Listen for the cardDrawn event
-    socket.on("cardDrawn", (cardDrawn) => {
+    socket.on("equipmentCardDrawn", (cardDrawn) => {
       console.log("Card drawn:", cardDrawn);
-      
-      if(currentPlayer){
+      setEquipmentCardDetails(cardDrawn);
+      if (currentPlayer) {
         const newPlayer = {
           ...currentPlayer,
           inventory: {
@@ -45,8 +47,6 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
         };
         updatePlayerData(newPlayer);
       }
-     
-
     });
 
     // Handle any errors
@@ -56,7 +56,7 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
 
     // Clean up on component unmount
     return () => {
-      socket.off("cardDrawn");
+      socket.off("equipmentCardDrawn");
       socket.off("errorDrawingCard");
     };
   }, []);
@@ -66,7 +66,6 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
       <IonModal
         isOpen={showCardDrawDetails}
         onDidDismiss={() => setShowCardDrawDetails(false)}
-       
       >
         <button
           className="closeButton"
@@ -74,10 +73,44 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
         >
           <IonIcon icon={closeOutline} />
         </button>
-        <IonButton onClick={handleCardDraw}>Draw Card</IonButton>
-        <IonButton onClick={() => setShowCardDrawDetails(false)}>
-          Close
-        </IonButton>
+        {isEquipmentCardDrawn ? (
+          <>
+            <h2>Equipment Card Drawn!</h2>
+            {equipmentCardDetails && (
+              <>
+                <p>
+                  <strong>Name:</strong> {equipmentCardDetails.equipmentName}
+                </p>
+                <p>
+                  <strong>Slot:</strong> {equipmentCardDetails.slot}
+                </p>
+                <p>
+                  <strong>Set:</strong> {equipmentCardDetails.set}
+                </p>
+                <p>
+                  <strong>Rank:</strong> {equipmentCardDetails.rank}
+                </p>
+                <p>
+                  <strong>Element:</strong> {equipmentCardDetails.element}
+                </p>
+                <p>
+                  <strong>Bonus:</strong> {equipmentCardDetails.bonus}
+                </p>
+              </>
+            )}
+            <IonButton onClick={() => setShowCardDrawDetails(false)}>
+              Close
+            </IonButton>
+          </>
+        ) : (
+          <>
+            {" "}
+            <IonButton onClick={handleCardDraw}>Draw Card</IonButton>{" "}
+            <IonButton onClick={() => setShowCardDrawDetails(false)}>
+              Close
+            </IonButton>
+          </>
+        )}
       </IonModal>
     </div>
   );

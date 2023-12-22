@@ -191,17 +191,13 @@ module.exports = function (socket, io) {
 
   //Game Phases
   //Draw phase
-  socket.on('drawCard', async ({ sessionId, playerId }) => {
+  socket.on('drawEquipmentCard', async ({ sessionId, playerId }) => {
     try {
         // Call the drawPhaseCardDraw function and update the game state
         const cardDrawn = await gameSessionManager.drawPhaseCardDraw(playerId, sessionId);
         // Emit back the result to the specific player
-        socket.emit('cardDrawn', cardDrawn);
-  
-        // // Optionally, retrieve the updated game state
-        // const updatedGameState = await gameSessionManager.getGameState(sessionId);
-        // // Broadcast the updated state to all players in the session
-        // io.to(sessionId).emit('updateGameState', updatedGameState);
+        socket.emit('equipmentCardDrawn', cardDrawn);
+
        
     } catch (error) {
         console.error('Error in drawCard:', error);

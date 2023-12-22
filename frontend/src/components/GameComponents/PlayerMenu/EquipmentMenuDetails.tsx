@@ -18,7 +18,6 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
   equipableItems,
   player,
 }) => {
-
   return (
     <>
       {" "}
@@ -28,15 +27,16 @@ const EquipmentMenuDetails: React.FC<EquipmentMenuDetailsProps> = ({
           {equipableItems.map((item: any, index: any) => {
             return (
               <div key={index} className="equipmentDetails">
-                <EquipGear equipableItems={equipableItems} player={player} />
-                <RankupGear equipableItems={equipableItems} player={player} />
+                <EquipGear equipableItems={item} player={player} />
+
+                <RankupGear equipableItems={item} player={player} />
                 <p>
                   <strong>Slot:</strong> {item.slot}
                 </p>
                 <p>
                   <strong>Set:</strong> {item.set}
                 </p>
-                <AttuneGear equipableItems={equipableItems} player={player} />
+                <AttuneGear equipableItems={item} player={player} />
                 <p>
                   <strong>Bonus:</strong> {item.bonus}
                 </p>

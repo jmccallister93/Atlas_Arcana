@@ -207,7 +207,7 @@ const AttuneGear: React.FC<AttuneGearProps> = ({ equipableItems, player }) => {
         </p>
       ))}
 
-<IonAlert
+      <IonAlert
         isOpen={showAttuneConfirmation}
         onDidDismiss={() => setShowAttuneConfirmation(false)}
         header={"Attune Gear"}
