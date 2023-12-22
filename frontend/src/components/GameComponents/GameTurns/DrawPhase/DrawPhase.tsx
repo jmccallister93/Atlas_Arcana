@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { EquipmentItem, GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { EquipmentItem, GameSessionInfo, PlayerInfo } from "../../Interfaces";
 import { IonButton, IonIcon, IonModal } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import socket from "../../../context/SocketClient/socketClient";
-import { useGameContext } from "../../../context/GameContext/GameContext";
-import { useAuth } from "../../../context/AuthContext/AuthContext";
+import socket from "../../../../context/SocketClient/socketClient";
+import { useGameContext } from "../../../../context/GameContext/GameContext";
+import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import "./GameTurn.scss";
 
 export interface DrawPhaseProps {}
@@ -19,9 +19,10 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
   const [isEquipmentCardDrawn, setIsEquipmentCardDrawn] = useState(false);
   const [equipmentCardDetails, setEquipmentCardDetails] =
     useState<EquipmentItem>();
+  const [resourcesAllocatedDetails, setResourcesAllocatedDetails] = useState<any>();
 
   // Function to handle card draw
-  const handleCardDraw = () => {
+  const handleEquipmentCardDraw = () => {
     if (currentPlayer && gameState) {
       // Emit drawCard event with necessary data
       socket.emit("drawEquipmentCard", {
@@ -32,6 +33,18 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
     setIsEquipmentCardDrawn(true);
   };
 
+  // Function to handle resource allocation
+  const handleResourceAllocation = () => {
+    if (currentPlayer && gameState) {
+      // Emit allocateResources event with necessary data
+      socket.emit("allocateResources", {
+        sessionId: gameState.sessionId,
+        playerId: currentPlayer,
+      });
+    }
+  };
+
+  // Listen for cardDrawn event
   useEffect(() => {
     // Listen for the cardDrawn event
     socket.on("equipmentCardDrawn", (cardDrawn) => {
@@ -59,6 +72,39 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
       socket.off("equipmentCardDrawn");
       socket.off("errorDrawingCard");
     };
+  }, []);
+
+   // Listen for allocate resources event
+   useEffect(() => {
+    socket.on("resourcesAllocated", (resourcesAllocated) => {
+      console.log("resroucesAllocated", resourcesAllocated);
+      setResourcesAllocatedDetails(resourcesAllocated);
+      if (currentPlayer) {
+        const newPlayer = {
+          ...currentPlayer,
+          inventory: {
+            ...currentPlayer.inventory,
+            resources: [...currentPlayer.inventory.resources, resourcesAllocated],
+          },
+        };
+        updatePlayerData(newPlayer);
+      }
+    });
+
+    // Handle any errors
+    socket.on("errorAllocatingResources", (errorMessage) => {
+      console.error("errorAllocatingResources:", errorMessage);
+    });
+
+    // Clean up on component unmount
+    return () => {
+      socket.off("resourcesAllocated");
+      socket.off("errorAllocatingResources");
+    };
+  }, []);
+
+  useEffect(() => {
+    handleResourceAllocation();
   }, []);
 
   return (
@@ -105,7 +151,9 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
         ) : (
           <>
             {" "}
-            <IonButton onClick={handleCardDraw}>Draw Card</IonButton>{" "}
+            <IonButton onClick={handleEquipmentCardDraw}>
+              Draw Card
+            </IonButton>{" "}
             <IonButton onClick={() => setShowCardDrawDetails(false)}>
               Close
             </IonButton>

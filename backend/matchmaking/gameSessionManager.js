@@ -148,36 +148,16 @@ function initializePlayers(playerData) {
     stamina: 1,
     movement: 3,
     build: 1,
-    buildings: {
-      defense: {
-        outpost: 1,
-        fortification: 0,
-        archerTower: 0,
-        battlement: 0,
+    buildings: [
+      {
+        category: "",
+        type: "",
+        position: { row: 0, col: 0 },
+        health: 0,
+        defense: 0,
+        offense: 0,
       },
-      equipment: {
-        armory: 0,
-        forge: 1,
-        attunementShrine: 1,
-        warehouse: 0,
-      },
-      quest: {
-        tavern: 0,
-        guildHall: 0,
-        library: 0,
-        oracleHut: 0,
-      },
-      resource: {
-        farm: 0,
-        ranch: 0,
-        plantation: 0,
-      },
-      movement: {
-        portal: 0,
-        road: 0,
-        humanCatapult: 0,
-      },
-    },
+    ],
     equippedItems: {
       weapon: [],
       armor: [],
@@ -299,6 +279,37 @@ function isPositionValid(titanPositions, row, col) {
 }
 
 //DRAW PHASE
+async function allocatedResources(players, sessionId) {
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
+  const playerResources = [];
+
+  players.forEach(player => {
+    let farmCount = 0;
+    let ranchCount = 0;
+    let plantationCount = 0;
+
+    // Count each type of resource building
+    player.buildings.forEach(building => {
+      if (building.category === "resource") {
+        if (building.type === "farm") farmCount++;
+        else if (building.type === "ranch") ranchCount++;
+        else if (building.type === "plantation") plantationCount++;
+      }
+    });
+
+    // Allocate resources based on the count
+    const resourcesToAdd = farmCount * 1 + ranchCount * 2 + plantationCount * 3;
+    player.inventory.resources.push(resourcesToAdd);
+
+    playerResources.push(player.inventory.resources);
+  });
+
+  sessionData.gameState.players = players;
+  await sessionClient.set(sessionId, JSON.stringify(sessionData));
+  return playerResources;
+}
+
+
 async function drawPhaseCardDraw(player, sessionId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let card;
@@ -344,4 +355,5 @@ module.exports = {
   endGameSession,
   getGameState,
   drawPhaseCardDraw,
+  allocatedResources,
 };

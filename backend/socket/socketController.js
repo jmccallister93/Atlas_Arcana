@@ -138,8 +138,7 @@ module.exports = function (socket, io) {
       const updatedState = await gameSessionManager.getGameState(sessionId);
       // Broadcast the updated state to all players in the session
       console.log("Broadcasting updated state to session:", sessionId);
-      io.to(sessionId)
-      .emit("updateGameState", updatedState.gameState); // Emit the gameState part
+      io.to(sessionId).emit("updateGameState", updatedState.gameState); // Emit the gameState part
     } catch (error) {
       console.error("Error updating game state:", error);
       // Optionally, emit  an error message back to the client
@@ -154,10 +153,10 @@ module.exports = function (socket, io) {
     try {
       // Retrieve the current game state for the session
       const gameState = await gameSessionManager.getGameState(sessionId);
-  
+
       // Update the currentPlayerTurn
       gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
-  
+
       // Broadcast the updated state to all players in the session
       io.to(sessionId).emit("updateGameState", gameState);
     } catch (error) {
@@ -169,39 +168,54 @@ module.exports = function (socket, io) {
     }
   });
 
-    // Current Phase
-    socket.on("updateCurrentPhase", async ({ sessionId, partialUpdate }) => {
-      try {
-        // Retrieve the current game state for the session
-        const gameState = await gameSessionManager.getGameState(sessionId);
-    
-        // Update the currentPhase
-        gameState.currentPhase = partialUpdate.currentPhase;
-    
-        // Broadcast the updated state to all players in the session
-        io.to(sessionId).emit("updateGameState", gameState);
-      } catch (error) {
-        console.error("Error updating current phase:", error);
-        // Optionally, emit an error message back to the client
-        socket.emit("gameStateUpdateError", {
-          message: "Failed to update current phase.",
-        });
-      }
-    });
+  // Current Phase
+  socket.on("updateCurrentPhase", async ({ sessionId, partialUpdate }) => {
+    try {
+      // Retrieve the current game state for the session
+      const gameState = await gameSessionManager.getGameState(sessionId);
+
+      // Update the currentPhase
+      gameState.currentPhase = partialUpdate.currentPhase;
+
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updateGameState", gameState);
+    } catch (error) {
+      console.error("Error updating current phase:", error);
+      // Optionally, emit an error message back to the client
+      socket.emit("gameStateUpdateError", {
+        message: "Failed to update current phase.",
+      });
+    }
+  });
 
   //Game Phases
-  //Draw phase
-  socket.on('drawEquipmentCard', async ({ sessionId, playerId }) => {
+  // Draw Phase
+  //Allocate Resources
+  socket.on("allocateResources", async ({ sessionId, playerId }) => {
     try {
-        // Call the drawPhaseCardDraw function and update the game state
-        const cardDrawn = await gameSessionManager.drawPhaseCardDraw(playerId, sessionId);
-        // Emit back the result to the specific player
-        socket.emit('equipmentCardDrawn', cardDrawn);
-
-       
+      const allocateResources = await gameSessionManager.allocateResources(
+        playerId,
+        sessionId
+      );
+      socket.emit("resourcesAllocated", allocateResources);
     } catch (error) {
-        console.error('Error in drawCard:', error);
-        socket.emit('errorDrawingCard', error.message);
+      console.error("Error in allocateResources:", error);
+      socket.emit("errorAllocatingResources", error.message);
+    }
+  });
+  // Draw cards
+  socket.on("drawEquipmentCard", async ({ sessionId, playerId }) => {
+    try {
+      // Call the drawPhaseCardDraw function and update the game state
+      const cardDrawn = await gameSessionManager.drawPhaseCardDraw(
+        playerId,
+        sessionId
+      );
+      // Emit back the result to the specific player
+      socket.emit("equipmentCardDrawn", cardDrawn);
+    } catch (error) {
+      console.error("Error in drawCard:", error);
+      socket.emit("errorDrawingCard", error.message);
     }
   });
 };

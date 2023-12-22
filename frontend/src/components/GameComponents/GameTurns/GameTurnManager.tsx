@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { IonIcon, ReactComponentOrElement, IonAlert } from "@ionic/react";
 import { arrowForwardCircleOutline } from "ionicons/icons";
 import { GameSessionInfo, PlayerInfo } from "../Interfaces";
-import DrawPhase from "./DrawPhase";
+import DrawPhase from "./DrawPhase/DrawPhase";
 import TradePhase from "./TradePhase";
 import RestPhase from "./RestPhase";
 import MapPhase from "./MapPhase";
