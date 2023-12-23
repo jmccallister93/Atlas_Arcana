@@ -291,15 +291,23 @@ async function allocateResources(player, sessionId) {
     }
   });
 
-  // Allocate resources based on the count, adding 1 default resource
-  // Set the resources directly as a number
-  player.inventory.resources = 1 + farmCount * 1 + ranchCount * 2 + plantationCount * 3;
+  // Calculate the new resources to be added
+  const newResources = 1 + farmCount * 1 + ranchCount * 2 + plantationCount * 3;
+
+  // Retrieve the current resources from the player's inventory
+  const currentResources = player.inventory.resources || 0; // Default to 0 if undefined
+
+  // Add the new resources to the current total resources
+  const totalResources = currentResources + newResources;
+
+  // Update the player's resources in the inventory
+  player.inventory.resources = totalResources;
 
   // Update the player in the session data and save the changes
   sessionData.gameState.player = player;
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
-  return player.inventory.resources;
+  return totalResources; // Return the new total resources
 }
 
 
