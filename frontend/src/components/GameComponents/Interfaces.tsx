@@ -49,8 +49,8 @@ export interface QuestItem {
 }
 
 export interface BuildingInfo {
-  type: string; // e.g., 'outpost', 'fortification', 'armory', etc.
-  count: number; // The count of this type of building
+  type: string; 
+  count: number; 
   location: {
     row: number;
     col: number;

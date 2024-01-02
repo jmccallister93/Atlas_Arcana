@@ -69,7 +69,7 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
   useEffect(() => {
     socket.on("resourcesAllocated", (resourcesAllocated) => {
       console.log("resourcesAllocated", resourcesAllocated);
-      setResourcesAllocatedDetails(resourcesAllocated);
+      setResourcesAllocatedDetails(resourcesAllocated - currentPlayer?.inventory.resources);
       if (currentPlayer) {
         const newPlayer = {
           ...currentPlayer,
@@ -107,6 +107,9 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
 
   return (
     <div className="gameturnMenuContainer">
+      <IonButton onClick={() => setShowCardDrawDetails(true)}>
+        Draw Options
+      </IonButton>
       <IonModal
         isOpen={showCardDrawDetails}
         onDidDismiss={() => setShowCardDrawDetails(false)}

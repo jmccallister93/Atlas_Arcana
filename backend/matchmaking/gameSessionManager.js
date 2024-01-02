@@ -307,7 +307,7 @@ async function allocateResources(player, sessionId) {
   sessionData.gameState.player = player;
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
-  return totalResources; // Return the new total resources
+  return newResources,totalResources; // Return the new total resources
 }
 
 
