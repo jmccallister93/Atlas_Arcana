@@ -9,14 +9,10 @@ import { useGameContext } from "../../../../context/GameContext/GameContext";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import {
   IonButton,
-  IonCheckbox,
-  IonItem,
-  IonList,
   IonModal,
 } from "@ionic/react";
 import "../../GameTurns/GameTurn.scss";
 import socket from "../../../../context/SocketClient/socketClient";
-import { use } from "matter";
 
 export interface TradePhaseProps {}
 
@@ -26,15 +22,11 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
-
-  const [showTradePhaseDetails, setShowTradePhaseDetails] = useState(true);
-  const [showTradeWindow, setShowTradeWindow] = useState(false);
+  const [showTradeWindow, setShowTradeWindow] = useState(true);
+  const [showTradePhaseDetails, setShowTradePhaseDetails] = useState(false);
   const [playerToTradeWith, setPlayerToTradeWith] = useState<PlayerInfo>();
-  const [equipmentCardsToTrade, setEquipmentCardsToTrade] =
-    useState<EquipmentItem[]>();
-  const [treasureCardsToTrade, setTreasureCardsToTrade] =
-    useState<TreasureItem[]>();
-  const [resourcesToTrade, setResourcesToTrade] = useState<number>(0);
+  const [isNegotiationAccepted, setIsNegotiationAccepted] = useState(false);
+  const [isTradeMade, setIsTradeMade] = useState(false);
   const [tradeOffer, setTradeOffer] = useState<{
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
@@ -44,72 +36,33 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
     treasures: [],
     resources: 0,
   });
-  const [isNegotiationAccepted, setIsNegotiationAccepted] = useState(false);
-  const [isTradeMade, setIsTradeMade] = useState(false);
 
-  const toggleEquipmentItem = (item: EquipmentItem) => {
-    setTradeOffer((prevOffer) => ({
-      ...prevOffer,
-      equipment: prevOffer.equipment.includes(item) 
-        ? prevOffer.equipment.filter(e => e !== item)
-        : [...prevOffer.equipment, item],
-    }));
-  };
-
-  const toggleTreasureItem = (item: TreasureItem) => {
-    setTradeOffer((prevOffer) => ({
-      ...prevOffer,
-      treasures: prevOffer.treasures.includes(item) 
-        ? prevOffer.treasures.filter(t => t !== item)
-        : [...prevOffer.treasures, item],
-    }));
-  };
-
-  const isEquipmentItemInOffer = (item: EquipmentItem) => {
-    return tradeOffer.equipment.includes(item);
-  };
-
-  const isTreasureItemInOffer = (item: TreasureItem) => {
-    return tradeOffer.treasures.includes(item);
+  const sendTradeRequest = (player: PlayerInfo) => {
+    socket.emit("sendTradeRequest", {
+      sessionId: gameState.sessionId,
+      fromPlayerId: currentPlayer?.username,
+      toPlayerId: player.username,
+      tradeOffer: tradeOffer,
+    });
   };
 
   useEffect(() => {
-    console.log(tradeOffer);
-  }, [tradeOffer]);
+    const handleReceiveTradeRequest = (data: any) => {
+      // Handle the received trade request
+      // Show trade details to the player and allow them to respond
+    };
 
-  const playersToTradewith = gameState.players
-    .filter((player) => player.username !== currentPlayer?.username)
-    .map((player) => player.username);
+    socket.on("receiveTradeRequest", handleReceiveTradeRequest);
 
-  const incrementResources = () => {
-    if (resourcesToTrade >= currentPlayer?.inventory.resources) {
-      return;
-    } else {
-      setResourcesToTrade(resourcesToTrade + 1);
-    }
+    // Return a cleanup function
+    return () => {
+      socket.off("receiveTradeRequest", handleReceiveTradeRequest);
+    };
+  }, [socket]); // Make sure to include socket in the dependency array if it's a prop or state
+
+  const respondToTradeRequest = (response: any) => {
+    socket.emit("respondToTradeRequest", response);
   };
-
-  const decrementResources = () => {
-    if (resourcesToTrade > 0) {
-      setResourcesToTrade(resourcesToTrade - 1);
-    }
-  };
-
-  // const addToTradeOffer = (type: string, item: any) => {
-  //   setTradeOffer(prevOffer => ({
-  //     ...prevOffer,
-  //     [type]: type === 'resources' ? item : [...prevOffer[type], item]
-  //   }));
-  // };
-
-  // const sendTradeRequest = (player: PlayerInfo) => {
-  //   socket.emit("sendTradeRequest", {
-  //     sessionId: gameState.sessionId, // Assuming this is how you access the session ID
-  //     fromPlayerId: currentPlayer.id, // Send the ID of the current player
-  //     toPlayerId: player.id, // Send the ID of the player you want to trade with
-  //     tradeOffer: tradeOffer, // The trade offer details
-  //   });
-  // };
 
   const acceptTrade = () => {
     // Logic to accept the trade and update the game state
@@ -125,45 +78,21 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
         Trade Options
       </IonButton>
       <IonModal
-        isOpen={showTradePhaseDetails}
-        onDidDismiss={() => setShowTradePhaseDetails(false)}
+        isOpen={showTradeWindow}
+        onDidDismiss={() => setShowTradeWindow(false)}
       >
-        <h1>Trading Phase</h1>
-        <h2>Select Equipment to Trade:</h2>
-        {currentPlayer?.inventory.equipment.map((card) => (
-          <IonItem key={card.equipmentName}>
-            {card.equipmentName}{" "}
-            <IonCheckbox 
-          checked={isEquipmentItemInOffer(card)}
-          onIonChange={() => toggleEquipmentItem(card)}
-        ></IonCheckbox>
-          </IonItem>
-        ))}
-        <h2>Select Treasures to Trade:</h2>
-        {currentPlayer?.inventory.treasures.map((card) => (
-          <IonItem key={card.treasureName}>
-            {card.treasureName}
-            <IonCheckbox 
-          checked={isTreasureItemInOffer(card)}
-          onIonChange={() => toggleTreasureItem(card)}
-        ></IonCheckbox>
-          </IonItem>
-        ))}
-        <h2>Select Resources to Trade:</h2>
-        <IonItem>
-          <IonButton onClick={decrementResources}>-</IonButton>
-          <span>{currentPlayer?.inventory.resources}</span>
-          <IonButton onClick={incrementResources}>+</IonButton>
-          <IonCheckbox></IonCheckbox>
-        </IonItem>
-        {playersToTradewith.map((player) => (
-          <IonButton>Offer to {player}</IonButton>
-        ))}
-
-        <IonButton onClick={() => setShowTradePhaseDetails(false)}>
-          Close
-        </IonButton>
+        {gameState.players
+          .filter((player) => player.username !== currentPlayer?.username)
+          .map((player) => (
+            <IonButton
+              key={player.username}
+              onClick={() => sendTradeRequest(player)}
+            >
+              Trade with {player.username}
+            </IonButton>
+          ))}
       </IonModal>
+
     </div>
   );
 };

@@ -220,24 +220,31 @@ module.exports = function (socket, io) {
   });
 };
 //Trade phase
-// socket.on("sendTradeRequest", async ({ sessionId, playerId, tradeRequest }) => {
-//   try {
-//     const session = await gameSessionManager.getSession(sessionId);
-//     const targetPlayerSocketId = session.getPlayerSocketId(
-//       tradeRequest.targetPlayerId
-//     );
+socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId, tradeOffer }) => {
+  try {
+    const session = await gameSessionManager.getSession(sessionId);
 
-//     if (targetPlayerSocketId) {
-//       io.to(targetPlayerSocketId).emit("receiveTradeRequest", {
-//         fromPlayerId: playerId,
-//         tradeDetails: tradeRequest,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Error in sendTradeRequest:", error);
-//     socket.emit("errorSendingTradeRequest", error.message);
-//   }
-// });
+    if (toPlayerId) {
+      io.to(toPlayerId).emit("receiveTradeRequest", {
+        fromPlayerId: playerId,
+        tradeDetails: tradeRequest,
+      });
+    }
+  } catch (error) {
+    console.error("Error in sendTradeRequest:", error);
+    socket.emit("errorSendingTradeRequest", error.message);
+  }
+});
+
+socket.on("respondToTradeRequest", ({ sessionId, fromPlayerId, toPlayerId, response }) => {
+  // Find the original sender's socket ID
+  // Send the response back to the sender
+  io.to(originalSenderSocketId).emit("tradeResponseReceived", {
+    fromPlayerId: toPlayerId,
+    response
+  });
+});
+
 
 // Call to check user online status
 function checkAndEmitUserStatus(userId, status, io) {
