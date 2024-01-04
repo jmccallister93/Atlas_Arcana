@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   EquipmentItem,
   GameSessionInfo,
@@ -7,9 +7,16 @@ import {
 } from "../../Interfaces";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
-import { IonButton, IonItem, IonList, IonModal } from "@ionic/react";
-import "../GameTurns/GameTurn.scss";
+import {
+  IonButton,
+  IonCheckbox,
+  IonItem,
+  IonList,
+  IonModal,
+} from "@ionic/react";
+import "../../GameTurns/GameTurn.scss";
 import socket from "../../../../context/SocketClient/socketClient";
+import { use } from "matter";
 
 export interface TradePhaseProps {}
 
@@ -28,7 +35,11 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   const [treasureCardsToTrade, setTreasureCardsToTrade] =
     useState<TreasureItem[]>();
   const [resourcesToTrade, setResourcesToTrade] = useState<number>(0);
-  const [tradeOffer, setTradeOffer] = useState({
+  const [tradeOffer, setTradeOffer] = useState<{
+    equipment: EquipmentItem[];
+    treasures: TreasureItem[];
+    resources: number;
+  }>({
     equipment: [],
     treasures: [],
     resources: 0,
@@ -36,21 +47,39 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   const [isNegotiationAccepted, setIsNegotiationAccepted] = useState(false);
   const [isTradeMade, setIsTradeMade] = useState(false);
 
-  const openTradeWindow = (player: PlayerInfo) => {
-    setShowTradeWindow(true);
-    setPlayerToTradeWith(player);
-    setEquipmentCardsToTrade(currentPlayer?.inventory.equipment);
-    setTreasureCardsToTrade(currentPlayer?.inventory.treasures);
-    setResourcesToTrade(currentPlayer?.inventory.resources);
+  const toggleEquipmentItem = (item: EquipmentItem) => {
+    setTradeOffer((prevOffer) => ({
+      ...prevOffer,
+      equipment: prevOffer.equipment.includes(item) 
+        ? prevOffer.equipment.filter(e => e !== item)
+        : [...prevOffer.equipment, item],
+    }));
   };
+
+  const toggleTreasureItem = (item: TreasureItem) => {
+    setTradeOffer((prevOffer) => ({
+      ...prevOffer,
+      treasures: prevOffer.treasures.includes(item) 
+        ? prevOffer.treasures.filter(t => t !== item)
+        : [...prevOffer.treasures, item],
+    }));
+  };
+
+  const isEquipmentItemInOffer = (item: EquipmentItem) => {
+    return tradeOffer.equipment.includes(item);
+  };
+
+  const isTreasureItemInOffer = (item: TreasureItem) => {
+    return tradeOffer.treasures.includes(item);
+  };
+
+  useEffect(() => {
+    console.log(tradeOffer);
+  }, [tradeOffer]);
 
   const playersToTradewith = gameState.players
     .filter((player) => player.username !== currentPlayer?.username)
-    .map((player) => (
-      <IonButton key={player.username} onClick={() => openTradeWindow(player)}>
-        {player.username}
-      </IonButton>
-    ));
+    .map((player) => player.username);
 
   const incrementResources = () => {
     if (resourcesToTrade >= currentPlayer?.inventory.resources) {
@@ -73,13 +102,14 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   //   }));
   // };
 
-  const sendTradeRequest = (player: PlayerInfo) => {
-    socket.emit("sendTradeRequest", {
-      from: currentPlayer,
-      to: player,
-      tradeOffer: tradeOffer,
-    });
-  };
+  // const sendTradeRequest = (player: PlayerInfo) => {
+  //   socket.emit("sendTradeRequest", {
+  //     sessionId: gameState.sessionId, // Assuming this is how you access the session ID
+  //     fromPlayerId: currentPlayer.id, // Send the ID of the current player
+  //     toPlayerId: player.id, // Send the ID of the player you want to trade with
+  //     tradeOffer: tradeOffer, // The trade offer details
+  //   });
+  // };
 
   const acceptTrade = () => {
     // Logic to accept the trade and update the game state
@@ -99,49 +129,41 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
         onDidDismiss={() => setShowTradePhaseDetails(false)}
       >
         <h1>Trading Phase</h1>
-        <h2>Select Player to Trade with:</h2>
-        {playersToTradewith}
+        <h2>Select Equipment to Trade:</h2>
+        {currentPlayer?.inventory.equipment.map((card) => (
+          <IonItem key={card.equipmentName}>
+            {card.equipmentName}{" "}
+            <IonCheckbox 
+          checked={isEquipmentItemInOffer(card)}
+          onIonChange={() => toggleEquipmentItem(card)}
+        ></IonCheckbox>
+          </IonItem>
+        ))}
+        <h2>Select Treasures to Trade:</h2>
+        {currentPlayer?.inventory.treasures.map((card) => (
+          <IonItem key={card.treasureName}>
+            {card.treasureName}
+            <IonCheckbox 
+          checked={isTreasureItemInOffer(card)}
+          onIonChange={() => toggleTreasureItem(card)}
+        ></IonCheckbox>
+          </IonItem>
+        ))}
+        <h2>Select Resources to Trade:</h2>
+        <IonItem>
+          <IonButton onClick={decrementResources}>-</IonButton>
+          <span>{currentPlayer?.inventory.resources}</span>
+          <IonButton onClick={incrementResources}>+</IonButton>
+          <IonCheckbox></IonCheckbox>
+        </IonItem>
+        {playersToTradewith.map((player) => (
+          <IonButton>Offer to {player}</IonButton>
+        ))}
+
         <IonButton onClick={() => setShowTradePhaseDetails(false)}>
           Close
         </IonButton>
       </IonModal>
-
-      {isNegotiationAccepted ? (
-        <>
-          <IonModal
-            isOpen={showTradeWindow}
-            onDidDismiss={() => setShowTradeWindow(false)}
-          >
-            <h1>Trade with {playerToTradeWith?.username}</h1>
-            <div>Equipment Cards</div>
-            {equipmentCardsToTrade?.map((card) => (
-              <IonItem key={card.equipmentName}>
-                <h2>{card.equipmentName}</h2>
-                <IonButton>Offer</IonButton>
-              </IonItem>
-            ))}
-            <div>Treasure Cards</div>
-            {treasureCardsToTrade?.map((card) => (
-              <IonItem key={card.treasureName}>
-                <h2>{card.treasureName}</h2>
-                <IonButton>Offer</IonButton>
-              </IonItem>
-            ))}
-            <div>Resources</div>
-            <IonItem>
-              <div>
-                <IonButton onClick={decrementResources}>-</IonButton>
-                <span>{resourcesToTrade}</span>
-                <IonButton onClick={incrementResources}>+</IonButton>
-              </div>
-              <IonButton>Offer</IonButton>
-            </IonItem>
-            <IonButton onClick={() => setShowTradeWindow(false)}>
-              Close
-            </IonButton>
-          </IonModal>
-        </>
-      ) : null}
     </div>
   );
 };

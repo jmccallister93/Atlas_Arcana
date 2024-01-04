@@ -138,6 +138,7 @@ async function getGameState(sessionId) {
 function initializePlayers(playerData) {
   // Create player objects with initial stats, inventory, etc.
   return playerData.map((player) => ({
+    socketId: player.socketId,
     id: player.id,
     username: player.username,
     victoryPoints: 0,

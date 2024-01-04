@@ -219,6 +219,25 @@ module.exports = function (socket, io) {
     }
   });
 };
+//Trade phase
+// socket.on("sendTradeRequest", async ({ sessionId, playerId, tradeRequest }) => {
+//   try {
+//     const session = await gameSessionManager.getSession(sessionId);
+//     const targetPlayerSocketId = session.getPlayerSocketId(
+//       tradeRequest.targetPlayerId
+//     );
+
+//     if (targetPlayerSocketId) {
+//       io.to(targetPlayerSocketId).emit("receiveTradeRequest", {
+//         fromPlayerId: playerId,
+//         tradeDetails: tradeRequest,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error in sendTradeRequest:", error);
+//     socket.emit("errorSendingTradeRequest", error.message);
+//   }
+// });
 
 // Call to check user online status
 function checkAndEmitUserStatus(userId, status, io) {
