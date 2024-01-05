@@ -218,16 +218,18 @@ module.exports = function (socket, io) {
       socket.emit("errorDrawingCard", error.message);
     }
   });
-};
-//Trade phase
-socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId, tradeOffer }) => {
-  try {
-    const session = await gameSessionManager.getSession(sessionId);
 
+  //Trade phase
+socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId}) => {
+  try {
+
+    console.log("From socket controller sendTradeRequest: " + sessionId);
+    console.log("From socket controller fromPlayerId: " + fromPlayerId);
+    console.log("From socket controller toPlayerId: " + toPlayerId);
     if (toPlayerId) {
+      console.log("Sending trade request to player:", toPlayerId);
       io.to(toPlayerId).emit("receiveTradeRequest", {
-        fromPlayerId: playerId,
-        tradeDetails: tradeRequest,
+        fromPlayerId,
       });
     }
   } catch (error) {
@@ -235,15 +237,17 @@ socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId, trade
     socket.emit("errorSendingTradeRequest", error.message);
   }
 });
+};
 
-socket.on("respondToTradeRequest", ({ sessionId, fromPlayerId, toPlayerId, response }) => {
-  // Find the original sender's socket ID
-  // Send the response back to the sender
-  io.to(originalSenderSocketId).emit("tradeResponseReceived", {
-    fromPlayerId: toPlayerId,
-    response
-  });
-});
+
+// socket.on("respondToTradeRequest", ({ sessionId, fromPlayerId, toPlayerId, response }) => {
+//   // Find the original sender's socket ID
+//   // Send the response back to the sender
+//   io.to(originalSenderSocketId).emit("tradeResponseReceived", {
+//     fromPlayerId: toPlayerId,
+//     response
+//   });
+// });
 
 
 // Call to check user online status

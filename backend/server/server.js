@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
     console.log("From joinMatchmaking socket token: " + token)
     console.log("From joinMatchmaking socket username: " + username)
     console.log("From joinMatchmaking socket socketId: " + socket.id)
-    matchmakingService.addToQueue({ token, username });
+    matchmakingService.addToQueue({ token, username, socketId: socket.id });
   });
 
   socket.on('leaveMatchmaking', async (data) => {

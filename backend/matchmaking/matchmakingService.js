@@ -68,13 +68,13 @@ async function findMatch(connectedUsers, io) {
       // console.log(
       //   "From matchmakingservice new gamesession: ",
       //   JSON.stringify(newSession)
-      // ); 
+      // );
       // console.log(
       //   "From matchmakingservice new playerOneData: ",
       //   JSON.stringify(playerOneData)
-      // ); 
+      // );
       notifyPlayers(
-        playerOneData, 
+        playerOneData,
         playerTwoData,
         newSession,
         newSession.sessionId,
@@ -85,22 +85,26 @@ async function findMatch(connectedUsers, io) {
   }
 }
 
-
 // Notify players
-const notifyPlayers = (playerOneData, playerTwoData, newSession, sessionId, connectedUsers, io) => {
-
+const notifyPlayers = (
+  playerOneData,
+  playerTwoData,
+  newSession,
+  sessionId,
+  connectedUsers,
+  io
+) => {
   // Get socket IDs using the tokens
   const playerOneSocketId = connectedUsers.get(playerOneData.token).socketId;
   const playerTwoSocketId = connectedUsers.get(playerTwoData.token).socketId;
 
   if (playerOneSocketId && playerTwoSocketId) {
-    const roomName = sessionId;
-    io.sockets.sockets.get(playerOneSocketId)?.join(roomName);
-    io.sockets.sockets.get(playerTwoSocketId)?.join(roomName);
+    // Use socket IDs to join the room
+    io.sockets.sockets.get(playerOneData.socketId)?.join(sessionId);
+    io.sockets.sockets.get(playerTwoData.socketId)?.join(sessionId);
 
-    // Emitting to the room
-    io.to(roomName).emit("matchFound", newSession); 
-    // console.log("From notifyplayers newSession: " + JSON.stringify(newSession))
+    // Emit to the room
+    io.to(sessionId).emit("matchFound", newSession);
   } else {
     console.log("One or both players are not connected");
   }
@@ -121,8 +125,6 @@ async function removeFromQueue(playerId) {
     await client.lRem("matchmakingQueue", 1, playerId);
   }
 }
-
-
 
 // Start the match making
 function startMatchmaking(connectedUsers, io) {

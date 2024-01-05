@@ -58,6 +58,7 @@ export interface BuildingInfo {
 }
 
 export interface PlayerInfo {
+  socketId: string;
   username: string;
   col: number;
   row: number;

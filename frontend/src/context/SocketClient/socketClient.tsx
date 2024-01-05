@@ -33,6 +33,10 @@ const offGameStateUpdate = (callback: (newGameState: GameSessionInfo) => void) =
   socket.off("updateGameState", callback);
 };
 
+socket.on("receiveTradeRequest", (fromPlayerId: string, tradeOffer: {}) => {
+  console.log("Received trade request");
+});
+
 
 export { sendGameStateUpdate, onGameStateUpdate, offGameStateUpdate };
 export default socket;

@@ -6,14 +6,15 @@ import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
 import socket from "../../../../context/SocketClient/socketClient";
 
 interface FromPlayerTradeProps {
-    showFromPlayerTrade: boolean;
+  showFromPlayerTrade: boolean;
   setShowFromPlayerTrade: (showFromPlayerTrade: boolean) => void;
-  fromTradeOffer: {
+
+  tradeOffer: {
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
     resources: number;
   };
-  setFromTradeOffer: (tradeOffer: {
+  setTradeOffer: (offer: {
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
     resources: number;
@@ -21,8 +22,10 @@ interface FromPlayerTradeProps {
 }
 
 const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
-    showFromPlayerTrade,
-    setShowFromPlayerTrade,
+  showFromPlayerTrade,
+  setShowFromPlayerTrade,
+  tradeOffer,
+  setTradeOffer,
 }) => {
   const { gameState } = useGameContext();
   const auth = useAuth();
@@ -35,32 +38,23 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
   const [treasureCardsToTrade, setTreasureCardsToTrade] =
     useState<TreasureItem[]>();
   const [resourcesToTrade, setResourcesToTrade] = useState<number>(0);
-  const [tradeOffer, setTradeOffer] = useState<{
-    equipment: EquipmentItem[];
-    treasures: TreasureItem[];
-    resources: number;
-  }>({
-    equipment: [],
-    treasures: [],
-    resources: 0,
-  });
 
   const toggleEquipmentItem = (item: EquipmentItem) => {
-    setTradeOffer((prevOffer) => ({
-      ...prevOffer,
-      equipment: prevOffer.equipment.includes(item)
-        ? prevOffer.equipment.filter((e) => e !== item)
-        : [...prevOffer.equipment, item],
-    }));
-  };
+  //   setTradeOffer((prevOffer) => ({
+  //     ...prevOffer,
+  //     equipment: prevOffer.equipment.includes(item)
+  //       ? prevOffer.equipment.filter((e) => e !== item)
+  //       : [...prevOffer.equipment, item],
+  //   }));
+  // };
 
-  const toggleTreasureItem = (item: TreasureItem) => {
-    setTradeOffer((prevOffer) => ({
-      ...prevOffer,
-      treasures: prevOffer.treasures.includes(item)
-        ? prevOffer.treasures.filter((t) => t !== item)
-        : [...prevOffer.treasures, item],
-    }));
+  // const toggleTreasureItem = (item: TreasureItem) => {
+  //   setTradeOffer((prevOffer) => ({
+  //     ...prevOffer,
+  //     treasures: prevOffer.treasures.includes(item)
+  //       ? prevOffer.treasures.filter((t) => t !== item)
+  //       : [...prevOffer.treasures, item],
+  //   }));
   };
 
   const isEquipmentItemInOffer = (item: EquipmentItem) => {
@@ -102,7 +96,7 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
         </IonItem>
       ))}
       <h3>Select Treasures to Trade:</h3>
-      {currentPlayer?.inventory.treasures.map((card) => (
+      {/* {currentPlayer?.inventory.treasures.map((card) => (
         <IonItem key={card.treasureName}>
           {card.treasureName}
           <IonCheckbox
@@ -110,7 +104,7 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
             onIonChange={() => toggleTreasureItem(card)}
           ></IonCheckbox>
         </IonItem>
-      ))}
+      ))} */}
       <h3>Select Resources to Trade:</h3>
       <IonItem>
         <IonButton onClick={decrementResources}>-</IonButton>
@@ -119,9 +113,7 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
         <IonCheckbox></IonCheckbox>
       </IonItem>
 
-      <IonButton onClick={() => setShowFromPlayerTrade(false)}>
-        Close
-      </IonButton>
+      <IonButton onClick={() => setShowFromPlayerTrade(false)}>Close</IonButton>
     </IonModal>
   );
 };

@@ -39,8 +39,8 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   const sendTradeRequest = (player: PlayerInfo) => {
     socket.emit("sendTradeRequest", {
       sessionId: gameState.sessionId,
-      fromPlayerId: currentPlayer?.username,
-      toPlayerId: player.username,
+      fromPlayerId: currentPlayer?.socketId,
+      toPlayerId: player.socketId,
       tradeOffer: tradeOffer,
     });
   };
@@ -92,7 +92,7 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
           ))}
         <IonButton onClick={() => setShowTradeWindow(false)}>Close</IonButton>
       </IonModal>
-      <PlayersTradeWindow />
+      {/* <PlayersTradeWindow /> */}
     </div>
   );
 };

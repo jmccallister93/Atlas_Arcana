@@ -9,6 +9,7 @@ import PlayerMenu from "../../components/GameComponents/PlayerMenu/PlayerMenu";
 import GameTurnManager from "../../components/GameComponents/GameTurns/GameTurnManager";
 import PlayersInGame from "../../components/GameComponents/GameBar/PlayersInGame";
 import UpdateNotifications from "../../components/GameComponents/GameBar/UpdateNotification";
+import TradeListener from "../../components/GameComponents/GameTurns/TradePhase/TradeListener";
 
 const MultiPlayerGamePage = () => {
   // Show Welcome Modal
@@ -52,6 +53,9 @@ const MultiPlayerGamePage = () => {
 
         {/* Turn Manager */}
         <GameTurnManager />
+
+        {/* Trade Listener */}
+        <TradeListener />
 
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
