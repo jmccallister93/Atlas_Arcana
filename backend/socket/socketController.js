@@ -220,12 +220,8 @@ module.exports = function (socket, io) {
   });
 
   //Trade phase
-socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId}) => {
+socket.on("sendTradeRequest", async ({ fromPlayerId, toPlayerId}) => {
   try {
-
-    console.log("From socket controller sendTradeRequest: " + sessionId);
-    console.log("From socket controller fromPlayerId: " + fromPlayerId);
-    console.log("From socket controller toPlayerId: " + toPlayerId);
     if (toPlayerId) {
       console.log("Sending trade request to player:", toPlayerId);
       io.to(toPlayerId.socketId).emit("receiveTradeRequest", {
@@ -237,17 +233,29 @@ socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId}) => {
     socket.emit("errorSendingTradeRequest", error.message);
   }
 });
+
+socket.on("respondToTradeRequest", async ({ fromPlayerId, toPlayerId, response }) => {
+  if (response === 'accepted') {
+    // Both players should now enter the trade window
+
+
+    // Emit to both players to open the trade window
+    io.to(fromPlayerId.socketId).emit("openTradeWindow", { otherPlayerId: toPlayerId });
+    io.to(toPlayerId.socketId).emit("openTradeWindow", { otherPlayerId: fromPlayerId });
+  } else {
+    io.to(fromPlayerId).emit("tradeRequestDeclined");
+  }
+});
+
+
+
+
+
+
 };
 
 
-// socket.on("respondToTradeRequest", ({ sessionId, fromPlayerId, toPlayerId, response }) => {
-//   // Find the original sender's socket ID
-//   // Send the response back to the sender
-//   io.to(originalSenderSocketId).emit("tradeResponseReceived", {
-//     fromPlayerId: toPlayerId,
-//     response
-//   });
-// });
+
 
 
 // Call to check user online status

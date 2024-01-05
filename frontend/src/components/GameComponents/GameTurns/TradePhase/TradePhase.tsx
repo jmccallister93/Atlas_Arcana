@@ -38,38 +38,11 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
 
   const sendTradeRequest = (player: PlayerInfo) => {
     socket.emit("sendTradeRequest", {
-      sessionId: gameState.sessionId,
       fromPlayerId: currentPlayer,
       toPlayerId: player,
-      tradeOffer: tradeOffer,
     });
   };
 
-  useEffect(() => {
-    const handleReceiveTradeRequest = (data: any) => {
-      // Handle the received trade request
-      // Show trade details to the player and allow them to respond
-    };
-
-    socket.on("receiveTradeRequest", handleReceiveTradeRequest);
-
-    // Return a cleanup function
-    return () => {
-      socket.off("receiveTradeRequest", handleReceiveTradeRequest);
-    };
-  }, [socket]); // Make sure to include socket in the dependency array if it's a prop or state
-
-  const respondToTradeRequest = (response: any) => {
-    socket.emit("respondToTradeRequest", response);
-  };
-
-  const acceptTrade = () => {
-    // Logic to accept the trade and update the game state
-  };
-
-  const declineTrade = () => {
-    // Logic to decline the trade
-  };
 
   return (
     <div className="gameturnMenuContainer">

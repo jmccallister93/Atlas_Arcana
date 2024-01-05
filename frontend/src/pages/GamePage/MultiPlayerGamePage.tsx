@@ -57,7 +57,7 @@ const MultiPlayerGamePage = () => {
 
         {/* Trade Listener */}
         <TradeListener />
-
+        
         {/* VP Count */}
         <h4 className="pageHeader">VP Counts: </h4>
 
