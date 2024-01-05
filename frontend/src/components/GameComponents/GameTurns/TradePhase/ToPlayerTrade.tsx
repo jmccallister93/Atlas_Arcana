@@ -2,7 +2,7 @@ import { IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
 import React, { useState } from "react";
 import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
 
-interface ReponseTradeProps {
+interface ToPlayerTradeProps {
   tradeOffer: {
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
@@ -11,7 +11,7 @@ interface ReponseTradeProps {
   player: PlayerInfo;
 }
 
-const ReponseTrade: React.FC<ReponseTradeProps> = ({ tradeOffer, player }) => {
+const ToPlayerTrade: React.FC<ToPlayerTradeProps> = ({ tradeOffer, player }) => {
     const [returnTradeOffer, setReturnTradeOffer] = useState<{
         equipment: EquipmentItem[];
         treasures: TreasureItem[];
@@ -92,4 +92,4 @@ const ReponseTrade: React.FC<ReponseTradeProps> = ({ tradeOffer, player }) => {
   );
 };
 
-export default ReponseTrade;
+export default ToPlayerTrade;

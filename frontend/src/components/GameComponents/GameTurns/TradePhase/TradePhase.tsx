@@ -7,12 +7,11 @@ import {
 } from "../../Interfaces";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
-import {
-  IonButton,
-  IonModal,
-} from "@ionic/react";
+import { IonButton, IonModal } from "@ionic/react";
 import "../../GameTurns/GameTurn.scss";
 import socket from "../../../../context/SocketClient/socketClient";
+import FromPlayerTrade from "./FromPlayerTrade";
+import PlayersTradeWindow from "./PlayersTradeWindow";
 
 export interface TradePhaseProps {}
 
@@ -74,7 +73,7 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
 
   return (
     <div className="gameturnMenuContainer">
-      <IonButton onClick={() => setShowTradePhaseDetails(true)}>
+      <IonButton onClick={() => setShowTradeWindow(true)}>
         Trade Options
       </IonButton>
       <IonModal
@@ -91,8 +90,9 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
               Trade with {player.username}
             </IonButton>
           ))}
+        <IonButton onClick={() => setShowTradeWindow(false)}>Close</IonButton>
       </IonModal>
-
+      <PlayersTradeWindow />
     </div>
   );
 };

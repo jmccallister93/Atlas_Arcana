@@ -6,14 +6,14 @@ import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
 import socket from "../../../../context/SocketClient/socketClient";
 
 interface FromPlayerTradeProps {
-  showTradePhaseDetails: boolean;
-  setShowTradePhaseDetails: (showTradePhaseDetails: boolean) => void;
-  tradeOffer: {
+    showFromPlayerTrade: boolean;
+  setShowFromPlayerTrade: (showFromPlayerTrade: boolean) => void;
+  fromTradeOffer: {
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
     resources: number;
   };
-  setTradeOffer: (tradeOffer: {
+  setFromTradeOffer: (tradeOffer: {
     equipment: EquipmentItem[];
     treasures: TreasureItem[];
     resources: number;
@@ -21,8 +21,8 @@ interface FromPlayerTradeProps {
 }
 
 const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
-  showTradePhaseDetails,
-  setShowTradePhaseDetails,
+    showFromPlayerTrade,
+    setShowFromPlayerTrade,
 }) => {
   const { gameState } = useGameContext();
   const auth = useAuth();
@@ -87,8 +87,8 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
 
   return (
     <IonModal
-      isOpen={showTradePhaseDetails}
-      onDidDismiss={() => setShowTradePhaseDetails(false)}
+      isOpen={showFromPlayerTrade}
+      onDidDismiss={() => setShowFromPlayerTrade(false)}
     >
       <h1>Trading Phase</h1>
       <h3>Select Equipment to Trade:</h3>
@@ -119,7 +119,7 @@ const FromPlayerTrade: React.FC<FromPlayerTradeProps> = ({
         <IonCheckbox></IonCheckbox>
       </IonItem>
 
-      <IonButton onClick={() => setShowTradePhaseDetails(false)}>
+      <IonButton onClick={() => setShowFromPlayerTrade(false)}>
         Close
       </IonButton>
     </IonModal>
