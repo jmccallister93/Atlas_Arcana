@@ -228,7 +228,7 @@ socket.on("sendTradeRequest", async ({sessionId, fromPlayerId, toPlayerId}) => {
     console.log("From socket controller toPlayerId: " + toPlayerId);
     if (toPlayerId) {
       console.log("Sending trade request to player:", toPlayerId);
-      io.to(toPlayerId).emit("receiveTradeRequest", {
+      io.to(toPlayerId.socketId).emit("receiveTradeRequest", {
         fromPlayerId,
       });
     }

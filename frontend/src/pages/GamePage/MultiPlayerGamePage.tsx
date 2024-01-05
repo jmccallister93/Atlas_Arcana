@@ -42,6 +42,7 @@ const MultiPlayerGamePage = () => {
         <div className="actionsMenu">
           <button className="actionsIcon" onClick={togglePlayerMenu}>
             <IonIcon icon={addCircleOutline} size="large" color="success" />
+            Player Menu
           </button>
         </div>
 

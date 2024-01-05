@@ -39,8 +39,8 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
   const sendTradeRequest = (player: PlayerInfo) => {
     socket.emit("sendTradeRequest", {
       sessionId: gameState.sessionId,
-      fromPlayerId: currentPlayer?.socketId,
-      toPlayerId: player.socketId,
+      fromPlayerId: currentPlayer,
+      toPlayerId: player,
       tradeOffer: tradeOffer,
     });
   };
