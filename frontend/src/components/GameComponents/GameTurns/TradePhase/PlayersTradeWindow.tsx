@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
-import FromPlayerTrade from "./FromPlayerTrade";
-import ToPlayerTrade from "./ToPlayerTrade";
 import { IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
 import "../GameTurn.scss";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
-import { TypeGuard } from "@reduxjs/toolkit/dist/tsHelpers";
+
 
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
@@ -192,7 +190,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           <h3>Trade offer from {tradePartnerId?.username}</h3>
           <div>
             <h4>Equipment:</h4>
-
             <IonItem>
               {tradeState[
                 currentPlayer?.username === auth.username
