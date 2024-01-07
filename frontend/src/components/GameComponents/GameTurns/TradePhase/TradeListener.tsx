@@ -14,7 +14,7 @@ const TradeListener: React.FC = () => {
   const [showIncomingTradeRequest, setShowIncomingTradeRequest] =
     useState<boolean>(false);
 
-  const [showTradeWindow, setShowTradeWindow] = useState(false);
+  const [showActiveTradeWindow, setShowActiveTradeWindow] = useState(false);
   const [tradePartnerId, setTradePartnerId] = useState<string | null>(null);
   const { gameState } = useGameContext();
   const auth = useAuth();
@@ -22,19 +22,7 @@ const TradeListener: React.FC = () => {
     (player) => player.username === auth.username
   );
 
-  useEffect(() => {
-    const handleOpenTradeWindow = (data: any) => {
-      console.log("Opening trade window with:", data.otherPlayerId);
-      setTradePartnerId(data.otherPlayerId);
-      setShowTradeWindow(true);
-    };
 
-    socket.on("openTradeWindow", handleOpenTradeWindow);
-
-    return () => {
-      socket.off("openTradeWindow", handleOpenTradeWindow);
-    };
-  }, []);
 
   useEffect(() => {
     const handleReceiveTradeRequest = (data: any) => {
@@ -58,7 +46,7 @@ const TradeListener: React.FC = () => {
     socket.emit("respondToTradeRequest", {
       response: "accepted",
       fromPlayerId,
-        toPlayerId: currentPlayer,
+      toPlayerId: currentPlayer,
     });
     setIncomingTradeRequest(false); // Reset trade request
   };
@@ -71,9 +59,20 @@ const TradeListener: React.FC = () => {
     setIncomingTradeRequest(false); // Reset trade request
   };
 
-  if (!incomingTradeRequest) {
-    return null; // No trade request to display
-  }
+  useEffect(() => {
+    const handleOpenTradeWindow = (data: any) => {
+      console.log("Opening trade window with:", data.otherPlayerId);
+      setTradePartnerId(data.otherPlayerId);
+      setShowActiveTradeWindow(true);
+    };
+
+    socket.on("openTradeWindow", handleOpenTradeWindow);
+
+    return () => {
+      socket.off("openTradeWindow", handleOpenTradeWindow);
+    };
+  }, []);
+
 
   return (
     <>
@@ -89,7 +88,12 @@ const TradeListener: React.FC = () => {
           Close
         </IonButton>
       </IonModal>
-      {showTradeWindow && tradePartnerId ? <PlayersTradeWindow /> : null}
+      <IonModal
+        isOpen={showActiveTradeWindow}
+        onDidDismiss={() => setShowActiveTradeWindow(false)}
+      >
+        Trade window 
+      </IonModal>
     </>
   );
 };

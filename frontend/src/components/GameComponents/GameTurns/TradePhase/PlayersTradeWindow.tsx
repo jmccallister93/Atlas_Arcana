@@ -53,9 +53,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   return (
     <>
-    <IonModal >
-      Trade window
-    </IonModal>
+
       {/* <FromPlayerTrade
         showFromPlayerTrade={showFromPlayerTrade}
         setShowFromPlayerTrade={setShowFromPlayerTrade}

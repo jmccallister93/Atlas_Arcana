@@ -10,8 +10,6 @@ import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { IonButton, IonModal } from "@ionic/react";
 import "../../GameTurns/GameTurn.scss";
 import socket from "../../../../context/SocketClient/socketClient";
-import FromPlayerTrade from "./FromPlayerTrade";
-import PlayersTradeWindow from "./PlayersTradeWindow";
 
 export interface TradePhaseProps {}
 
@@ -22,19 +20,6 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
     (player) => player.username === auth.username
   );
   const [showTradeWindow, setShowTradeWindow] = useState(true);
-  const [showTradePhaseDetails, setShowTradePhaseDetails] = useState(false);
-  const [playerToTradeWith, setPlayerToTradeWith] = useState<PlayerInfo>();
-  const [isNegotiationAccepted, setIsNegotiationAccepted] = useState(false);
-  const [isTradeMade, setIsTradeMade] = useState(false);
-  const [tradeOffer, setTradeOffer] = useState<{
-    equipment: EquipmentItem[];
-    treasures: TreasureItem[];
-    resources: number;
-  }>({
-    equipment: [],
-    treasures: [],
-    resources: 0,
-  });
 
   const sendTradeRequest = (player: PlayerInfo) => {
     socket.emit("sendTradeRequest", {
