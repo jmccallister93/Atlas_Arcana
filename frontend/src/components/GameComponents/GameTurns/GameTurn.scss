@@ -43,11 +43,32 @@
   align-items: center;
   margin: 10px;
   padding: 10px;
-  border: 1px solid #ffffff;
+  
   border-radius: 5px;
   cursor: pointer;
   color: #ffffff;
   font-size: 1.5em;
-  width: 8rem;
-  height: fit-content;
+  // width: fit-content;
+  // height: fit-content;
+  text-align: center;
+}
+
+.currentPlayerInventory{
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: left;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 1.5em;
+
+}
+
+.tradeWindowDetailsContainer{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
