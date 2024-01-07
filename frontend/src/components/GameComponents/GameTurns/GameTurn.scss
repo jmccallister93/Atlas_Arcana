@@ -35,3 +35,19 @@
   width: 8rem;
   height: fit-content;
 }
+
+.tradeWindowContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 1.5em;
+  width: 8rem;
+  height: fit-content;
+}

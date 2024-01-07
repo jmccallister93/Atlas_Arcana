@@ -1,41 +1,14 @@
 import { useState } from "react";
-import { EquipmentItem, TreasureItem } from "../../Interfaces";
+import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
 import FromPlayerTrade from "./FromPlayerTrade";
 import ToPlayerTrade from "./ToPlayerTrade";
 import { IonModal } from "@ionic/react";
+import "../GameTurn.scss"
 
 interface PlayersTradewindowProps {
-  // showFromPlayerTrade: boolean;
-  // setShowFromPlayerTrade: (showFromPlayerTrade: boolean) => void;
-  // fromTradeOffer: {
-  //   equipment: EquipmentItem[];
-  //   treasures: TreasureItem[];
-  //   resources: number;
-  // };
-  // setFromTradeOffer: (tradeOffer: {
-  //   equipment: EquipmentItem[];
-  //   treasures: TreasureItem[];
-  //   resources: number;
-  // }) => void;
-  // showToPlayerTrade: boolean;
-  // setShowToPlayerTrade: (showToPlayerTrade: boolean) => void;
-  // toTradeOffer: {
-  //   equipment: EquipmentItem[];
-  //   treasures: TreasureItem[];
-  //   resources: number;
-  // };
-  // setToTradeOffer: (tradeOffer: {
-  //   equipment: EquipmentItem[];
-  //   treasures: TreasureItem[];
-  //   resources: number;
-  // }) => void;
+  tradePartnerId: PlayerInfo | undefined;
 }
-const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
-  // showFromPlayerTrade,
-  // setShowFromPlayerTrade,
-  // fromTradeOffer,
-  // setFromTradeOffer,
-}) => {
+const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({tradePartnerId}) => {
   const [tradeState, setTradeState] = useState({
     fromPlayerOffer: {
       equipment: [],
@@ -49,11 +22,12 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     },
   });
 
-  console.log("Trade window would be open")
+  console.log("tradePartnerId", tradePartnerId);
 
   return (
-    <>
-
+    <div className="tradeWindowContainer">
+      Trade Window
+      <div>{tradePartnerId?.username}</div>
       {/* <FromPlayerTrade
         showFromPlayerTrade={showFromPlayerTrade}
         setShowFromPlayerTrade={setShowFromPlayerTrade}
@@ -70,7 +44,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           setTradeState((prev) => ({ ...prev, toPlayerOffer: offer }))
         }
       /> */}
-    </>
+    </div>
   );
 };
 export default PlayersTradeWindow;
