@@ -237,6 +237,7 @@ module.exports = function (socket, io) {
   socket.on(
     "respondToTradeRequest",
     async ({ fromPlayerId, toPlayerId, response }) => {
+  
       if (response === "accepted") {
         // Both players should now enter the trade window
 
@@ -247,6 +248,26 @@ module.exports = function (socket, io) {
         io.to(toPlayerId.socketId).emit("openTradeWindow", {
           otherPlayerId: fromPlayerId,
         });
+
+        const tradeSessionId =
+          fromPlayerId.username + "_" + toPlayerId.username;
+          const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
+          const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
+          
+          if (fromSocket) {
+            fromSocket.join(tradeSessionId);
+          } else {
+            console.error(`Socket with ID ${fromPlayerId.socketId} does not exist.`);
+          }
+          
+          if (toSocket) {
+            toSocket.join(tradeSessionId);
+          } else {
+            console.error(`Socket with ID ${toPlayerId.socketId} does not exist.`);
+          }
+          
+      
+        
       } else {
         io.to(fromPlayerId).emit("tradeRequestDeclined");
       }
@@ -255,19 +276,13 @@ module.exports = function (socket, io) {
 
   // WORKING HERE
   //TWTEWATEA
-  socket.on("addToTrade", async ({sessionId,  playerId, tradeState }) => {
-    console.log(
-      "PlayerId: " + playerId + " tradeState: " + tradeState,
-
-    );
+  socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
+    console.log("PlayerId: " + playerId + " tradeState: " + tradeState);
     try {
-      const trade = await gameSessionManager.addToTrade(
-        sessionId,
-        tradeState
-      );
+      const trade = await gameSessionManager.addToTrade(sessionId, tradeState);
 
       // Emit back the result to the specific player
-      socket.emit("tradeAdded", trade);
+      io.to(sessionId).emit("tradeAdded", trade);
     } catch (error) {
       console.error("Error in addToTrade:", error);
       socket.emit("errorAddingToTrade", error.message);

@@ -35,18 +35,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   const [resourcesToTrade, setResourcesToTrade] = useState<number>(0);
   const [tradeDisplayPlayer, setTradeDisplayPlayer] = useState<string>();
-  const [tradeDisplayOffer, setTradeDisplayOffer] = useState<TradeState>({
-    firstPlayerOffer: {
-      equipment: [],
-      treasures: [],
-      resources: 0,
-    },
-    secondPlayerOffer: {
-      equipment: [],
-      treasures: [],
-      resources: 0,
-    },
-  });
+  const [tradeDisplayOffer, setTradeDisplayOffer] = useState<TradeState>({});
   const [equipmentItemsForTrade, setEquipmentItemsForTrade] =
     useState<ReactElement>();
 
@@ -202,23 +191,26 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    const tradePartner = tradePartnerId?.username; // or tradePartnerId?.username
+  // useEffect(() => {
+  //   const tradePartner = tradePartnerId?.username; // or tradePartnerId?.username
 
-    const offerKey =
-      tradePartner && tradePartner !== currentPlayer?.username // or currentPlayer?.username
-        ? tradePartner // Use trade partner's offer if they are not the current player
-        : currentPlayer?.username; // Use current player's offer otherwise
-    if (!offerKey) return;
-    setEquipmentItemsForTrade(
-      <IonItem>
-        {tradeDisplayOffer[offerKey]?.equipment.map((item) => (
-          <li key={item.equipmentName}>{item.equipmentName}</li>
-        ))}
-      </IonItem>
-    );
-  }, [tradeDisplayOffer]);
-  console.log(tradeDisplayOffer);
+  //   const offerKey =
+  //     tradePartner && tradePartner !== currentPlayer?.username // or currentPlayer?.username
+  //       ? tradePartner // Use trade partner's offer if they are not the current player
+  //       : currentPlayer?.username; // Use current player's offer otherwise
+  //       console.log(offerKey)
+  //   if (!offerKey) return;
+  //   console.log("continued")
+  //   setEquipmentItemsForTrade(
+  //     <IonItem>
+  //       {tradeDisplayOffer[offerKey].equipment.map((item) => (
+  //         <li key={item.equipmentName}>{item.equipmentName}</li>
+  //       ))}
+  //     </IonItem>
+  //   );
+  //   console.log("Test logs:",tradeDisplayOffer[offerKey].equipment);
+  // }, [tradeDisplayOffer]);
+ 
   return (
     <div className="tradeWindowContainer">
       <div className="tradeWindowHeader">
@@ -264,7 +256,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           <div>
             <h4>Equipment:</h4>
 
-            {equipmentItemsForTrade}
+            {/* {equipmentItemsForTrade} */}
 
             <h4>Treasures:</h4>
             <IonItem>
