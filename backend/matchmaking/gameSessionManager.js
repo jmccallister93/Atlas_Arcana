@@ -311,8 +311,6 @@ async function allocateResources(player, sessionId) {
   return newResources,totalResources; // Return the new total resources
 }
 
-
-
 async function drawPhaseCardDraw(player, sessionId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let card;
@@ -328,6 +326,17 @@ async function drawPhaseCardDraw(player, sessionId) {
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
   return card;
+}
+
+//Trade Phase
+// WORKING HERE
+//TWTEWATEA
+async function addToTrade(player, sessionId, tradeState) {
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
+  let trade = [];
+  trade.push(tradeState);
+  await sessionClient.set(sessionId, JSON.stringify(trade));
+  return trade;
 }
 
 // Function to handle player disconnection
@@ -359,4 +368,5 @@ module.exports = {
   getGameState,
   drawPhaseCardDraw,
   allocateResources,
+  addToTrade,
 };

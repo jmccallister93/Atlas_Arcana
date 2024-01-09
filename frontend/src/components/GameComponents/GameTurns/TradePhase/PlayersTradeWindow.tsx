@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
 import { IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
 import "../GameTurn.scss";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
-
+import socket from "../../../../context/SocketClient/socketClient";
 
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
@@ -17,6 +17,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
+  const [tradeDisplayPlayer, setTradeDisplayPlayer] = useState<string>();
+  const [tradeDisplayOffer, setTradeDisplayOffer] = useState<{}>();
 
   interface TradeOffer {
     equipment: EquipmentItem[];
@@ -68,7 +70,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       player === currentPlayer?.username
         ? "firstPlayerOffer"
         : "secondPlayerOffer";
-
     setTradeState((prevState) => {
       // Clone the previous state's offer for the specific player
       const updatedOffer = { ...prevState[offerKey] };
@@ -142,10 +143,31 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   ) => {
     if (isItemInCurrentPlayerOffer(item, itemType)) {
       removeFromOffer(currentPlayer?.username, item, itemType);
+      socket.emit("addToTrade", {
+        sessionId: gameState.sessionId,
+        playerId: currentPlayer,
+        tradeState: tradeState,
+      });
     } else {
       addToOffer(currentPlayer?.username, item, itemType);
+      socket.emit("addToTrade", {
+        sessionId: gameState.sessionId,
+        playerId: currentPlayer,
+        tradeState: tradeState,
+      });
     }
   };
+
+  useEffect(() => {
+    socket.on("tradeAdded", (data: any) => {
+      console.log("Trade added:", data);
+      setTradeDisplayPlayer(data.playerId)
+      setTradeDisplayOffer(data.tradeState)
+    });
+    return () => {
+      socket.off("tradeAdded");
+    };
+  }, []);
 
   return (
     <div className="tradeWindowContainer">
@@ -191,13 +213,10 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           <div>
             <h4>Equipment:</h4>
             <IonItem>
-              {tradeState[
-                currentPlayer?.username === auth.username
+            {currentPlayer?.username === auth.username
                   ? "secondPlayerOffer"
-                  : "firstPlayerOffer"
-              ].equipment.map((item) => (
-                <li key={item.equipmentName}>{item.equipmentName}</li>
-              ))}
+                  : "firstPlayerOffer"}
+        
             </IonItem>
             <h4>Treasures:</h4>
             <IonItem>

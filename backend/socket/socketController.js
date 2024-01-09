@@ -220,43 +220,61 @@ module.exports = function (socket, io) {
   });
 
   //Trade phase
-socket.on("sendTradeRequest", async ({ fromPlayerId, toPlayerId}) => {
-  try {
-    if (toPlayerId) {
-      console.log("Sending trade request to player:", toPlayerId);
-      io.to(toPlayerId.socketId).emit("receiveTradeRequest", {
-        fromPlayerId,
-      });
+  socket.on("sendTradeRequest", async ({ fromPlayerId, toPlayerId }) => {
+    try {
+      if (toPlayerId) {
+        console.log("Sending trade request to player:", toPlayerId);
+        io.to(toPlayerId.socketId).emit("receiveTradeRequest", {
+          fromPlayerId,
+        });
+      }
+    } catch (error) {
+      console.error("Error in sendTradeRequest:", error);
+      socket.emit("errorSendingTradeRequest", error.message);
     }
-  } catch (error) {
-    console.error("Error in sendTradeRequest:", error);
-    socket.emit("errorSendingTradeRequest", error.message);
-  }
-});
+  });
 
-socket.on("respondToTradeRequest", async ({ fromPlayerId, toPlayerId, response }) => {
-  if (response === 'accepted') {
-    // Both players should now enter the trade window
+  socket.on(
+    "respondToTradeRequest",
+    async ({ fromPlayerId, toPlayerId, response }) => {
+      if (response === "accepted") {
+        // Both players should now enter the trade window
 
+        // Emit to both players to open the trade window
+        io.to(fromPlayerId.socketId).emit("openTradeWindow", {
+          otherPlayerId: toPlayerId,
+        });
+        io.to(toPlayerId.socketId).emit("openTradeWindow", {
+          otherPlayerId: fromPlayerId,
+        });
+      } else {
+        io.to(fromPlayerId).emit("tradeRequestDeclined");
+      }
+    }
+  );
 
-    // Emit to both players to open the trade window
-    io.to(fromPlayerId.socketId).emit("openTradeWindow", { otherPlayerId: toPlayerId });
-    io.to(toPlayerId.socketId).emit("openTradeWindow", { otherPlayerId: fromPlayerId });
-  } else {
-    io.to(fromPlayerId).emit("tradeRequestDeclined");
-  }
-});
+  // WORKING HERE
+  //TWTEWATEA
+  socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
+    console.log(
+      "PlayerId: " + playerId + " tradeState: " + tradeState,
+      " sessionId: " + sessionId
+    );
+    try {
+      const trade = await gameSessionManager.addToTrade(
+        sessionId,
+        playerId,
+        tradeState
+      );
 
-
-
-
-
-
+      // Emit back the result to the specific player
+      socket.emit("tradeAdded", trade);
+    } catch (error) {
+      console.error("Error in addToTrade:", error);
+      socket.emit("errorAddingToTrade", error.message);
+    }
+  });
 };
-
-
-
-
 
 // Call to check user online status
 function checkAndEmitUserStatus(userId, status, io) {
