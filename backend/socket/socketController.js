@@ -255,15 +255,14 @@ module.exports = function (socket, io) {
 
   // WORKING HERE
   //TWTEWATEA
-  socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
+  socket.on("addToTrade", async ({sessionId,  playerId, tradeState }) => {
     console.log(
       "PlayerId: " + playerId + " tradeState: " + tradeState,
-      " sessionId: " + sessionId
+
     );
     try {
       const trade = await gameSessionManager.addToTrade(
         sessionId,
-        playerId,
         tradeState
       );
 

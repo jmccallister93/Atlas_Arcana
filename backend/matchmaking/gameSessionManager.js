@@ -331,12 +331,9 @@ async function drawPhaseCardDraw(player, sessionId) {
 //Trade Phase
 // WORKING HERE
 //TWTEWATEA
-async function addToTrade(player, sessionId, tradeState) {
-  const sessionData = JSON.parse(await sessionClient.get(sessionId));
-  let trade = [];
-  trade.push(tradeState);
-  await sessionClient.set(sessionId, JSON.stringify(trade));
-  return trade;
+async function addToTrade(sessionId, tradeState) {
+  await sessionClient.set(sessionId, JSON.stringify(tradeState));
+  return tradeState;
 }
 
 // Function to handle player disconnection
