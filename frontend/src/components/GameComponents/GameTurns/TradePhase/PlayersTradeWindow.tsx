@@ -77,6 +77,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         resources: 0,
       };
 
+      console.log("Add to offer item:",item)
+
       if (itemType === "equipment" && isEquipmentItem(item)) {
         updatedOffer.equipment = [...updatedOffer.equipment, item];
       } else if (itemType === "treasures" && isTreasureItem(item)) {
@@ -154,7 +156,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   
     return false;
   };
-  
+
   const toggleItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -162,20 +164,40 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     if (!currentPlayer) return;
     if (isItemInCurrentPlayerOffer(item, itemType)) {
       removeFromOffer(currentPlayer.username, item, itemType);
-      socket.emit("addToTrade", {
-        sessionId: gameState.sessionId,
-        playerId: currentPlayer,
-        tradeState: tradeState,
-      });
     } else {
       addToOffer(currentPlayer?.username, item, itemType);
-      socket.emit("addToTrade", {
-        sessionId: gameState.sessionId,
-        playerId: currentPlayer,
-        tradeState: tradeState,
-      });
     }
   };
+  
+  // const toggleItemInCurrentPlayerOffer = (
+  //   item: EquipmentItem | TreasureItem,
+  //   itemType: ItemType
+  // ) => {
+  //   if (!currentPlayer) return;
+  //   if (isItemInCurrentPlayerOffer(item, itemType)) {
+  //     removeFromOffer(currentPlayer.username, item, itemType);
+  //     socket.emit("addToTrade", {
+  //       sessionId: gameState.sessionId,
+  //       playerId: currentPlayer,
+  //       tradeState: tradeState,
+  //     });
+  //   } else {
+  //     addToOffer(currentPlayer?.username, item, itemType);
+  //     socket.emit("addToTrade", {
+  //       sessionId: gameState.sessionId,
+  //       playerId: currentPlayer,
+  //       tradeState: tradeState,
+  //     });
+  //   }
+  // };
+  useEffect(() => {
+    // Emit the trade state whenever it changes
+    socket.emit("addToTrade", {
+      sessionId: gameState.sessionId,
+      playerId: currentPlayer,
+      tradeState: tradeState,
+    });
+  }, [tradeState, gameState.sessionId, currentPlayer]);
 
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
