@@ -172,7 +172,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     if (!currentPlayer || !tradePartnerId) return;
     socket.emit("addToTrade", {
       sessionId: tradeSessionId,
-      playerId: currentPlayer,
+      playerId: currentPlayer?.username,
       tradeState: tradeState,
     });
   }, [tradeState, gameState.sessionId, currentPlayer]);
@@ -180,7 +180,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
       // Make sure the data type matches TradeState
-      // console.log(data)
+      console.log(data)
       setTradeDisplayOffer(data); // Assuming data is of type TradeState
     });
     return () => {

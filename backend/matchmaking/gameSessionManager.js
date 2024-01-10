@@ -331,7 +331,7 @@ async function drawPhaseCardDraw(player, sessionId) {
 //Trade Phase
 async function getTradeState(sessionId) {
   const tradeStateJson = await sessionClient.get(sessionId);
-  console.log("TradeStateJson:", sessionId)
+  console.log(tradeStateJson)
   if (tradeStateJson) {
       return JSON.parse(tradeStateJson);
   } else {
@@ -342,6 +342,8 @@ async function getTradeState(sessionId) {
 }
 async function addToTrade(sessionId, tradeState) {
   await sessionClient.set(sessionId, JSON.stringify(tradeState));
+  console.log("addToTrade - Trade state updated:", tradeState);
+  
   return tradeState;
 }
 

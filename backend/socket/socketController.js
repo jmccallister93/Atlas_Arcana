@@ -242,7 +242,7 @@ module.exports = function (socket, io) {
 
         const tradeSessionId =
           fromPlayerId.username + "_" + toPlayerId.username;
-        console.log("tradeSessionId: " + tradeSessionId);
+
         const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
         const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
 
@@ -283,12 +283,14 @@ module.exports = function (socket, io) {
       const currentTradeState = await gameSessionManager.getTradeState(
         sessionId
       );
-
+        console.log("Current trade state:", currentTradeState)
+        console.log("Incoming trade state:", tradeState)
       // Merge the incoming tradeState with the existing trade state
       const updatedTradeState = {
         ...currentTradeState,
         [playerId]: tradeState[playerId], // Update only the relevant player's trade offer
       };
+      console.log("Updated trade state:", updatedTradeState);
 
       // Persist this updated state
       await gameSessionManager.addToTrade(sessionId, updatedTradeState);
