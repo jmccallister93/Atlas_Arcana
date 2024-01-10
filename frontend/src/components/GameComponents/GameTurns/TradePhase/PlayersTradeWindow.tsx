@@ -43,6 +43,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<ReactElement>();
   const [resourceItemsForTrade, setResourceItemsForTrade] =
     useState<ReactElement>();
+  const [includeResourcesInOffer, setIncludeResourcesInOffer] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const initialTradeState: TradeState = {};
@@ -57,18 +59,31 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   }, []);
 
   const incrementResources = () => {
-    if (resourcesToTrade >= currentPlayer?.inventory.resources) {
-      return;
-    } else {
-      setResourcesToTrade(resourcesToTrade + 1);
-    }
+    if (!includeResourcesInOffer || !currentPlayer) return;
+
+    const newResourceAmount = Math.min(
+      resourcesToTrade + 1,
+      currentPlayer.inventory.resources
+    );
+    setResourcesToTrade(newResourceAmount);
+    updateResourceOffer(newResourceAmount);
   };
 
   const decrementResources = () => {
-    if (resourcesToTrade > 0) {
-      setResourcesToTrade(resourcesToTrade - 1);
-    }
+    if (!includeResourcesInOffer || resourcesToTrade <= 0) return;
+
+    const newResourceAmount = resourcesToTrade - 1;
+    setResourcesToTrade(newResourceAmount);
+    updateResourceOffer(newResourceAmount);
   };
+  useEffect(() => {
+    if (includeResourcesInOffer) {
+      updateResourceOffer(resourcesToTrade);
+    } else {
+      updateResourceOffer(0); // Remove resources from the offer when unchecked
+    }
+  }, [includeResourcesInOffer, resourcesToTrade]);
+
   // Type guard for EquipmentItem
   function isEquipmentItem(
     item: EquipmentItem | TreasureItem
@@ -84,7 +99,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   }
 
   // Add to offer local state
-  const addToOffer = (
+  const addItemToOffer = (
     playerId: string,
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -117,7 +132,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   };
 
   //remove from offer local state
-  const removeFromOffer = (
+  const removeItemFromOffer = (
     playerId: string,
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -149,6 +164,38 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     });
   };
 
+  // Add to offer local state
+  const addResourceToOffer = (playerId: string, resourceAmount: number) => {
+    setTradeState((prevState) => {
+      const updatedOffer = prevState[playerId] || {
+        equipment: [],
+        treasures: [],
+        resources: 0,
+      };
+
+      // Add the resource amount to the current offer
+      updatedOffer.resources = resourceAmount;
+
+      return { ...prevState, [playerId]: updatedOffer };
+    });
+  };
+
+  //remove from offer local state
+  const removeResourceFromOffer = (playerId: string) => {
+    setTradeState((prevState) => {
+      if (!prevState[playerId]) {
+        return prevState;
+      }
+
+      const updatedOffer = { ...prevState[playerId] };
+
+      // Reset the resources in the offer
+      updatedOffer.resources = 0;
+
+      return { ...prevState, [playerId]: updatedOffer };
+    });
+  };
+
   const isItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -167,15 +214,30 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     return false;
   };
 
+  const areResourcesInCurrentPlayerOffer = (): boolean => {
+    if (!currentPlayer) return false;
+    const currentPlayerUsername = currentPlayer.username;
+    const tradeOffer = tradeState[currentPlayerUsername];
+    return tradeOffer && tradeOffer.resources > 0;
+  };
+
+  const updateResourceOffer = (newResourceAmount: number) => {
+    if (!currentPlayer) return;
+    const currentPlayerUsername = currentPlayer.username;
+
+    // Set the new resource amount for the current player's offer
+    addResourceToOffer(currentPlayerUsername, newResourceAmount);
+  };
+
   const toggleItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
   ) => {
     if (!currentPlayer) return;
     if (isItemInCurrentPlayerOffer(item, itemType)) {
-      removeFromOffer(currentPlayer.username, item, itemType);
+      removeItemFromOffer(currentPlayer.username, item, itemType);
     } else {
-      addToOffer(currentPlayer.username, item, itemType);
+      addItemToOffer(currentPlayer.username, item, itemType);
     }
   };
 
@@ -233,11 +295,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       );
     }
     if (typeof offer.resources === "number") {
-      setResourceItemsForTrade(
-        <IonItem>
-          {offer.resources}
-        </IonItem>
-      );
+      setResourceItemsForTrade(<IonItem>{offer.resources}</IonItem>);
     }
     // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
@@ -266,7 +324,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             <IonItem key={treasureItem.treasureName}>
               {treasureItem.treasureName}
               <IonCheckbox
-                checked={isItemInCurrentPlayerOffer(treasureItem, "treasures")}
                 onIonChange={() =>
                   toggleItemInCurrentPlayerOffer(treasureItem, "treasures")
                 }
@@ -275,10 +332,25 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           ))}
           <h3>Select Resources to Trade:</h3>
           <IonItem>
-            <IonButton onClick={decrementResources}>-</IonButton>
-            <span>{currentPlayer?.inventory.resources}</span>
-            <IonButton onClick={incrementResources}>+</IonButton>
-            <IonCheckbox></IonCheckbox>
+            <IonButton
+              disabled={!includeResourcesInOffer}
+              onClick={decrementResources}
+            >
+              -
+            </IonButton>
+            <span>{resourcesToTrade}</span>
+            <IonButton
+              disabled={!includeResourcesInOffer}
+              onClick={incrementResources}
+            >
+              +
+            </IonButton>
+            <IonCheckbox
+              checked={includeResourcesInOffer}
+              onIonChange={() =>
+                setIncludeResourcesInOffer(!includeResourcesInOffer)
+              }
+            ></IonCheckbox>
           </IonItem>
         </div>
         <div className="partnerTradeItems">
