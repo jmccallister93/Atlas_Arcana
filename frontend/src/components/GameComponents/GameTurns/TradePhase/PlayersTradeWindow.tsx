@@ -9,9 +9,11 @@ import TradeOffer from "./TradeOffer";
 
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
+  tradeSessionId?: string;
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
+  tradeSessionId,
 }) => {
   const { gameState } = useGameContext();
   const auth = useAuth();
@@ -167,9 +169,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   useEffect(() => {
     // Emit the trade state whenever it changes
-    
+    if (!currentPlayer || !tradePartnerId) return;
     socket.emit("addToTrade", {
-      sessionId: gameState.sessionId,
+      sessionId: tradeSessionId,
       playerId: currentPlayer,
       tradeState: tradeState,
     });
@@ -178,7 +180,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
       // Make sure the data type matches TradeState
-
+      // console.log(data)
       setTradeDisplayOffer(data); // Assuming data is of type TradeState
     });
     return () => {

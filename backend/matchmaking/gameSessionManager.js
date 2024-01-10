@@ -329,8 +329,17 @@ async function drawPhaseCardDraw(player, sessionId) {
 }
 
 //Trade Phase
-// WORKING HERE
-//TWTEWATEA
+async function getTradeState(sessionId) {
+  const tradeStateJson = await sessionClient.get(sessionId);
+  console.log("TradeStateJson:", sessionId)
+  if (tradeStateJson) {
+      return JSON.parse(tradeStateJson);
+  } else {
+      // Handle the case where there is no existing trade state
+      // This could mean initializing a new trade state object or handling it as an error, depending on your application's logic
+      return null; // or initialize a new state, e.g., {}
+  }
+}
 async function addToTrade(sessionId, tradeState) {
   await sessionClient.set(sessionId, JSON.stringify(tradeState));
   return tradeState;
@@ -365,5 +374,6 @@ module.exports = {
   getGameState,
   drawPhaseCardDraw,
   allocateResources,
+  getTradeState,
   addToTrade,
 };

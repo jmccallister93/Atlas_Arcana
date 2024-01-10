@@ -237,37 +237,38 @@ module.exports = function (socket, io) {
   socket.on(
     "respondToTradeRequest",
     async ({ fromPlayerId, toPlayerId, response }) => {
-  
       if (response === "accepted") {
         // Both players should now enter the trade window
 
-        // Emit to both players to open the trade window
-        io.to(fromPlayerId.socketId).emit("openTradeWindow", {
-          otherPlayerId: toPlayerId,
-        });
-        io.to(toPlayerId.socketId).emit("openTradeWindow", {
-          otherPlayerId: fromPlayerId,
-        });
-
         const tradeSessionId =
           fromPlayerId.username + "_" + toPlayerId.username;
-          const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
-          const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
-          
-          if (fromSocket) {
-            fromSocket.join(tradeSessionId);
-          } else {
-            console.error(`Socket with ID ${fromPlayerId.socketId} does not exist.`);
-          }
-          
-          if (toSocket) {
-            toSocket.join(tradeSessionId);
-          } else {
-            console.error(`Socket with ID ${toPlayerId.socketId} does not exist.`);
-          }
-          
-      
-        
+        console.log("tradeSessionId: " + tradeSessionId);
+        const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
+        const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
+
+        // Emit to both players to open the trade window
+        io.to(fromPlayerId.socketId).emit("openTradeWindow", {
+          otherPlayerId: toPlayerId, tradeSessionId: tradeSessionId,
+        });
+        io.to(toPlayerId.socketId).emit("openTradeWindow", {
+          otherPlayerId: fromPlayerId, tradeSessionId: tradeSessionId,
+        });
+
+        if (fromSocket) {
+          fromSocket.join(tradeSessionId);
+        } else {
+          console.error(
+            `Socket with ID ${fromPlayerId.socketId} does not exist.`
+          );
+        }
+
+        if (toSocket) {
+          toSocket.join(tradeSessionId);
+        } else {
+          console.error(
+            `Socket with ID ${toPlayerId.socketId} does not exist.`
+          );
+        }
       } else {
         io.to(fromPlayerId).emit("tradeRequestDeclined");
       }
@@ -277,12 +278,23 @@ module.exports = function (socket, io) {
   // WORKING HERE
   //TWTEWATEA
   socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
-    console.log("PlayerId: " + playerId + " tradeState: " + tradeState);
     try {
-      const trade = await gameSessionManager.addToTrade(sessionId, tradeState);
+      // Retrieve the current trade state for the session
+      const currentTradeState = await gameSessionManager.getTradeState(
+        sessionId
+      );
 
-      // Emit back the result to the specific player
-      io.to(sessionId).emit("tradeAdded", trade);
+      // Merge the incoming tradeState with the existing trade state
+      const updatedTradeState = {
+        ...currentTradeState,
+        [playerId]: tradeState[playerId], // Update only the relevant player's trade offer
+      };
+
+      // Persist this updated state
+      await gameSessionManager.addToTrade(sessionId, updatedTradeState);
+
+      // Emit back the updated trade state to all players in the session
+      io.to(sessionId).emit("tradeAdded", updatedTradeState);
     } catch (error) {
       console.error("Error in addToTrade:", error);
       socket.emit("errorAddingToTrade", error.message);

@@ -21,6 +21,7 @@ const TradeListener: React.FC = () => {
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
+    const [tradeSessionId, setTradeSessionId] = useState<string>();
 
   useEffect(() => {
     const handleReceiveTradeRequest = (data: any) => {
@@ -62,6 +63,7 @@ const TradeListener: React.FC = () => {
     const handleOpenTradeWindow = (data: any) => {
       console.log("Opening trade window with:", data.otherPlayerId);
       setTradePartnerId(data.otherPlayerId);
+      setTradeSessionId(data.tradeSessionId);
       setShowActiveTradeWindow(true);
     };
 
@@ -92,6 +94,7 @@ const TradeListener: React.FC = () => {
       >
         <PlayersTradeWindow
          tradePartnerId={tradePartnerId}
+         tradeSessionId={tradeSessionId}
         />
       </IonModal>
     </>
