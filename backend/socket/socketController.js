@@ -248,10 +248,12 @@ module.exports = function (socket, io) {
 
         // Emit to both players to open the trade window
         io.to(fromPlayerId.socketId).emit("openTradeWindow", {
-          otherPlayerId: toPlayerId, tradeSessionId: tradeSessionId,
+          otherPlayerId: toPlayerId,
+          tradeSessionId: tradeSessionId,
         });
         io.to(toPlayerId.socketId).emit("openTradeWindow", {
-          otherPlayerId: fromPlayerId, tradeSessionId: tradeSessionId,
+          otherPlayerId: fromPlayerId,
+          tradeSessionId: tradeSessionId,
         });
 
         if (fromSocket) {
@@ -275,8 +277,6 @@ module.exports = function (socket, io) {
     }
   );
 
-  // WORKING HERE
-  //TWTEWATEA
   socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
     try {
       // Retrieve the current trade state for the session
@@ -289,7 +289,6 @@ module.exports = function (socket, io) {
         ...currentTradeState,
         [playerId.username]: tradeState[playerId.username], // Update only the relevant player's trade offer
       };
-    
 
       // Persist this updated state
       await gameSessionManager.addToTrade(sessionId, updatedTradeState);
@@ -301,6 +300,30 @@ module.exports = function (socket, io) {
       socket.emit("errorAddingToTrade", error.message);
     }
   });
+
+  socket.on("tradeOfferAccepted", async ({ sessionId, playerId }) => {
+    console.log("Trade offer accepted by player:", playerId);
+    if (await gameSessionManager.pendingTradeAcceptance(sessionId, playerId)) {
+        // Finalize trade if both players have accepted
+        await gameSessionManager.finalizeTrade(sessionId);
+
+        // Emit event to notify players about trade finalization
+        io.in(sessionId).emit("tradeFinalized", {
+            sessionId: sessionId,
+            status: "accepted"
+        });
+    }
+});
+
+
+  socket.on("tradeOfferDeclined", async ({ sessionId, playerId }) => {
+    console.log("Trade offer declined by player:", playerId);
+  })
+
+  
+
+
+
 };
 
 // Call to check user online status

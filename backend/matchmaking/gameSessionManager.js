@@ -345,6 +345,40 @@ async function addToTrade(sessionId, tradeState) {
   return tradeState;
 }
 
+// Wokring through here
+async function pendingTradeAcceptance(sessionId, playerId) {
+  const tradeStateJson = await sessionClient.get(sessionId);
+  let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
+
+  // Update acceptance status
+  tradeSession.acceptedPlayers = tradeSession.acceptedPlayers || {};
+  tradeSession.acceptedPlayers[playerId] = true;
+
+  // Check if both players have accepted
+  const allAccepted = Object.keys(tradeSession.acceptedPlayers).length === 2; // Assuming 2 players in trade
+
+  await sessionClient.set(sessionId, JSON.stringify(tradeSession));
+  return allAccepted;
+}
+
+
+const finalizeTrade = async (sessionId) => {
+  const tradeStateJson = await sessionClient.get(sessionId);
+  let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
+
+  if (Object.keys(tradeSession.acceptedPlayers).length === 2) {
+      // Logic to update each player's inventory based on the trade
+      // ...
+
+      // Notify players of trade completion
+      // ...
+
+      // Reset the trade session
+      tradeSession = {}; // Reset or handle as needed
+      await sessionClient.set(sessionId, JSON.stringify(tradeSession));
+  }
+};
+
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -376,4 +410,6 @@ module.exports = {
   allocateResources,
   getTradeState,
   addToTrade,
+  pendingTradeAcceptance,
+  finalizeTrade,
 };

@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
 import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
-import { IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
+import { IonAlert, IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
 import "../GameTurn.scss";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
@@ -45,7 +45,54 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<ReactElement>();
   const [includeResourcesInOffer, setIncludeResourcesInOffer] =
     useState<boolean>(false);
+  const [isTradeOfferAccepted, setIsTradeOfferAccepted] =
+    useState<boolean>(false);
+  const [isTradeOfferPending, setIsTradeOfferPending] =
+    useState<boolean>(false);
 
+    // Accept the trade offer
+  const acceptTradeOffer = () => {
+    setIsTradeOfferAccepted(true);
+    setIsTradeOfferPending(true); // Set to pending until the other player responds
+    if (!currentPlayer) return;
+    // Emit trade acceptance event to the server with relevant data
+    socket.emit("tradeOfferAccepted", {
+      sessionId: tradeSessionId,
+      playerId: currentPlayer.username,
+      tradeOffer: tradeState[currentPlayer.username],
+    });
+  };
+
+  // Decline the trade offer
+  const declineTradeOffer = () => {
+    setIsTradeOfferAccepted(false);
+    setIsTradeOfferPending(false); // Reset pending state
+    if (!currentPlayer) return;
+    // Emit trade decline event to the server
+    socket.emit("tradeOfferDeclined", {
+      sessionId: tradeSessionId,
+      playerId: currentPlayer.username,
+    });
+  };
+
+  useEffect(() => {
+    socket.on("tradeFinalized", (data) => {
+      console.log("Trade finalized")
+        if (data.sessionId === tradeSessionId) {
+            if (data.status === "accepted") {
+                // Handle trade finalization logic
+                // Update UI to reflect the successful trade
+                // Possibly update player inventories, close trade window, etc.
+            }
+        }
+    });
+
+    return () => {
+        socket.off("tradeFinalized");
+    };
+}, [socket, tradeSessionId]); // Make sure to include dependencies
+
+  // Update the trade state when the trade partner's offer changes
   useEffect(() => {
     const initialTradeState: TradeState = {};
     gameState.players.forEach((player) => {
@@ -58,6 +105,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     setTradeState(initialTradeState);
   }, []);
 
+  // Increment the resource amount in the offer local state
   const incrementResources = () => {
     if (!includeResourcesInOffer || !currentPlayer) return;
 
@@ -69,6 +117,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     updateResourceOffer(newResourceAmount);
   };
 
+  // Decrement the resource amount in the offer local state
   const decrementResources = () => {
     if (!includeResourcesInOffer || resourcesToTrade <= 0) return;
 
@@ -76,6 +125,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     setResourcesToTrade(newResourceAmount);
     updateResourceOffer(newResourceAmount);
   };
+
+  // Update the resource offer when the includeResourcesInOffer state changes
   useEffect(() => {
     if (includeResourcesInOffer) {
       updateResourceOffer(resourcesToTrade);
@@ -196,6 +247,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     });
   };
 
+  // Check if an item is in the current player's offer
   const isItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -214,6 +266,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     return false;
   };
 
+
   const areResourcesInCurrentPlayerOffer = (): boolean => {
     if (!currentPlayer) return false;
     const currentPlayerUsername = currentPlayer.username;
@@ -221,6 +274,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     return tradeOffer && tradeOffer.resources > 0;
   };
 
+  // Update the resource amount in the offer local state
   const updateResourceOffer = (newResourceAmount: number) => {
     if (!currentPlayer) return;
     const currentPlayerUsername = currentPlayer.username;
@@ -229,6 +283,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     addResourceToOffer(currentPlayerUsername, newResourceAmount);
   };
 
+  // Toggle item in offer local state
   const toggleItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
     itemType: ItemType
@@ -241,6 +296,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     }
   };
 
+  // Socket call to add to trade state
   useEffect(() => {
     // Emit the trade state whenever it changes
     if (!currentPlayer || !tradePartnerId) return;
@@ -251,6 +307,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     });
   }, [tradeState, gameState.sessionId, currentPlayer]);
 
+  // Listen for trade state changes from the server
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
       // Make sure the data type matches TradeState
@@ -262,6 +319,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     };
   }, []);
 
+  // Render partner trade offer
   useEffect(() => {
     const tradePartner = tradePartnerId?.username; // or tradePartnerId?.username
 
@@ -307,6 +365,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       </div>
       <div className="tradeWindowDetailsContainer">
         <div className="currentPlayerInventory">
+
           <h3>Select Equipment to Trade:</h3>
           {currentPlayer?.inventory.equipment.map((equipmentItem) => (
             <IonItem key={equipmentItem.equipmentName}>
@@ -319,6 +378,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
               ></IonCheckbox>
             </IonItem>
           ))}
+
           <h3>Select Treasures to Trade:</h3>
           {currentPlayer?.inventory.treasures.map((treasureItem) => (
             <IonItem key={treasureItem.treasureName}>
@@ -330,6 +390,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
               ></IonCheckbox>
             </IonItem>
           ))}
+
           <h3>Select Resources to Trade:</h3>
           <IonItem>
             <IonButton
@@ -353,9 +414,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             ></IonCheckbox>
           </IonItem>
         </div>
+
         <div className="partnerTradeItems">
           <h3>Trade offer from {tradePartnerId?.username}</h3>
-
           <div>
             <h4>Equipment:</h4>
             {equipmentItemsForTrade}
@@ -365,6 +426,21 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             {resourceItemsForTrade}
           </div>
         </div>
+      </div>
+
+      <div>
+        {" "}
+        {isTradeOfferPending ? (
+          <>
+            <IonButton disabled>Pending {tradePartnerId?.username}</IonButton>
+            <IonButton onClick={declineTradeOffer}>Cancel Trade</IonButton>
+          </>
+        ) : (
+          <>
+            <IonButton onClick={acceptTradeOffer}>Accept Trade</IonButton>
+            <IonButton onClick={declineTradeOffer}>Decline Trade</IonButton>
+          </>
+        )}
       </div>
     </div>
   );
