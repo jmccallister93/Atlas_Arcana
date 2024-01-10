@@ -38,17 +38,17 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   const [equipmentItemsForTrade, setEquipmentItemsForTrade] =
     useState<ReactElement>();
 
-    useEffect(() => {
-      const initialTradeState: TradeState = {};
-      gameState.players.forEach((player) => {
-        initialTradeState[player.username] = {
-          equipment: [],
-          treasures: [],
-          resources: 0,
-        };
-      });
-      setTradeState(initialTradeState);
-    }, [gameState.players]);
+  useEffect(() => {
+    const initialTradeState: TradeState = {};
+    gameState.players.forEach((player) => {
+      initialTradeState[player.username] = {
+        equipment: [],
+        treasures: [],
+        resources: 0,
+      };
+    });
+    setTradeState(initialTradeState);
+  }, []);
 
   const incrementResources = () => {
     if (resourcesToTrade >= currentPlayer?.inventory.resources) {
@@ -63,32 +63,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       setResourcesToTrade(resourcesToTrade - 1);
     }
   };
-
-  const addToOffer = (
-    playerId: string,
-    item: EquipmentItem | TreasureItem,
-    itemType: ItemType
-  ) => {
-    setTradeState((prevState) => {
-      // Clone the previous state's offer for the specific player
-      const updatedOffer = prevState[playerId] || {
-        equipment: [],
-        treasures: [],
-        resources: 0,
-      };
-
-      console.log("Add to offer item:",item)
-
-      if (itemType === "equipment" && isEquipmentItem(item)) {
-        updatedOffer.equipment = [...updatedOffer.equipment, item];
-      } else if (itemType === "treasures" && isTreasureItem(item)) {
-        updatedOffer.treasures = [...updatedOffer.treasures, item];
-      }
-
-      return { ...prevState, [playerId]: updatedOffer };
-    });
-  };
-
   // Type guard for EquipmentItem
   function isEquipmentItem(
     item: EquipmentItem | TreasureItem
@@ -103,6 +77,32 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     return (item as TreasureItem).treasureName !== undefined;
   }
 
+  // Add to offer local state
+  const addToOffer = (
+    playerId: string,
+    item: EquipmentItem | TreasureItem,
+    itemType: ItemType
+  ) => {
+    setTradeState((prevState) => {
+      // Clone the previous state's offer for the specific player
+      const updatedOffer = prevState[playerId]
+
+      if (itemType === "equipment" && isEquipmentItem(item)) {
+           // Check if the item is already in the offer
+           if (!updatedOffer.equipment.some(e => e.equipmentName === item.equipmentName)) {
+            updatedOffer.equipment = [...updatedOffer.equipment, item];
+          }
+      } else if (itemType === "treasures" && isTreasureItem(item)) {
+        if (!updatedOffer.treasures.some(t => t.treasureName === item.treasureName)) {
+          updatedOffer.treasures = [...updatedOffer.treasures, item];
+        }
+      }
+
+      return { ...prevState, [playerId]: updatedOffer };
+    });
+  };
+
+  //remove from offer local state
   const removeFromOffer = (
     playerId: string,
     item: EquipmentItem | TreasureItem,
@@ -114,20 +114,16 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         return prevState;
       }
 
-      const updatedOffer = prevState[playerId] || {
-        equipment: [],
-        treasures: [],
-        resources: 0,
-      };
+      const updatedOffer = { ...prevState[playerId] };
 
       // Update the appropriate item list (equipment or treasures) by removing the specified item
       if (itemType === "equipment" && isEquipmentItem(item)) {
         updatedOffer.equipment = updatedOffer.equipment.filter(
-          (i) => i !== item
+          (i) => i.equipmentName !== item.equipmentName
         );
       } else if (itemType === "treasures" && isTreasureItem(item)) {
         updatedOffer.treasures = updatedOffer.treasures.filter(
-          (i) => i !== item
+          (i) => i.treasureName !== item.treasureName
         );
       }
 
@@ -153,7 +149,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     } else if (itemType === "treasures" && isTreasureItem(item)) {
       return tradeOffer?.treasures.includes(item);
     }
-  
+
     return false;
   };
 
@@ -165,33 +161,13 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     if (isItemInCurrentPlayerOffer(item, itemType)) {
       removeFromOffer(currentPlayer.username, item, itemType);
     } else {
-      addToOffer(currentPlayer?.username, item, itemType);
+      addToOffer(currentPlayer.username, item, itemType);
     }
   };
-  
-  // const toggleItemInCurrentPlayerOffer = (
-  //   item: EquipmentItem | TreasureItem,
-  //   itemType: ItemType
-  // ) => {
-  //   if (!currentPlayer) return;
-  //   if (isItemInCurrentPlayerOffer(item, itemType)) {
-  //     removeFromOffer(currentPlayer.username, item, itemType);
-  //     socket.emit("addToTrade", {
-  //       sessionId: gameState.sessionId,
-  //       playerId: currentPlayer,
-  //       tradeState: tradeState,
-  //     });
-  //   } else {
-  //     addToOffer(currentPlayer?.username, item, itemType);
-  //     socket.emit("addToTrade", {
-  //       sessionId: gameState.sessionId,
-  //       playerId: currentPlayer,
-  //       tradeState: tradeState,
-  //     });
-  //   }
-  // };
+
   useEffect(() => {
     // Emit the trade state whenever it changes
+    
     socket.emit("addToTrade", {
       sessionId: gameState.sessionId,
       playerId: currentPlayer,
@@ -202,7 +178,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
       // Make sure the data type matches TradeState
-      console.log("Trade added:", data);
+
       setTradeDisplayOffer(data); // Assuming data is of type TradeState
     });
     return () => {
@@ -217,26 +193,26 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       tradePartner && tradePartner !== currentPlayer?.username // or currentPlayer?.username
         ? tradePartner // Use trade partner's offer if they are not the current player
         : currentPlayer?.username; // Use current player's offer otherwise
-  if(!offerKey) return;
-        
- // Ensure that the offerKey is valid and tradeDisplayOffer[offerKey] exists and is an object
-  const offer = tradeDisplayOffer[offerKey];
-  if (!offer || typeof offer !== 'object') return;
+    if (!offerKey) return;
 
-  // Ensure that the equipment property exists and is an array before mapping over it
-  if (Array.isArray(offer.equipment)) {
-    setEquipmentItemsForTrade(
-      <IonItem>
-        {offer.equipment.map((item) => (
-          <li key={item.equipmentName}>{item.equipmentName}</li>
-        ))}
-      </IonItem>
-    );
-  }
-    if(!tradeDisplayOffer[offerKey].treasures) return;
-    console.log(tradeDisplayOffer[offerKey].equipment)
+    // Ensure that the offerKey is valid and tradeDisplayOffer[offerKey] exists and is an object
+    const offer = tradeDisplayOffer[offerKey];
+    if (!offer || typeof offer !== "object") return;
+    
+    // Ensure that the equipment property exists and is an array before mapping over it
+    if (Array.isArray(offer.equipment)) {
+      setEquipmentItemsForTrade(
+        <IonItem>
+          {offer.equipment.map((item) => (
+            <li key={item.equipmentName}>{item.equipmentName}</li>
+          ))}
+        </IonItem>
+      );
+    }
+    if (!tradeDisplayOffer[offerKey].treasures) return;
+    // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
- 
+
   return (
     <div className="tradeWindowContainer">
       <div className="tradeWindowHeader">
@@ -249,7 +225,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             <IonItem key={equipmentItem.equipmentName}>
               {equipmentItem.equipmentName}{" "}
               <IonCheckbox
-                checked={isItemInCurrentPlayerOffer(equipmentItem, "equipment")}
+                // checked={isItemInCurrentPlayerOffer(equipmentItem, "equipment")}
                 onIonChange={() =>
                   toggleItemInCurrentPlayerOffer(equipmentItem, "equipment")
                 }
