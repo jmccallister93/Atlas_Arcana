@@ -366,18 +366,46 @@ const finalizeTrade = async (sessionId) => {
   const tradeStateJson = await sessionClient.get(sessionId);
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
 
-  if (Object.keys(tradeSession.acceptedPlayers).length === 2) {
-      // Logic to update each player's inventory based on the trade
-      // ...
+  // Check if both players have accepted the trade
+  if (tradeSession.acceptedPlayers && Object.keys(tradeSession.acceptedPlayers).length === 2) {
+      // Get player IDs, excluding 'acceptedPlayers'
+      const playerIds = Object.keys(tradeSession).filter(key => key !== 'acceptedPlayers');
 
-      // Notify players of trade completion
-      // ...
+      // Assuming there are always 2 players involved in the trade
+      if (playerIds.length === 2) {
+          const player1Id = playerIds[0];
+          const player2Id = playerIds[1];
 
-      // Reset the trade session
-      tradeSession = {}; // Reset or handle as needed
-      await sessionClient.set(sessionId, JSON.stringify(tradeSession));
+          const player1Trade = tradeSession[player1Id];
+          const player2Trade = tradeSession[player2Id];
+
+          // Fetch players' current game state
+          const player1GameState = await getGameState(player1Id);
+          const player2GameState = await getGameState(player2Id);
+
+          // Process trade for Player 1
+          // Remove traded items and add received items
+          // Similar logic for Player 2
+
+          // Update game state for both players
+          await updateGameState(player1GameState);
+          await updateGameState(player2GameState);
+
+          // Notify players of trade completion
+          // ...
+
+          // Reset the trade session
+          tradeSession = {}; 
+          await sessionClient.set(sessionId, JSON.stringify(tradeSession));
+      } else {
+          console.error("Invalid number of players in trade session", tradeSession);
+      }
+  } else {
+      console.error("Trade session not ready or missing", tradeSession);
   }
 };
+
+
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
