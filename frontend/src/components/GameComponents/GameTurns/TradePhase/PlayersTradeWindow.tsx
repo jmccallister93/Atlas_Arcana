@@ -39,6 +39,10 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   const [tradeDisplayOffer, setTradeDisplayOffer] = useState<TradeState>({});
   const [equipmentItemsForTrade, setEquipmentItemsForTrade] =
     useState<ReactElement>();
+  const [treasureItemsForTrade, setTreasureItemsForTrade] =
+    useState<ReactElement>();
+  const [resourceItemsForTrade, setResourceItemsForTrade] =
+    useState<ReactElement>();
 
   useEffect(() => {
     const initialTradeState: TradeState = {};
@@ -87,15 +91,23 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   ) => {
     setTradeState((prevState) => {
       // Clone the previous state's offer for the specific player
-      const updatedOffer = prevState[playerId]
+      const updatedOffer = prevState[playerId];
 
       if (itemType === "equipment" && isEquipmentItem(item)) {
-           // Check if the item is already in the offer
-           if (!updatedOffer.equipment.some(e => e.equipmentName === item.equipmentName)) {
-            updatedOffer.equipment = [...updatedOffer.equipment, item];
-          }
+        // Check if the item is already in the offer
+        if (
+          !updatedOffer.equipment.some(
+            (e) => e.equipmentName === item.equipmentName
+          )
+        ) {
+          updatedOffer.equipment = [...updatedOffer.equipment, item];
+        }
       } else if (itemType === "treasures" && isTreasureItem(item)) {
-        if (!updatedOffer.treasures.some(t => t.treasureName === item.treasureName)) {
+        if (
+          !updatedOffer.treasures.some(
+            (t) => t.treasureName === item.treasureName
+          )
+        ) {
           updatedOffer.treasures = [...updatedOffer.treasures, item];
         }
       }
@@ -172,7 +184,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     if (!currentPlayer || !tradePartnerId) return;
     socket.emit("addToTrade", {
       sessionId: tradeSessionId,
-      playerId: currentPlayer?.username,
+      playerId: currentPlayer,
       tradeState: tradeState,
     });
   }, [tradeState, gameState.sessionId, currentPlayer]);
@@ -180,7 +192,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   useEffect(() => {
     socket.on("tradeAdded", (data: TradeState) => {
       // Make sure the data type matches TradeState
-      console.log(data)
+
       setTradeDisplayOffer(data); // Assuming data is of type TradeState
     });
     return () => {
@@ -200,7 +212,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     // Ensure that the offerKey is valid and tradeDisplayOffer[offerKey] exists and is an object
     const offer = tradeDisplayOffer[offerKey];
     if (!offer || typeof offer !== "object") return;
-    
+
     // Ensure that the equipment property exists and is an array before mapping over it
     if (Array.isArray(offer.equipment)) {
       setEquipmentItemsForTrade(
@@ -211,7 +223,22 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         </IonItem>
       );
     }
-    if (!tradeDisplayOffer[offerKey].treasures) return;
+    if (Array.isArray(offer.equipment)) {
+      setTreasureItemsForTrade(
+        <IonItem>
+          {offer.treasures.map((item) => (
+            <li key={item.treasureName}>{item.treasureName}</li>
+          ))}
+        </IonItem>
+      );
+    }
+    if (typeof offer.resources === "number") {
+      setResourceItemsForTrade(
+        <IonItem>
+          {offer.resources}
+        </IonItem>
+      );
+    }
     // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
 
@@ -259,29 +286,11 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
           <div>
             <h4>Equipment:</h4>
-
             {equipmentItemsForTrade}
-
             <h4>Treasures:</h4>
-            <IonItem>
-              {/* {tradeDisplayOffer?[
-                currentPlayer?.username === auth.username
-                  ? "secondPlayerOffer"
-                  : "firstPlayerOffer"
-              ].treasures.map((item) => (
-                <li key={item.treasureName}>{item.treasureName}</li>
-              ))} */}
-            </IonItem>
+            {treasureItemsForTrade}
             <h4>Resources:</h4>
-            <p>
-              {/* {
-                tradeState[
-                  currentPlayer?.username === auth.username
-                    ? "secondPlayerOffer"
-                    : "firstPlayerOffer"
-                ].resources
-              } */}
-            </p>
+            {resourceItemsForTrade}
           </div>
         </div>
       </div>

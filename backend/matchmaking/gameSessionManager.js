@@ -342,8 +342,6 @@ async function getTradeState(sessionId) {
 }
 async function addToTrade(sessionId, tradeState) {
   await sessionClient.set(sessionId, JSON.stringify(tradeState));
-  console.log("addToTrade - Trade state updated:", tradeState);
-  
   return tradeState;
 }
 
