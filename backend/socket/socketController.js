@@ -301,15 +301,16 @@ module.exports = function (socket, io) {
     }
   });
 
-  socket.on("tradeOfferAccepted", async ({ sessionId, playerId }) => {
+  socket.on("tradeOfferAccepted", async ({ tradeSessionId, sessionId, playerId }) => {
     console.log("Trade offer accepted by player:", playerId);
     if (await gameSessionManager.pendingTradeAcceptance(sessionId, playerId)) {
         // Finalize trade if both players have accepted
-        await gameSessionManager.finalizeTrade(sessionId);
+        await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
 
         // Emit event to notify players about trade finalization
         io.in(sessionId).emit("tradeFinalized", {
             sessionId: sessionId,
+            tradeSessionId: tradeSessionId,
             status: "accepted"
         });
     }

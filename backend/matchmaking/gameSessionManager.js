@@ -31,7 +31,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   const currentPlayerTurn = setCurrentPlayerTurn(turnOrder);
 
   // Set starting phase of the game
-  const currentPhase = "Setup";
+  const currentPhase = "Trade";
   //Determine starting cards
   const startingCardData = determineStartingCards(players);
 
@@ -362,41 +362,55 @@ async function pendingTradeAcceptance(sessionId, playerId) {
 }
 
 
-const finalizeTrade = async (sessionId) => {
-  const tradeStateJson = await sessionClient.get(sessionId);
+const finalizeTrade = async (tradeSessionId, sessionId) => {
+  const tradeStateJson = await sessionClient.get(tradeSessionId);
+  const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
 
-  // Check if both players have accepted the trade
   if (tradeSession.acceptedPlayers && Object.keys(tradeSession.acceptedPlayers).length === 2) {
-      // Get player IDs, excluding 'acceptedPlayers'
+      // Extract player IDs from the trade session
       const playerIds = Object.keys(tradeSession).filter(key => key !== 'acceptedPlayers');
-
-      // Assuming there are always 2 players involved in the trade
+      console.log("Player Ids: ", playerIds)
       if (playerIds.length === 2) {
           const player1Id = playerIds[0];
           const player2Id = playerIds[1];
 
+          // Extract trade offers for each player
           const player1Trade = tradeSession[player1Id];
           const player2Trade = tradeSession[player2Id];
+          console.log("player1Trade: ", player1Trade)
+          console.log("player2Trade: ", player2Trade)
+          // Find players in the session data
+          const player1 = sessionData.players.find(p => p.username === player1Id);
+          const player2 = sessionData.players.find(p => p.username === player2Id);
+          console.log("player1: ", player1)
+          console.log("player2: ", player2)
 
-          // Fetch players' current game state
-          const player1GameState = await getGameState(player1Id);
-          const player2GameState = await getGameState(player2Id);
+          if (!player1 || !player2) {
+              console.error("Players not found in session data");
+              return;
+          }
 
-          // Process trade for Player 1
-          // Remove traded items and add received items
-          // Similar logic for Player 2
-
-          // Update game state for both players
-          await updateGameState(player1GameState);
-          await updateGameState(player2GameState);
-
-          // Notify players of trade completion
-          // ...
+          // Process the trade for both players
+          // Example: Updating player1's inventory
+          // This assumes player1Trade and player2Trade are arrays of item IDs
+          player1.inventory.equipment = player1.inventory.equipment
+              .filter(item => !player1Trade.equipment.includes(item.id)) // Remove items being traded away
+              .concat(player2Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
+          console.log("player1: ", player1.inventory.equipment)
+          // Similar logic for player2...
+          player2.inventory.equipment = player2.inventory.equipment
+              .filter(item => !player2Trade.equipment.includes(item.id)) // Remove items being traded away
+              .concat(player1Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
+              console.log("player2: ", player2.inventory.equipment)
+          // Update the game state in Redis
+          await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
           // Reset the trade session
-          tradeSession = {}; 
-          await sessionClient.set(sessionId, JSON.stringify(tradeSession));
+          await sessionClient.set(tradeSessionId, JSON.stringify({}));
+
+          // Emit event to notify players about trade finalization
+          //...
       } else {
           console.error("Invalid number of players in trade session", tradeSession);
       }

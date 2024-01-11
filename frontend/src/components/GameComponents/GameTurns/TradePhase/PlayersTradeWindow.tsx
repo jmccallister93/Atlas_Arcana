@@ -57,7 +57,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     if (!currentPlayer) return;
     // Emit trade acceptance event to the server with relevant data
     socket.emit("tradeOfferAccepted", {
-      sessionId: tradeSessionId,
+      tradeSessionId: tradeSessionId,
+      sessionId: gameState.sessionId,
       playerId: currentPlayer.username,
       tradeOffer: tradeState[currentPlayer.username],
     });
