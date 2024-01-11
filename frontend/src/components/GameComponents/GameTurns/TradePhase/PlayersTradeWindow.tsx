@@ -79,13 +79,13 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   useEffect(() => {
     socket.on("tradeFinalized", (data) => {
-      console.log(data)
       if(!currentPlayer){return}
         if (data.tradeSessionId === tradeSessionId) {
             if (data.status === "accepted") {
-              
+              const tradeDetails = data.currentTradeState;
+              performTradeUpdate(tradeDetails);
               setIsTradeOfferFinalized(true)
-              updatePlayerData(currentPlayer)
+              
             }
         }
     });
@@ -94,6 +94,31 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         socket.off("tradeFinalized");
     };
 }, [socket, tradeSessionId]); // Make sure to include dependencies
+
+const performTradeUpdate = (tradeDetails: any) => {
+  console.log("Trade details: ",tradeDetails )
+  Object.keys(tradeDetails).forEach((username) => {
+    // Extract the updated data for the player
+    const updatedData = tradeDetails[username];
+    console.log("updatedData: ", updatedData)
+    // Find the current data of the player in the gameState
+    const currentPlayerData = gameState.players.find(player => player.username === username);
+    console.log("currentPlayerData: ", currentPlayerData)
+    if (currentPlayerData) {
+      // Create a new updated player object
+      const updatedPlayerData = {
+        ...currentPlayerData,
+        // Update the inventory based on the trade details
+        equipment: updatedData.equipment,
+        treasures: updatedData.treasures,
+        resources: updatedData.resources,
+      };
+      console.log("updatedPlayerData: ", updatedPlayerData)
+      // Use the context function to update the player data
+      updatePlayerData(updatedPlayerData);
+    }
+  });
+};
 
   // Update the trade state when the trade partner's offer changes
   useEffect(() => {
