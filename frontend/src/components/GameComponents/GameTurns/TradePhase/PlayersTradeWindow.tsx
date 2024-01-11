@@ -1,6 +1,12 @@
 import { ReactElement, useEffect, useState } from "react";
 import { EquipmentItem, PlayerInfo, TreasureItem } from "../../Interfaces";
-import { IonAlert, IonButton, IonCheckbox, IonItem, IonModal } from "@ionic/react";
+import {
+  IonAlert,
+  IonButton,
+  IonCheckbox,
+  IonItem,
+  IonModal,
+} from "@ionic/react";
 import "../GameTurn.scss";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
@@ -49,10 +55,10 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<boolean>(false);
   const [isTradeOfferPending, setIsTradeOfferPending] =
     useState<boolean>(false);
-    const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
+  const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
     useState<boolean>(false);
 
-    // Accept the trade offer
+  // Accept the trade offer
   const acceptTradeOffer = () => {
     setIsTradeOfferAccepted(true);
     setIsTradeOfferPending(true); // Set to pending until the other player responds
@@ -68,10 +74,11 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   // Decline the trade offer
   const declineTradeOffer = () => {
     setIsTradeOfferAccepted(false);
-    setIsTradeOfferPending(false); // Reset pending state
+    setIsTradeOfferPending(false);
     if (!currentPlayer) return;
     // Emit trade decline event to the server
     socket.emit("tradeOfferDeclined", {
+      tradeSessionId: tradeSessionId,
       sessionId: tradeSessionId,
       playerId: currentPlayer.username,
     });
@@ -79,46 +86,70 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   useEffect(() => {
     socket.on("tradeFinalized", (data) => {
-      if(!currentPlayer){return}
-        if (data.tradeSessionId === tradeSessionId) {
-            if (data.status === "accepted") {
-              const tradeDetails = data.currentTradeState;
-              performTradeUpdate(tradeDetails);
-              setIsTradeOfferFinalized(true)
-              
-            }
+      if (!currentPlayer) {
+        return;
+      }
+      if (data.tradeSessionId === tradeSessionId) {
+        if (data.status === "accepted") {
+          const tradeDetails = data.currentTradeState;
+          performTradeUpdate(tradeDetails);
+          setIsTradeOfferFinalized(true);
+          setIsTradeOfferPending(false);
         }
+      }
     });
 
     return () => {
-        socket.off("tradeFinalized");
+      socket.off("tradeFinalized");
     };
-}, [socket, tradeSessionId]); // Make sure to include dependencies
+  }, [socket, tradeSessionId]); // Make sure to include dependencies
 
-const performTradeUpdate = (tradeDetails: any) => {
-  console.log("Trade details: ",tradeDetails )
-  Object.keys(tradeDetails).forEach((username) => {
-    // Extract the updated data for the player
-    const updatedData = tradeDetails[username];
-    console.log("updatedData: ", updatedData)
-    // Find the current data of the player in the gameState
-    const currentPlayerData = gameState.players.find(player => player.username === username);
-    console.log("currentPlayerData: ", currentPlayerData)
-    if (currentPlayerData) {
-      // Create a new updated player object
-      const updatedPlayerData = {
-        ...currentPlayerData,
-        // Update the inventory based on the trade details
-        equipment: updatedData.equipment,
-        treasures: updatedData.treasures,
-        resources: updatedData.resources,
+  const performTradeUpdate = (tradeDetails: any) => {
+    const tradePartnerUsername = tradePartnerId?.username;
+  
+    if (!currentPlayer || !tradePartnerUsername) return;
+  
+    const currentPlayerTradeDetails = tradeDetails[currentPlayer.username];
+    const tradePartnerTradeDetails = tradeDetails[tradePartnerUsername];
+  
+    // Update the current player's inventory by removing traded items
+    const updatedCurrentPlayer = {
+      ...currentPlayer,
+      inventory: {
+        ...currentPlayer.inventory,
+        equipment: currentPlayer.inventory.equipment.filter(
+          item => !currentPlayerTradeDetails.equipment.includes(item)
+        ),
+        treasures: currentPlayer.inventory.treasures.filter(
+          item => !currentPlayerTradeDetails.treasures.includes(item)
+        ),
+        resources: currentPlayer.inventory.resources - currentPlayerTradeDetails.resources
+      }
+    };
+  
+    // Find the trade partner in gameState.players
+    const tradePartner = gameState.players.find(
+      player => player.username === tradePartnerUsername
+    );
+  
+    if (tradePartner) {
+      // Update the trade partner's inventory by adding traded items
+      const updatedTradePartner = {
+        ...tradePartner,
+        inventory: {
+          ...tradePartner.inventory,
+          equipment: [...tradePartner.inventory.equipment, ...currentPlayerTradeDetails.equipment],
+          treasures: [...tradePartner.inventory.treasures, ...currentPlayerTradeDetails.treasures],
+          resources: tradePartner.inventory.resources + currentPlayerTradeDetails.resources
+        }
       };
-      console.log("updatedPlayerData: ", updatedPlayerData)
-      // Use the context function to update the player data
-      updatePlayerData(updatedPlayerData);
+  
+      // Update both players' data
+      updatePlayerData(updatedCurrentPlayer);
+      updatePlayerData(updatedTradePartner);
     }
-  });
-};
+  };
+  
 
   // Update the trade state when the trade partner's offer changes
   useEffect(() => {
@@ -294,7 +325,6 @@ const performTradeUpdate = (tradeDetails: any) => {
     return false;
   };
 
-
   const areResourcesInCurrentPlayerOffer = (): boolean => {
     if (!currentPlayer) return false;
     const currentPlayerUsername = currentPlayer.username;
@@ -393,7 +423,6 @@ const performTradeUpdate = (tradeDetails: any) => {
       </div>
       <div className="tradeWindowDetailsContainer">
         <div className="currentPlayerInventory">
-
           <h3>Select Equipment to Trade:</h3>
           {currentPlayer?.inventory.equipment.map((equipmentItem) => (
             <IonItem key={equipmentItem.equipmentName}>
