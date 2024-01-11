@@ -1,5 +1,5 @@
 //SOCKET CONTROLLER
-
+const { v4: uuidv4 } = require('uuid');
 const StateManager = require("../networking/sync/stateManager");
 const Player = require("../database/PlayerModel");
 const gameSessionManager = require("../matchmaking/gameSessionManager");
@@ -240,8 +240,7 @@ module.exports = function (socket, io) {
       if (response === "accepted") {
         // Both players should now enter the trade window
 
-        const tradeSessionId =
-          fromPlayerId.username + "_" + toPlayerId.username;
+         const tradeSessionId = uuidv4();
 
         const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
         const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
@@ -302,9 +301,10 @@ module.exports = function (socket, io) {
   });
 
   socket.on("tradeOfferAccepted", async ({ tradeSessionId, sessionId, playerId }) => {
-    console.log("Trade offer accepted by player:", playerId);
-    if (await gameSessionManager.pendingTradeAcceptance(sessionId, playerId)) {
+  
+    if (await gameSessionManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
         // Finalize trade if both players have accepted
+    
         await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
 
         // Emit event to notify players about trade finalization

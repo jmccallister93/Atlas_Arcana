@@ -192,7 +192,6 @@ function determineTurnOrder(players) {
 function determineStartingCards(players) {
   let chosenEquipmentCards = [];
   players.forEach((player) => {
-   
     // Allocate 1 random equipment card
     do {
       const randomIndex = Math.floor(Math.random() * equipmentCards.length);
@@ -284,7 +283,7 @@ async function allocateResources(player, sessionId) {
   let plantationCount = 0;
 
   // Count each type of resource building for the single player
-  player.buildings.forEach(building => {
+  player.buildings.forEach((building) => {
     if (building.category === "resource") {
       if (building.type === "farm") farmCount++;
       else if (building.type === "ranch") ranchCount++;
@@ -308,7 +307,7 @@ async function allocateResources(player, sessionId) {
   sessionData.gameState.player = player;
   await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
-  return newResources,totalResources; // Return the new total resources
+  return newResources, totalResources; // Return the new total resources
 }
 
 async function drawPhaseCardDraw(player, sessionId) {
@@ -331,46 +330,54 @@ async function drawPhaseCardDraw(player, sessionId) {
 //Trade Phase
 async function getTradeState(sessionId) {
   const tradeStateJson = await sessionClient.get(sessionId);
-  console.log(tradeStateJson)
+  console.log("getTradeState: ", tradeStateJson)
   if (tradeStateJson) {
-      return JSON.parse(tradeStateJson);
+    return JSON.parse(tradeStateJson);
   } else {
-      // Handle the case where there is no existing trade state
-      // This could mean initializing a new trade state object or handling it as an error, depending on your application's logic
-      return null; // or initialize a new state, e.g., {}
+    // Handle the case where there is no existing trade state
+    // This could mean initializing a new trade state object or handling it as an error, depending on your application's logic
+    return null; // or initialize a new state, e.g., {}
   }
 }
+
 async function addToTrade(sessionId, tradeState) {
+  console.log("addToTrade: ", JSON.stringify(tradeState))
   await sessionClient.set(sessionId, JSON.stringify(tradeState));
   return tradeState;
 }
 
-// Wokring through here
-async function pendingTradeAcceptance(sessionId, playerId) {
-  const tradeStateJson = await sessionClient.get(sessionId);
+async function pendingTradeAcceptance(tradeSessionId, playerId) {
+  // Retrieve the current trade session state
+  let tradeStateJson = await sessionClient.get(tradeSessionId);
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
-
-  // Update acceptance status
+  console.log("tradeSessionId", tradeSessionId)
+  console.log("tradeStateJson:", tradeStateJson);
+  // Initialize acceptedPlayers if it doesn't exist
   tradeSession.acceptedPlayers = tradeSession.acceptedPlayers || {};
+
+  // Update the acceptance status of the current player
   tradeSession.acceptedPlayers[playerId] = true;
 
-  // Check if both players have accepted
-  const allAccepted = Object.keys(tradeSession.acceptedPlayers).length === 2; // Assuming 2 players in trade
+  // Save the updated trade session
+  await sessionClient.set(tradeSessionId, JSON.stringify(tradeSession));
 
-  await sessionClient.set(sessionId, JSON.stringify(tradeSession));
-  return allAccepted;
+  // Retrieve and log the updated trade session for debugging
+  let updatedTradeStateJson = await sessionClient.get(tradeSessionId);
+  let updatedTradeSession = JSON.parse(updatedTradeStateJson);
+
+  // Check if both players have accepted the trade
+  return Object.keys(updatedTradeSession.acceptedPlayers).length === 2;
 }
-
 
 const finalizeTrade = async (tradeSessionId, sessionId) => {
   const tradeStateJson = await sessionClient.get(tradeSessionId);
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
-
+  console.log("tradeSession: ", tradeSession);
   if (tradeSession.acceptedPlayers && Object.keys(tradeSession.acceptedPlayers).length === 2) {
       // Extract player IDs from the trade session
       const playerIds = Object.keys(tradeSession).filter(key => key !== 'acceptedPlayers');
-      console.log("Player Ids: ", playerIds)
+
       if (playerIds.length === 2) {
           const player1Id = playerIds[0];
           const player2Id = playerIds[1];
@@ -378,13 +385,10 @@ const finalizeTrade = async (tradeSessionId, sessionId) => {
           // Extract trade offers for each player
           const player1Trade = tradeSession[player1Id];
           const player2Trade = tradeSession[player2Id];
-          console.log("player1Trade: ", player1Trade)
-          console.log("player2Trade: ", player2Trade)
+
           // Find players in the session data
           const player1 = sessionData.players.find(p => p.username === player1Id);
           const player2 = sessionData.players.find(p => p.username === player2Id);
-          console.log("player1: ", player1)
-          console.log("player2: ", player2)
 
           if (!player1 || !player2) {
               console.error("Players not found in session data");
@@ -418,8 +422,6 @@ const finalizeTrade = async (tradeSessionId, sessionId) => {
       console.error("Trade session not ready or missing", tradeSession);
   }
 };
-
-
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {

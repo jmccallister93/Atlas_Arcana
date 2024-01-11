@@ -60,7 +60,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       tradeSessionId: tradeSessionId,
       sessionId: gameState.sessionId,
       playerId: currentPlayer.username,
-      tradeOffer: tradeState[currentPlayer.username],
     });
   };
 
