@@ -320,8 +320,20 @@ module.exports = function (socket, io) {
 });
 
 
-  socket.on("tradeOfferDeclined", async ({ sessionId, playerId }) => {
-    console.log("Trade offer declined by player:", playerId);
+  socket.on("tradeOfferDeclined", async ({ tradeSessionId, sessionId, playerId }) => {
+    if (await gameSessionManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
+      // Finalize trade if both players have accepted
+  
+      await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
+     
+      // Emit event to notify players about trade finalization
+      io.in(sessionId).emit("tradeFinalized", {
+          sessionId: sessionId,
+          tradeSessionId: tradeSessionId,
+          status: "declined",
+          currentTradeState: currentTradeState
+      });
+  }
   })
 
   

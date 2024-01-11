@@ -330,7 +330,7 @@ async function drawPhaseCardDraw(player, sessionId) {
 //Trade Phase
 async function getTradeState(sessionId) {
   const tradeStateJson = await sessionClient.get(sessionId);
-  console.log("getTradeState: ", tradeStateJson)
+  // console.log("getTradeState: ", tradeStateJson);
   if (tradeStateJson) {
     return JSON.parse(tradeStateJson);
   } else {
@@ -341,7 +341,7 @@ async function getTradeState(sessionId) {
 }
 
 async function addToTrade(sessionId, tradeState) {
-  console.log("addToTrade: ", JSON.stringify(tradeState))
+  // console.log("addToTrade: ", JSON.stringify(tradeState));
   await sessionClient.set(sessionId, JSON.stringify(tradeState));
   return tradeState;
 }
@@ -350,8 +350,8 @@ async function pendingTradeAcceptance(tradeSessionId, playerId) {
   // Retrieve the current trade session state
   let tradeStateJson = await sessionClient.get(tradeSessionId);
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
-  console.log("tradeSessionId", tradeSessionId)
-  console.log("tradeStateJson:", tradeStateJson);
+  // console.log("tradeSessionId", tradeSessionId);
+  // console.log("tradeStateJson:", tradeStateJson);
   // Initialize acceptedPlayers if it doesn't exist
   tradeSession.acceptedPlayers = tradeSession.acceptedPlayers || {};
 
@@ -373,55 +373,70 @@ const finalizeTrade = async (tradeSessionId, sessionId) => {
   const tradeStateJson = await sessionClient.get(tradeSessionId);
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
   let tradeSession = tradeStateJson ? JSON.parse(tradeStateJson) : {};
-  console.log("tradeSession: ", tradeSession);
-  if (tradeSession.acceptedPlayers && Object.keys(tradeSession.acceptedPlayers).length === 2) {
-      // Extract player IDs from the trade session
-      const playerIds = Object.keys(tradeSession).filter(key => key !== 'acceptedPlayers');
 
-      if (playerIds.length === 2) {
-          const player1Id = playerIds[0];
-          const player2Id = playerIds[1];
+  if (
+    tradeSession.acceptedPlayers &&
+    Object.keys(tradeSession.acceptedPlayers).length === 2
+  ) {
+    const [player1Id, player2Id] = Object.keys(tradeSession).filter(
+      (key) => key !== "acceptedPlayers"
+    );
 
-          // Extract trade offers for each player
-          const player1Trade = tradeSession[player1Id];
-          const player2Trade = tradeSession[player2Id];
+    const player1Trade = tradeSession[player1Id];
+    const player2Trade = tradeSession[player2Id];
 
-          // Find players in the session data
-          const player1 = sessionData.players.find(p => p.username === player1Id);
-          const player2 = sessionData.players.find(p => p.username === player2Id);
+    const player1 = sessionData.players.find((p) => p.username === player1Id);
+    const player2 = sessionData.players.find((p) => p.username === player2Id);
 
-          if (!player1 || !player2) {
-              console.error("Players not found in session data");
-              return;
-          }
+    if (!player1 || !player2) {
+      console.error("Players not found in session data");
+      return;
+    }
 
-          // Process the trade for both players
-          // Example: Updating player1's inventory
-          // This assumes player1Trade and player2Trade are arrays of item IDs
-          player1.inventory.equipment = player1.inventory.equipment
-              .filter(item => !player1Trade.equipment.includes(item.id)) // Remove items being traded away
-              .concat(player2Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
-        
-          // Similar logic for player2...
-          player2.inventory.equipment = player2.inventory.equipment
-              .filter(item => !player2Trade.equipment.includes(item.id)) // Remove items being traded away
-              .concat(player1Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
-            
-          // Update the game state in Redis
-          await sessionClient.set(sessionId, JSON.stringify(sessionData));
+    try {
+      // Swap equipment
+      console.log("Player1Inv prprocess:",player1.inventory)
+      processTradeItems(
+        player1.inventory,
+        player2.inventory,
+        player1Trade.equipment,
+        player2Trade.equipment
+      );
+      
+      // Update the game state in the database
+      await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
-          // Reset the trade session
-          await sessionClient.set(tradeSessionId, JSON.stringify({}));
+      // Reset the trade session
+      await sessionClient.set(tradeSessionId, JSON.stringify({}));
 
-          // Emit event to notify players about trade finalization
-          //...
-      } else {
-          console.error("Invalid number of players in trade session", tradeSession);
-      }
+      // Commit transaction here if your database supports it
+    } catch (error) {
+      // Rollback transaction here if your database supports it
+      console.error("Error processing trade:", error);
+    }
   } else {
-      console.error("Trade session not ready or missing", tradeSession);
+    console.error("Trade session not ready or missing", tradeSession);
   }
 };
+
+function processTradeItems(
+  player1Inventory,
+  player2Inventory,
+  player1TradeItems,
+  player2TradeItems
+) {
+  // Assuming player1TradeItems and player2TradeItems are arrays of equipment objects
+  player1Inventory.equipment = player1Inventory.equipment
+    .filter((item) => !player1TradeItems.some((tradeItem) => tradeItem.equipmentName === item.equipmentName))
+    .concat(player2TradeItems);
+
+  player2Inventory.equipment = player2Inventory.equipment
+    .filter((item) => !player2TradeItems.some((tradeItem) => tradeItem.equipmentName === item.equipmentName))
+    .concat(player1TradeItems);
+
+  console.log("Player1 Inventory postprocess:", player1Inventory);
+  console.log("Player2 Inventory postprocess:", player2Inventory);
+}
 
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {

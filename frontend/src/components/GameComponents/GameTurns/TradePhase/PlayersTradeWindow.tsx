@@ -91,8 +91,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       }
       if (data.tradeSessionId === tradeSessionId) {
         if (data.status === "accepted") {
+          console.log(data.tradeState)
           const tradeDetails = data.currentTradeState;
-          performTradeUpdate(tradeDetails);
+
           setIsTradeOfferFinalized(true);
           setIsTradeOfferPending(false);
         }
@@ -104,52 +105,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     };
   }, [socket, tradeSessionId]); // Make sure to include dependencies
 
-  const performTradeUpdate = (tradeDetails: any) => {
-    const tradePartnerUsername = tradePartnerId?.username;
-  
-    if (!currentPlayer || !tradePartnerUsername) return;
-  
-    const currentPlayerTradeDetails = tradeDetails[currentPlayer.username];
-    const tradePartnerTradeDetails = tradeDetails[tradePartnerUsername];
-  
-    // Update the current player's inventory by removing traded items
-    const updatedCurrentPlayer = {
-      ...currentPlayer,
-      inventory: {
-        ...currentPlayer.inventory,
-        equipment: currentPlayer.inventory.equipment.filter(
-          item => !currentPlayerTradeDetails.equipment.includes(item)
-        ),
-        treasures: currentPlayer.inventory.treasures.filter(
-          item => !currentPlayerTradeDetails.treasures.includes(item)
-        ),
-        resources: currentPlayer.inventory.resources - currentPlayerTradeDetails.resources
-      }
-    };
-  
-    // Find the trade partner in gameState.players
-    const tradePartner = gameState.players.find(
-      player => player.username === tradePartnerUsername
-    );
-  
-    if (tradePartner) {
-      // Update the trade partner's inventory by adding traded items
-      const updatedTradePartner = {
-        ...tradePartner,
-        inventory: {
-          ...tradePartner.inventory,
-          equipment: [...tradePartner.inventory.equipment, ...currentPlayerTradeDetails.equipment],
-          treasures: [...tradePartner.inventory.treasures, ...currentPlayerTradeDetails.treasures],
-          resources: tradePartner.inventory.resources + currentPlayerTradeDetails.resources
-        }
-      };
-  
-      // Update both players' data
-      updatePlayerData(updatedCurrentPlayer);
-      updatePlayerData(updatedTradePartner);
-    }
-  };
-  
 
   // Update the trade state when the trade partner's offer changes
   useEffect(() => {
