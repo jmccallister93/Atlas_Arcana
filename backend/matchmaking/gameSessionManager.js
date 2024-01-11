@@ -434,8 +434,6 @@ function processTradeItems(
     .filter((item) => !player2TradeItems.some((tradeItem) => tradeItem.equipmentName === item.equipmentName))
     .concat(player1TradeItems);
 
-  console.log("Player1 Inventory postprocess:", player1Inventory);
-  console.log("Player2 Inventory postprocess:", player2Inventory);
 }
 
 // Function to handle player disconnection
