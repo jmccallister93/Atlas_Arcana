@@ -401,12 +401,12 @@ const finalizeTrade = async (tradeSessionId, sessionId) => {
           player1.inventory.equipment = player1.inventory.equipment
               .filter(item => !player1Trade.equipment.includes(item.id)) // Remove items being traded away
               .concat(player2Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
-          console.log("player1: ", player1.inventory.equipment)
+        
           // Similar logic for player2...
           player2.inventory.equipment = player2.inventory.equipment
               .filter(item => !player2Trade.equipment.includes(item.id)) // Remove items being traded away
               .concat(player1Trade.equipment.map(itemId => ({ id: itemId }))); // Add items being received
-              console.log("player2: ", player2.inventory.equipment)
+            
           // Update the game state in Redis
           await sessionClient.set(sessionId, JSON.stringify(sessionData));
 

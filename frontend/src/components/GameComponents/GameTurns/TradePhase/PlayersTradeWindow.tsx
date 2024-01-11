@@ -15,7 +15,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
   tradeSessionId,
 }) => {
-  const { gameState } = useGameContext();
+  const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
@@ -49,6 +49,8 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<boolean>(false);
   const [isTradeOfferPending, setIsTradeOfferPending] =
     useState<boolean>(false);
+    const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
+    useState<boolean>(false);
 
     // Accept the trade offer
   const acceptTradeOffer = () => {
@@ -77,12 +79,13 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   useEffect(() => {
     socket.on("tradeFinalized", (data) => {
-      console.log("Trade finalized")
-        if (data.sessionId === tradeSessionId) {
+      console.log(data)
+      if(!currentPlayer){return}
+        if (data.tradeSessionId === tradeSessionId) {
             if (data.status === "accepted") {
-                // Handle trade finalization logic
-                // Update UI to reflect the successful trade
-                // Possibly update player inventories, close trade window, etc.
+              
+              setIsTradeOfferFinalized(true)
+              updatePlayerData(currentPlayer)
             }
         }
     });
