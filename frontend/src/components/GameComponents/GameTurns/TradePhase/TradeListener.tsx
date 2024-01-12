@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactElement } from "react";
 import socket from "../../../../context/SocketClient/socketClient";
-import { IonButton, IonModal } from "@ionic/react";
+import { IonAlert, IonButton, IonModal } from "@ionic/react";
 import { PlayerInfo } from "../../Interfaces";
 import PlayersTradeWindow from "./PlayersTradeWindow";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
@@ -21,7 +21,15 @@ const TradeListener: React.FC = () => {
   const currentPlayer = gameState.players.find(
     (player) => player.username === auth.username
   );
-    const [tradeSessionId, setTradeSessionId] = useState<string>();
+  const [tradeSessionId, setTradeSessionId] = useState<string>();
+  const [tradeRequestDeclined, setTradeRequestDeclined] =
+    useState<boolean>(false);
+  const [tradeRequestDeclinedAlert, setTradeRequestDeclinedAlert] =
+    useState<ReactElement>();
+  const [
+    isTradeRequestDeclinedAlertVisible,
+    setIsTradeRequestDeclinedAlertVisible,
+  ] = useState<boolean>(false);
 
   useEffect(() => {
     const handleReceiveTradeRequest = (data: any) => {
@@ -52,13 +60,25 @@ const TradeListener: React.FC = () => {
   };
 
   const declineTrade = () => {
-    // Handle trade decline logic
-    console.log("Trade declined");
     // You can emit an event to the server here
-    socket.emit("respondToTradeRequest", { response: "declined" });
+    socket.emit("respondToTradeRequest", {
+      response: "declined",
+      fromPlayerId,
+      toPlayerId: currentPlayer,
+    });
     setIncomingTradeRequest(false); // Reset trade request
-    setShowIncomingTradeRequest(false)
+    setShowIncomingTradeRequest(false);
   };
+
+  useEffect(() => {
+    socket.on("tradeRequestDeclined", (data) => {
+      setTradeRequestDeclined(true);
+      setIsTradeRequestDeclinedAlertVisible(true);
+    });
+    return () => {
+      socket.off("tradeRequestDeclined");
+    };
+  }, []);
 
   useEffect(() => {
     const handleOpenTradeWindow = (data: any) => {
@@ -94,10 +114,19 @@ const TradeListener: React.FC = () => {
         onDidDismiss={() => setShowActiveTradeWindow(false)}
       >
         <PlayersTradeWindow
-         tradePartnerId={tradePartnerId}
-         tradeSessionId={tradeSessionId}
+          tradeRequestDeclined={tradeRequestDeclined}
+          tradePartnerId={tradePartnerId}
+          tradeSessionId={tradeSessionId}
         />
       </IonModal>
+
+      <IonAlert
+        isOpen={isTradeRequestDeclinedAlertVisible}
+        onDidDismiss={() => setIsTradeRequestDeclinedAlertVisible(false)}
+        header={"Trade Declined"}
+        message={"The trade request has been declined."}
+        buttons={["OK"]}
+      />
     </>
   );
 };

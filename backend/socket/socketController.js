@@ -1,5 +1,5 @@
 //SOCKET CONTROLLER
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const StateManager = require("../networking/sync/stateManager");
 const Player = require("../database/PlayerModel");
 const gameSessionManager = require("../matchmaking/gameSessionManager");
@@ -223,7 +223,7 @@ module.exports = function (socket, io) {
   socket.on("sendTradeRequest", async ({ fromPlayerId, toPlayerId }) => {
     try {
       if (toPlayerId) {
-        console.log("Sending trade request to player:", toPlayerId);
+        // console.log("Sending trade request to player:", toPlayerId);
         io.to(toPlayerId.socketId).emit("receiveTradeRequest", {
           fromPlayerId,
         });
@@ -238,10 +238,7 @@ module.exports = function (socket, io) {
     "respondToTradeRequest",
     async ({ fromPlayerId, toPlayerId, response }) => {
       if (response === "accepted") {
-        // Both players should now enter the trade window
-
-         const tradeSessionId = uuidv4();
-
+        const tradeSessionId = uuidv4();
         const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
         const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
 
@@ -271,7 +268,30 @@ module.exports = function (socket, io) {
           );
         }
       } else {
-        io.to(fromPlayerId).emit("tradeRequestDeclined");
+        // Notify both players that the trade request was declined
+        const fromSocket = io.sockets.sockets.get(fromPlayerId.socketId);
+        const toSocket = io.sockets.sockets.get(toPlayerId.socketId);
+        if (fromSocket) {
+          fromSocket.emit("tradeRequestDeclined", {
+            message: "Trade request declined",
+            declinedBy: toPlayerId,
+          });
+        } else {
+          console.error(
+            `Socket with ID ${fromPlayerId.socketId} does not exist.`
+          );
+        }
+
+        // if (toSocket) {
+        //   toSocket.emit("tradeRequestDeclined", {
+        //     message: "Trade request declined",
+        //     declinedBy: toPlayerId,
+        //   });
+        // } else {
+        //   console.error(
+        //     `Socket with ID ${toPlayerId.socketId} does not exist.`
+        //   );
+        // }
       }
     }
   );
@@ -300,51 +320,63 @@ module.exports = function (socket, io) {
     }
   });
 
-  socket.on("tradeOfferAccepted", async ({ tradeSessionId, sessionId, playerId }) => {
-    const currentTradeState = await gameSessionManager.getTradeState(
-      tradeSessionId
-    );
-    if (await gameSessionManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
+  socket.on(
+    "tradeOfferAccepted",
+    async ({ tradeSessionId, sessionId, playerId }) => {
+      const currentTradeState = await gameSessionManager.getTradeState(
+        tradeSessionId
+      );
+      if (
+        await gameSessionManager.pendingTradeAcceptance(
+          tradeSessionId,
+          playerId
+        )
+      ) {
         // Finalize trade if both players have accepted
-    
-        const updatedSessionData = await gameSessionManager.finalizeTrade(tradeSessionId, sessionId)
+
+        const updatedSessionData = await gameSessionManager.finalizeTrade(
+          tradeSessionId,
+          sessionId
+        );
 
         // Emit event to notify players about trade finalization
         io.in(sessionId).emit("tradeFinalized", {
-            sessionId: sessionId,
-            tradeSessionId: tradeSessionId,
-            status: "accepted",
-            currentTradeState: currentTradeState
+          sessionId: sessionId,
+          tradeSessionId: tradeSessionId,
+          status: "accepted",
+          currentTradeState: currentTradeState,
         });
         // Additionally, emit the updated game state
-    if (updatedSessionData) {
-
-      io.in(sessionId).emit("updateGameState", updatedSessionData);
+        if (updatedSessionData) {
+          io.in(sessionId).emit("updateGameState", updatedSessionData);
+        }
+      }
     }
-    }
-});
+  );
 
+  socket.on(
+    "tradeOfferDeclined",
+    async ({ tradeSessionId, sessionId, playerId }) => {
+      if (
+        await gameSessionManager.pendingTradeAcceptance(
+          tradeSessionId,
+          playerId
+        )
+      ) {
+        // Finalize trade if both players have accepted
 
-  socket.on("tradeOfferDeclined", async ({ tradeSessionId, sessionId, playerId }) => {
-    if (await gameSessionManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
-      // Finalize trade if both players have accepted
-  
-      await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
-     
-      // Emit event to notify players about trade finalization
-      io.in(sessionId).emit("tradeFinalized", {
+        await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
+
+        // Emit event to notify players about trade finalization
+        io.in(sessionId).emit("tradeFinalized", {
           sessionId: sessionId,
           tradeSessionId: tradeSessionId,
           status: "declined",
-          currentTradeState: currentTradeState
-      });
-  }
-  })
-
-  
-
-
-
+          currentTradeState: currentTradeState,
+        });
+      }
+    }
+  );
 };
 
 // Call to check user online status

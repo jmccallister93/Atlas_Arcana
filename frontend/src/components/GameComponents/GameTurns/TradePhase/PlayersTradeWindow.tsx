@@ -16,10 +16,12 @@ import TradeOffer from "./TradeOffer";
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
   tradeSessionId?: string;
+  tradeRequestDeclined: boolean,
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
   tradeSessionId,
+  tradeRequestDeclined
 }) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -57,18 +59,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<boolean>(false);
   const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
     useState<boolean>(false);
-  const [tradeRequestDeclined, setTradeRequeustDeclined] = useState<boolean>(false)
 
-//Decline trade request
-useEffect(() => {
-  socket.on("tradeRequestDeclined", (data) =>{
-    console.log("Firedddd")
-    setTradeRequeustDeclined(true)
-  })
-  return () => {
-    socket.off("tradeRequestDeclined");
-  };
-}, [])
 
   // Accept the trade offer
   const acceptTradeOffer = () => {
@@ -257,22 +248,6 @@ useEffect(() => {
     });
   };
 
-  //remove from offer local state
-  const removeResourceFromOffer = (playerId: string) => {
-    setTradeState((prevState) => {
-      if (!prevState[playerId]) {
-        return prevState;
-      }
-
-      const updatedOffer = { ...prevState[playerId] };
-
-      // Reset the resources in the offer
-      updatedOffer.resources = 0;
-
-      return { ...prevState, [playerId]: updatedOffer };
-    });
-  };
-
   // Check if an item is in the current player's offer
   const isItemInCurrentPlayerOffer = (
     item: EquipmentItem | TreasureItem,
@@ -290,13 +265,6 @@ useEffect(() => {
     }
 
     return false;
-  };
-
-  const areResourcesInCurrentPlayerOffer = (): boolean => {
-    if (!currentPlayer) return false;
-    const currentPlayerUsername = currentPlayer.username;
-    const tradeOffer = tradeState[currentPlayerUsername];
-    return tradeOffer && tradeOffer.resources > 0;
   };
 
   // Update the resource amount in the offer local state
@@ -383,6 +351,8 @@ useEffect(() => {
     // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
 
+ 
+
   return (
     <div className="tradeWindowContainer">
       <div className="tradeWindowHeader">
@@ -466,9 +436,7 @@ useEffect(() => {
           </>
         )}
       </div>
-      <div>
-        {tradeRequestDeclined ? (<IonAlert>Trade Request declined</IonAlert>) : null}
-      </div>
+    
     </div>
   );
 };
