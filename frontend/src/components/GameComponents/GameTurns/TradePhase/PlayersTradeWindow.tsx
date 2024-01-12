@@ -57,6 +57,18 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<boolean>(false);
   const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
     useState<boolean>(false);
+  const [tradeRequestDeclined, setTradeRequeustDeclined] = useState<boolean>(false)
+
+//Decline trade request
+useEffect(() => {
+  socket.on("tradeRequestDeclined", (data) =>{
+    console.log("Firedddd")
+    setTradeRequeustDeclined(true)
+  })
+  return () => {
+    socket.off("tradeRequestDeclined");
+  };
+}, [])
 
   // Accept the trade offer
   const acceptTradeOffer = () => {
@@ -453,6 +465,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             <IonButton onClick={declineTradeOffer}>Decline Trade</IonButton>
           </>
         )}
+      </div>
+      <div>
+        {tradeRequestDeclined ? (<IonAlert>Trade Request declined</IonAlert>) : null}
       </div>
     </div>
   );

@@ -57,6 +57,7 @@ const TradeListener: React.FC = () => {
     // You can emit an event to the server here
     socket.emit("respondToTradeRequest", { response: "declined" });
     setIncomingTradeRequest(false); // Reset trade request
+    setShowIncomingTradeRequest(false)
   };
 
   useEffect(() => {
