@@ -91,7 +91,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       }
       if (data.tradeSessionId === tradeSessionId) {
         if (data.status === "accepted") {
-          console.log(data.tradeState)
+          console.log(data)
           const tradeDetails = data.currentTradeState;
 
           setIsTradeOfferFinalized(true);

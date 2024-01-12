@@ -395,20 +395,22 @@ const finalizeTrade = async (tradeSessionId, sessionId) => {
 
     try {
       // Swap equipment
-      console.log("Player1Inv prprocess:",player1.inventory)
+      console.log("Player1Inv preprocess:",player1.inventory)
       processTradeItems(
         player1.inventory,
         player2.inventory,
         player1Trade.equipment,
         player2Trade.equipment
       );
-      
+      console.log("Player1Inv postprocessing: ",player1.inventory)
+      console.log("SessionData: ", sessionData.players)
       // Update the game state in the database
       await sessionClient.set(sessionId, JSON.stringify(sessionData));
 
       // Reset the trade session
       await sessionClient.set(tradeSessionId, JSON.stringify({}));
 
+      return sessionData
       // Commit transaction here if your database supports it
     } catch (error) {
       // Rollback transaction here if your database supports it
@@ -433,7 +435,7 @@ function processTradeItems(
   player2Inventory.equipment = player2Inventory.equipment
     .filter((item) => !player2TradeItems.some((tradeItem) => tradeItem.equipmentName === item.equipmentName))
     .concat(player1TradeItems);
-
+ 
 }
 
 // Function to handle player disconnection

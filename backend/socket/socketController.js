@@ -307,8 +307,8 @@ module.exports = function (socket, io) {
     if (await gameSessionManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
         // Finalize trade if both players have accepted
     
-        await gameSessionManager.finalizeTrade(tradeSessionId, sessionId);
-       
+        const updatedSessionData = await gameSessionManager.finalizeTrade(tradeSessionId, sessionId)
+
         // Emit event to notify players about trade finalization
         io.in(sessionId).emit("tradeFinalized", {
             sessionId: sessionId,
@@ -316,6 +316,11 @@ module.exports = function (socket, io) {
             status: "accepted",
             currentTradeState: currentTradeState
         });
+        // Additionally, emit the updated game state
+    if (updatedSessionData) {
+
+      io.in(sessionId).emit("updateGameState", updatedSessionData);
+    }
     }
 });
 
