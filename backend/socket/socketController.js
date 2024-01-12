@@ -282,20 +282,30 @@ module.exports = function (socket, io) {
           );
         }
 
-        // if (toSocket) {
-        //   toSocket.emit("tradeRequestDeclined", {
-        //     message: "Trade request declined",
-        //     declinedBy: toPlayerId,
-        //   });
-        // } else {
-        //   console.error(
-        //     `Socket with ID ${toPlayerId.socketId} does not exist.`
-        //   );
-        // }
+        if (toSocket) {
+          toSocket.emit("tradeRequestDeclined", {
+            message: "Trade request declined",
+            declinedBy: toPlayerId,
+          });
+        } else {
+          console.error(
+            `Socket with ID ${toPlayerId.socketId} does not exist.`
+          );
+        }
       }
     }
   );
 
+  socket.on("tradeWindowClosed", async ({ tradeSessionId, playerId }) => {
+    try {
+      // Notify all sockets in the trade session that the trade window has been closed
+      socket.to(tradeSessionId).emit("tradeWindowClosedByOther", {
+        closedByPlayerId: playerId,
+      });
+    } catch (error) {
+      console.error("Error handling tradeWindowClosed event:", error);
+    }
+  });
   socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
     try {
       // Retrieve the current trade state for the session

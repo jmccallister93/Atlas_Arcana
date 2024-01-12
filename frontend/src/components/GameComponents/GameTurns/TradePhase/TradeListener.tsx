@@ -98,6 +98,20 @@ const TradeListener: React.FC = () => {
     declineTrade()
   }
 
+  useEffect(() => {
+    const handleCloseByOther = (data: any) => {
+      if (data.closedByPlayerId !== currentPlayer?.username) {
+        setShowActiveTradeWindow(false);
+      }
+    };
+  
+    socket.on("tradeWindowClosedByOther", handleCloseByOther);
+  
+    return () => {
+      socket.off("tradeWindowClosedByOther", handleCloseByOther);
+    };
+  }, [currentPlayer]);
+
   return (
     <>
       <div className="gameturnMenuContainer">
@@ -129,6 +143,8 @@ const TradeListener: React.FC = () => {
         <PlayersTradeWindow
           tradePartnerId={tradePartnerId}
           tradeSessionId={tradeSessionId}
+          onClose={() => setShowActiveTradeWindow(false)}
+          declineTrade={declineTrade}
         />
       </IonModal>
 

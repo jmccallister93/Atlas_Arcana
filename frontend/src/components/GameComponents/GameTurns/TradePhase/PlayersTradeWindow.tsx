@@ -18,12 +18,14 @@ import { closeOutline } from "ionicons/icons";
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
   tradeSessionId?: string;
-
+  onClose: () => void
+  declineTrade: () => void
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
   tradeSessionId,
-  
+  onClose,
+  declineTrade
 }) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -353,8 +355,17 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
 
- 
+ const closeAndDecline = () => {
+  declineTrade();
+  onClose()
+  socket.emit("tradeWindowClosed", {
+    tradeSessionId: tradeSessionId,
+    playerId: currentPlayer?.username,
+  });
+ }
 
+
+ 
   return (
     <div className="tradeWindowContainer">
       <div className="modalHeader">
@@ -363,7 +374,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         </h3>
         <button
               className="closeButton"
-              // onClick={}
+              onClick={closeAndDecline}
             >
               <IonIcon icon={closeOutline} />
             </button>
