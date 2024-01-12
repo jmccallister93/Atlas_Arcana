@@ -4,6 +4,7 @@ import {
   IonAlert,
   IonButton,
   IonCheckbox,
+  IonIcon,
   IonItem,
   IonModal,
 } from "@ionic/react";
@@ -11,17 +12,18 @@ import "../GameTurn.scss";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
 import socket from "../../../../context/SocketClient/socketClient";
-import TradeOffer from "./TradeOffer";
+import { closeOutline } from "ionicons/icons";
+
 
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
   tradeSessionId?: string;
-  tradeRequestDeclined: boolean,
+
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
   tradeSessionId,
-  tradeRequestDeclined
+  
 }) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -355,8 +357,16 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
   return (
     <div className="tradeWindowContainer">
-      <div className="tradeWindowHeader">
+      <div className="modalHeader">
+        <h3>
         Trading with {tradePartnerId?.username}
+        </h3>
+        <button
+              className="closeButton"
+              // onClick={}
+            >
+              <IonIcon icon={closeOutline} />
+            </button>
       </div>
       <div className="tradeWindowDetailsContainer">
         <div className="currentPlayerInventory">

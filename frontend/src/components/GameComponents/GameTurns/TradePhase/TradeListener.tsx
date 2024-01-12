@@ -1,10 +1,12 @@
 import React, { useState, useEffect, ReactElement } from "react";
 import socket from "../../../../context/SocketClient/socketClient";
-import { IonAlert, IonButton, IonModal } from "@ionic/react";
+import { IonAlert, IonButton, IonIcon, IonModal } from "@ionic/react";
 import { PlayerInfo } from "../../Interfaces";
 import PlayersTradeWindow from "./PlayersTradeWindow";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
+import { closeOutline } from "ionicons/icons";
+import "../GameTurn.scss";
 
 const TradeListener: React.FC = () => {
   const [incomingTradeRequest, setIncomingTradeRequest] =
@@ -22,10 +24,7 @@ const TradeListener: React.FC = () => {
     (player) => player.username === auth.username
   );
   const [tradeSessionId, setTradeSessionId] = useState<string>();
-  const [tradeRequestDeclined, setTradeRequestDeclined] =
-    useState<boolean>(false);
-  const [tradeRequestDeclinedAlert, setTradeRequestDeclinedAlert] =
-    useState<ReactElement>();
+
   const [
     isTradeRequestDeclinedAlertVisible,
     setIsTradeRequestDeclinedAlertVisible,
@@ -72,7 +71,6 @@ const TradeListener: React.FC = () => {
 
   useEffect(() => {
     socket.on("tradeRequestDeclined", (data) => {
-      setTradeRequestDeclined(true);
       setIsTradeRequestDeclinedAlertVisible(true);
     });
     return () => {
@@ -95,26 +93,40 @@ const TradeListener: React.FC = () => {
     };
   }, []);
 
+  const onCloseRequest = () => {
+    setShowIncomingTradeRequest(false)
+    declineTrade()
+  }
+
   return (
     <>
-      <IonModal
-        isOpen={showIncomingTradeRequest}
-        onDidDismiss={() => setShowIncomingTradeRequest(false)}
-      >
-        <p>Trade Request from {fromPlayerId?.username}</p>
-        {/* Display trade details here */}
-        <IonButton onClick={acceptTrade}>Accept</IonButton>
-        <IonButton onClick={declineTrade}>Decline</IonButton>
-        <IonButton onClick={() => setShowIncomingTradeRequest(false)}>
-          Close
-        </IonButton>
-      </IonModal>
+      <div className="gameturnMenuContainer">
+        <IonModal
+          isOpen={showIncomingTradeRequest}
+          onDidDismiss={() => setShowIncomingTradeRequest(false)}
+        >
+          <div className="modalHeader">
+            <h3>Incoming Trade Request from {fromPlayerId?.username}</h3>
+            <button
+              className="closeButton"
+              onClick={onCloseRequest}
+            >
+              <IonIcon icon={closeOutline} />
+            </button>
+          </div>
+          {/* Display trade details here */}
+          <IonButton onClick={acceptTrade}>Accept</IonButton>
+          <IonButton onClick={declineTrade}>Decline</IonButton>
+          <IonButton onClick={() => setShowIncomingTradeRequest(false)}>
+            Close
+          </IonButton>
+        </IonModal>
+      </div>
       <IonModal
         isOpen={showActiveTradeWindow}
         onDidDismiss={() => setShowActiveTradeWindow(false)}
       >
         <PlayersTradeWindow
-          tradeRequestDeclined={tradeRequestDeclined}
           tradePartnerId={tradePartnerId}
           tradeSessionId={tradeSessionId}
         />
