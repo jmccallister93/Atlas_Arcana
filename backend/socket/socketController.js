@@ -387,6 +387,12 @@ module.exports = function (socket, io) {
       }
     }
   );
+
+socket.on("restAccepted", async({sessionId, playerId}) => {
+ await gameSessionManager.restAccepted(sessionId, playerId)
+ console.log(playerId)
+})
+
 };
 
 // Call to check user online status

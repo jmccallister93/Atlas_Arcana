@@ -61,7 +61,7 @@ const TradePhase: React.FC<TradePhaseProps> = ({}) => {
           <IonButton onClick={() => setShowTradeWindow(false)}>Close</IonButton>
         </IonModal>
       </div>
-      {/* <PlayersTradeWindow /> */}
+    
     </>
   );
 };

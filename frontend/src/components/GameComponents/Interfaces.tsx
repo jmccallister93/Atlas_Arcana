@@ -41,6 +41,7 @@ export interface EquipmentItem {
 export interface TreasureItem {
   treasureName: string;
   description: string;
+  reaction: boolean;
 }
 
 export interface QuestItem {
@@ -64,7 +65,8 @@ export interface PlayerInfo {
   row: number;
   victoryPoints: number;
   rank: number;
-  health: number;
+  totalHealth: number;
+  currentHealth: number;
   offense: number;
   defense: number;
   stamina: number;

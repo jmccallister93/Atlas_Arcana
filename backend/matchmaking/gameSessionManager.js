@@ -143,7 +143,8 @@ function initializePlayers(playerData) {
     username: player.username,
     victoryPoints: 0,
     rank: 1,
-    health: 3,
+    totalHealth: 3,
+    currentHealth: 3,
     offense: 0,
     defense: 0,
     stamina: 1,
@@ -478,6 +479,12 @@ function processTradeItems(
     player2Inventory.resources - player2Resources + player1Resources;
 }
 
+// Rest Phase 
+async function restAccepted(sessionId, playerId){
+  const sessionData = JSON.parse(await sessionClient.get(sessionId))
+  
+}
+
 // Function to handle player disconnection
 async function handlePlayerDisconnect(sessionId, playerId) {
   const sessionData = JSON.parse(await sessionClient.get(sessionId));
@@ -511,4 +518,5 @@ module.exports = {
   addToTrade,
   pendingTradeAcceptance,
   finalizeTrade,
+  restAccepted,
 };

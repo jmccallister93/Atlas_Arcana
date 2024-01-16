@@ -4,7 +4,7 @@ import { arrowForwardCircleOutline } from "ionicons/icons";
 import { GameSessionInfo, PlayerInfo } from "../Interfaces";
 import DrawPhase from "./DrawPhase/DrawPhase";
 import TradePhase from "./TradePhase/TradePhase";
-import RestPhase from "./RestPhase";
+import RestPhase from "./RestPhase/RestPhase";
 import MapPhase from "./MapPhase";
 import CombatPhase from "./CombatPhase";
 import TitanPhase from "./TitanPhase";

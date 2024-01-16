@@ -44,7 +44,7 @@ const EquipGear: React.FC<EquipGearProps> = ({
   const statUpdateMap: Record<EquipmentSlot, StatUpdate> = {
     weapon: { stat: "offense", increment: 1 },
     armor: { stat: "defense", increment: 1 },
-    amulet: { stat: "health", increment: 1 },
+    amulet: { stat: "totalHealth", increment: 1 },
     boots: { stat: "movement", increment: 1 },
     gloves: { stat: "build", increment: 1 },
   };
@@ -57,7 +57,7 @@ const EquipGear: React.FC<EquipGearProps> = ({
   // Mapping from slot to stat update
   const elementUpdateMap: Record<string, ElementUpdate> = {
     Fire: { stat: "offense", increment: 1 },
-    Water: { stat: "health", increment: 1 },
+    Water: { stat: "totalHealth", increment: 1 },
     Wind: { stat: "movement", increment: 1 },
     Stone: { stat: "defense", increment: 1 },
   };

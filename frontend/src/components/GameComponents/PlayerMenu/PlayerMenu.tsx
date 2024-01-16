@@ -156,10 +156,16 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
       description: "Used to determine usable equipment level.",
     },
     {
-      label: "Health",
-      value: currentPlayer.health,
+      label: "Current Health",
+      value: currentPlayer.currentHealth,
       description: "Used for total life force, when 0 player dies.",
     },
+    {
+      label: "Total Health",
+      value: currentPlayer.totalHealth,
+      description: "Used for total life force, when 0 player dies.",
+    },
+  
     {
       label: "Offense",
       value: currentPlayer.offense,

@@ -14,15 +14,14 @@ import { useGameContext } from "../../../../context/GameContext/GameContext";
 import socket from "../../../../context/SocketClient/socketClient";
 import { closeOutline } from "ionicons/icons";
 
-
 interface PlayersTradewindowProps {
   tradePartnerId: PlayerInfo | undefined;
   tradeSessionId?: string;
-  onClose: () => void
-  declineTrade: () => void
+  onClose: () => void;
+  declineTrade: () => void;
   setShowActiveTradeWindow: (show: boolean) => void;
-  setIsTradeRequestCompleteAlertVisible: (show: boolean) => void
-  setShowIncomingTradeRequest: (show: boolean) => void
+  setIsTradeRequestCompleteAlertVisible: (show: boolean) => void;
+  setShowIncomingTradeRequest: (show: boolean) => void;
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
@@ -69,7 +68,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     useState<boolean>(false);
   const [isTradeOfferFinalized, setIsTradeOfferFinalized] =
     useState<boolean>(false);
-
+  const [selectedItem, setSelectedItem] = useState<
+    EquipmentItem | TreasureItem | null
+  >(null);
 
   // Accept the trade offer
   const acceptTradeOffer = () => {
@@ -104,14 +105,14 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       }
       if (data.tradeSessionId === tradeSessionId) {
         if (data.status === "accepted") {
-          console.log(data)
+          console.log(data);
           const tradeDetails = data.currentTradeState;
 
           setIsTradeOfferFinalized(true);
           setIsTradeOfferPending(false);
           setShowActiveTradeWindow(false);
-          setIsTradeRequestCompleteAlertVisible(true)
-          setShowIncomingTradeRequest(false)
+          setIsTradeRequestCompleteAlertVisible(true);
+          setShowIncomingTradeRequest(false);
         }
       }
     });
@@ -120,7 +121,6 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       socket.off("tradeFinalized");
     };
   }, [socket, tradeSessionId]); // Make sure to include dependencies
-
 
   // Update the trade state when the trade partner's offer changes
   useEffect(() => {
@@ -344,7 +344,10 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       setEquipmentItemsForTrade(
         <IonItem>
           {offer.equipment.map((item) => (
-            <li key={item.equipmentName}>{item.equipmentName}</li>
+            <div key={item.equipmentName}>
+              {item.equipmentName}
+              <IonButton onClick={() => handleItemClick(item)}>VIEW</IonButton>
+            </div>
           ))}
         </IonItem>
       );
@@ -353,7 +356,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       setTreasureItemsForTrade(
         <IonItem>
           {offer.treasures.map((item) => (
-            <li key={item.treasureName}>{item.treasureName}</li>
+            <div key={item.treasureName}>{item.treasureName}
+              <IonButton onClick={() => handleItemClick(item)}>VIEW</IonButton></div>
+            
           ))}
         </IonItem>
       );
@@ -363,30 +368,107 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
     }
     // console.log(tradeDisplayOffer[offerKey].equipment)
   }, [tradeDisplayOffer]);
+  // Close and decline offer
+  const closeAndDecline = () => {
+    declineTrade();
+    onClose();
+    socket.emit("tradeWindowClosed", {
+      tradeSessionId: tradeSessionId,
+      playerId: currentPlayer?.username,
+    });
+  };
 
- const closeAndDecline = () => {
-  declineTrade();
-  onClose()
-  socket.emit("tradeWindowClosed", {
-    tradeSessionId: tradeSessionId,
-    playerId: currentPlayer?.username,
-  });
- }
+  // Function to handle item click
+  const handleItemClick = (item: EquipmentItem | TreasureItem) => {
+    setSelectedItem(item);
+  };
 
+  // Function to close the item details
+  const closeItemDetails = () => {
+    setSelectedItem(null);
+  };
+  // Component or Function to render item details
+  const renderItemDetails = (item: EquipmentItem | TreasureItem) => {
+    let itemName = "";
+    let itemDetails = null;
 
- 
+    // Check if the item is an EquipmentItem
+    if ("equipmentName" in item) {
+      itemName = item.equipmentName;
+      // Add any other specific details for EquipmentItem
+      itemDetails = (
+        <>
+          <p>
+            <strong>Name:</strong>
+            {item.equipmentName}
+          </p>
+          <p>
+            <strong>Rank:</strong>
+            {item.rank}
+          </p>
+          <p>
+            <strong>Slot:</strong>
+            {item.slot}
+          </p>
+          <p>
+            <strong>Set:</strong>
+            {item.set}
+          </p>
+          <p>
+            <strong>Element:</strong>
+            {item.element}
+          </p>
+          <p>
+            <strong>Bonus:</strong>
+            {item.bonus}
+          </p>
+        </>
+      );
+    }
+
+    // Check if the item is a TreasureItem
+    else if ("treasureName" in item) {
+      itemName = item.treasureName;
+      // Add any other specific details for TreasureItem
+      itemDetails = (
+        <>
+          <p>
+            <strong>Name:</strong>
+            {item.treasureName}
+          </p>
+          <p>
+            <strong>Description:</strong>
+            {item.description}
+          </p>
+          <p>
+            <strong>Reaction:</strong>
+            {item.reaction}
+          </p>
+        </>
+      );
+    }
+
+    return (
+      <IonModal isOpen={!!item} onDidDismiss={closeItemDetails}>
+        <div className="modalHeader">
+          <h2>Item Details</h2>
+          <button className="closeButton" onClick={closeItemDetails}>
+            <IonIcon icon={closeOutline} />
+          </button>
+        </div>
+        <h2>{itemName}</h2>
+        {itemDetails}
+      </IonModal>
+    );
+  };
+
   return (
     <div className="tradeWindowContainer">
       <div className="modalHeader">
-        <h3>
-        Trading with {tradePartnerId?.username}
-        </h3>
-        <button
-              className="closeButton"
-              onClick={closeAndDecline}
-            >
-              <IonIcon icon={closeOutline} />
-            </button>
+        <h3>Trading with {tradePartnerId?.username}</h3>
+        <button className="closeButton" onClick={closeAndDecline}>
+          <IonIcon icon={closeOutline} />
+        </button>
       </div>
       <div className="tradeWindowDetailsContainer">
         <div className="currentPlayerInventory">
@@ -400,6 +482,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
                   toggleItemInCurrentPlayerOffer(equipmentItem, "equipment")
                 }
               ></IonCheckbox>
+              <IonButton onClick={() => handleItemClick(equipmentItem)}>
+                VIEW
+              </IonButton>
             </IonItem>
           ))}
 
@@ -412,6 +497,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
                   toggleItemInCurrentPlayerOffer(treasureItem, "treasures")
                 }
               ></IonCheckbox>
+              <IonButton onClick={() => handleItemClick(treasureItem)}>
+                VIEW
+              </IonButton>
             </IonItem>
           ))}
 
@@ -466,7 +554,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
           </>
         )}
       </div>
-    
+
+      {/* Render Item Details Modal */}
+      {selectedItem && renderItemDetails(selectedItem)}
     </div>
   );
 };
