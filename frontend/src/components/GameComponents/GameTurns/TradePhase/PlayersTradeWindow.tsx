@@ -20,12 +20,18 @@ interface PlayersTradewindowProps {
   tradeSessionId?: string;
   onClose: () => void
   declineTrade: () => void
+  setShowActiveTradeWindow: (show: boolean) => void;
+  setIsTradeRequestCompleteAlertVisible: (show: boolean) => void
+  setShowIncomingTradeRequest: (show: boolean) => void
 }
 const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
   tradePartnerId,
   tradeSessionId,
   onClose,
-  declineTrade
+  declineTrade,
+  setShowActiveTradeWindow,
+  setIsTradeRequestCompleteAlertVisible,
+  setShowIncomingTradeRequest,
 }) => {
   const { gameState, updatePlayerData } = useGameContext();
   const auth = useAuth();
@@ -103,6 +109,9 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
 
           setIsTradeOfferFinalized(true);
           setIsTradeOfferPending(false);
+          setShowActiveTradeWindow(false);
+          setIsTradeRequestCompleteAlertVisible(true)
+          setShowIncomingTradeRequest(false)
         }
       }
     });

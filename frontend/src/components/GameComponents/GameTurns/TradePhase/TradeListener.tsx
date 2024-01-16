@@ -29,6 +29,10 @@ const TradeListener: React.FC = () => {
     isTradeRequestDeclinedAlertVisible,
     setIsTradeRequestDeclinedAlertVisible,
   ] = useState<boolean>(false);
+  const [
+    isTradeRequestCompleteAlertVisible,
+    setIsTradeRequestCompleteAlertVisible,
+  ] = useState<boolean>(false);
 
   useEffect(() => {
     const handleReceiveTradeRequest = (data: any) => {
@@ -145,6 +149,9 @@ const TradeListener: React.FC = () => {
           tradeSessionId={tradeSessionId}
           onClose={() => setShowActiveTradeWindow(false)}
           declineTrade={declineTrade}
+          setShowActiveTradeWindow = {setShowActiveTradeWindow}
+          setIsTradeRequestCompleteAlertVisible= {setIsTradeRequestCompleteAlertVisible}
+          setShowIncomingTradeRequest = {setShowIncomingTradeRequest}
         />
       </IonModal>
 
@@ -153,6 +160,13 @@ const TradeListener: React.FC = () => {
         onDidDismiss={() => setIsTradeRequestDeclinedAlertVisible(false)}
         header={"Trade Declined"}
         message={"The trade request has been declined."}
+        buttons={["OK"]}
+      />
+      <IonAlert
+        isOpen={isTradeRequestCompleteAlertVisible}
+        onDidDismiss={() => setIsTradeRequestCompleteAlertVisible(false)}
+        header={"Trade Completed"}
+        message={"The trade request has been completed."}
         buttons={["OK"]}
       />
     </>
