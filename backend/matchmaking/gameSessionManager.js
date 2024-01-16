@@ -31,7 +31,7 @@ async function createGameSession(playerOneData, playerTwoData) {
   const currentPlayerTurn = setCurrentPlayerTurn(turnOrder);
 
   // Set starting phase of the game
-  const currentPhase = "Trade";
+  const currentPhase = "Map";
   //Determine starting cards
   const startingCardData = determineStartingCards(players);
 
@@ -482,7 +482,10 @@ function processTradeItems(
 // Rest Phase 
 async function restAccepted(sessionId, playerId){
   const sessionData = JSON.parse(await sessionClient.get(sessionId))
+  const player = sessionData.players.find((p) => p.username === playerId);
+  player.currentHealth = player.totalHealth
   
+  return sessionData
 }
 
 // Function to handle player disconnection

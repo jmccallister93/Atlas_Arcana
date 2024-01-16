@@ -397,7 +397,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       itemName = item.equipmentName;
       // Add any other specific details for EquipmentItem
       itemDetails = (
-        <>
+        <div className="currentPlayerInventory">
           <p>
             <strong>Name:</strong>
             {item.equipmentName}
@@ -422,7 +422,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             <strong>Bonus:</strong>
             {item.bonus}
           </p>
-        </>
+        </div>
       );
     }
 
@@ -431,7 +431,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
       itemName = item.treasureName;
       // Add any other specific details for TreasureItem
       itemDetails = (
-        <>
+        <div className="currentPlayerInventory">
           <p>
             <strong>Name:</strong>
             {item.treasureName}
@@ -444,7 +444,7 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
             <strong>Reaction:</strong>
             {item.reaction}
           </p>
-        </>
+        </div>
       );
     }
 

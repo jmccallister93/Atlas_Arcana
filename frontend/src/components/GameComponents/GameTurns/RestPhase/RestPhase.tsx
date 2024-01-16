@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GameSessionInfo, PlayerInfo } from "../../Interfaces";
 import { useAuth } from "../../../../context/AuthContext/AuthContext";
 import { useGameContext } from "../../../../context/GameContext/GameContext";
-import { IonButton, IonIcon, IonModal } from "@ionic/react";
+import { IonAlert, IonButton, IonIcon, IonModal } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import socket from "../../../../context/SocketClient/socketClient";
 
@@ -16,15 +16,20 @@ const RestPhase: React.FC<RestPhaseProps> = ({}) => {
   );
   const [showRestWindow, setShowRestWindow] = useState<boolean>(true);
   const [restAccepted, setRestAccepted] = useState<boolean>(false);
+  const [isRestAlertVisible, setIsRestAlertVisible] = useState<boolean>(false)
 
   useEffect(() => {
-    console.log("fired with pid:")
-    socket.emit("restAccepted", {
-      sessionId: gameState.sessionId,
-      playerId: currentPlayer,
-    });
+    if (restAccepted) {
+      socket.emit("restAccepted", {
+        sessionId: gameState.sessionId,
+        playerId: currentPlayer?.username,
+      });
+      setIsRestAlertVisible(true)
+      setShowRestWindow(false)
+      // Remove me after testing
+      setRestAccepted(false)
+    }
   }, [restAccepted]);
-
 
   return (
     <>
@@ -53,6 +58,13 @@ const RestPhase: React.FC<RestPhaseProps> = ({}) => {
           <IonButton onClick={() => setShowRestWindow(false)}>Close</IonButton>
         </IonModal>
       </div>
+      <IonAlert
+        isOpen={isRestAlertVisible}
+        onDidDismiss={() => setIsRestAlertVisible(false)}
+        header={"Rest Initiated"}
+        message={"Rest has been taken. Health restored to full. Movement reduced to 0."}
+        buttons={["OK"]}
+      />
     </>
   );
 };

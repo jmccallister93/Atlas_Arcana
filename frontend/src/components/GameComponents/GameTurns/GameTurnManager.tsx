@@ -29,7 +29,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   const currentPlayerTurn = gameState.currentPlayerTurn;
 
   const [gamePhaseButton, setGamePhaseButton] = useState<JSX.Element | null>();
-  const phaseOrder = ["Draw", "Trade", "Rest", "Map", "Combat", "Titan"];
+  const phaseOrder = ["Draw", "Trade", "Map", "Combat", "Titan"];
   const [phaseAction, setPhaseAction] =
     useState<ReactComponentOrElement | null>();
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
@@ -136,11 +136,6 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         case "Trade":
           setPhaseAction(
             <TradePhase/>
-          );
-          break;
-        case "Rest":
-          setPhaseAction(
-            <RestPhase/>
           );
           break;
         case "Map":
