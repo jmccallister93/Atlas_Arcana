@@ -25,6 +25,8 @@ async function createGameSession(playerOneData, playerTwoData) {
   const players = initializePlayers([playerOneData, playerTwoData]);
   // Determine random turn order
   const turnOrder = determineTurnOrder(players.map((p) => p.username));
+  
+  // Set current player turn
   const setCurrentPlayerTurn = (turnOrder) => {
     return turnOrder[0];
   };
@@ -34,6 +36,19 @@ async function createGameSession(playerOneData, playerTwoData) {
   const currentPhase = "Map";
   //Determine starting cards
   const startingCardData = determineStartingCards(players);
+
+  // Map object
+  const sessionMap = new SessionMap();
+    // Example to set initial positions
+    players.forEach(player => {
+      sessionMap.updatePlayerPosition(player.username, { x: 0, y: 0 });
+      // Initialize strongholds, buildings as needed
+    });
+  
+    // Set titan positions
+    titans.forEach(titan => {
+      sessionMap.updateTitanPosition(titan.titanName, { x: titan.row, y: titan.col });
+    });
 
   // GameBoard
   // Create tile grid to be sent to the front end
@@ -177,6 +192,38 @@ function initializePlayers(playerData) {
     },
   }));
 }
+
+// Map objects
+class SessionMap {
+  constructor() {
+    this.playerPositions = {};
+    this.strongholdPositions = {}
+    this.buildingPositions = {}
+    this.titanPositions = {}
+    this.treasureHoardPositions = {}
+  }
+
+  updatePlayerPosition(playerId, coordinates) {
+    this.playerPositions[playerId] = coordinates;
+  }
+
+  getPlayerPosition(playerId) {
+    return this.playerPositions[playerId];
+  }
+
+  updateStrongholdPosition(playerId, coordinates) {
+    this.strongholdPositions[playerId] = coordinates;
+  }
+
+  addBuildingPosition(buildingId, ownerName, coordinates) {
+    this.buildingPositions[buildingId] = { ownerName, ...coordinates };
+  }
+
+  updateTitanPosition(titanName, coordinates) {
+    this.titanPositions[titanName] = coordinates;
+  }
+}
+
 
 //Determine Turn Order
 function determineTurnOrder(players) {
