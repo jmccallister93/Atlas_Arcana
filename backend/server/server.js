@@ -4,7 +4,7 @@ require("dotenv").config();
 const http = require("http");
 const socketIo = require("socket.io");
 const app = require("./expressApp"); // Import the Express app
-const socketController = require("../socket/socketController");
+const socketController = require("../socket/socketController2");
 const matchmakingService = require("../matchmaking/matchmakingService");
 
 const server = http.createServer(app);

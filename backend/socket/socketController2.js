@@ -2,12 +2,18 @@
 const { v4: uuidv4 } = require("uuid");
 const StateManager = require("../networking/sync/stateManager");
 const Player = require("../database/PlayerModel");
-const gameSessionManager = require("../matchmaking/gameSessionManager");
-const { GameSessionManager, GameStateManager, TradeManager } = require("../managers/GameSessionManager");
+const GameSessionManager = require("../managers/GameSessionManager");
+const GameStateManager = require("../managers/GameStateManager")
+const TradeManager = require("../managers/TradeManager")
 const CardManager = require("../managers/CardManager");
 
 // Initialize the state manager
 const stateManager = new StateManager();
+
+const gameSessionManager = new GameSessionManager()
+const gameStateManager = new GameStateManager(gameSessionManager.sessionClient)
+const tradeManager = new TradeManager(gameSessionManager.sessionClient)
+const cardManager = new CardManager()
 
 // This will store unique socket IDs of connected users
 const totalConnectedUsers = new Set();
@@ -135,9 +141,9 @@ module.exports = function (socket, io) {
     );
     try {
       // Process the new state (e.g., validate, apply game logic)
-      await GameStateManager.updateGameState(io, sessionId, newState);
+      await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
-      const updatedState = await GameStateManager.getGameState(sessionId);
+      const updatedState = await gameStateManager.getGameState(sessionId);
       // Broadcast the updated state to all players in the session
       console.log("Broadcasting updated state to session:", sessionId);
       io.to(sessionId).emit("updateGameState", updatedState.gameState); // Emit the gameState part
@@ -154,7 +160,7 @@ module.exports = function (socket, io) {
   socket.on("updateCurrentPlayerTurn", async ({ sessionId, partialUpdate }) => {
     try {
       // Retrieve the current game state for the session
-      const gameState = await GameStateManager.getGameState(sessionId);
+      const gameState = await gameStateManager.getGameState(sessionId);
 
       // Update the currentPlayerTurn
       gameState.currentPlayerTurn = partialUpdate.currentPlayerTurn;
@@ -174,7 +180,7 @@ module.exports = function (socket, io) {
   socket.on("updateCurrentPhase", async ({ sessionId, partialUpdate }) => {
     try {
       // Retrieve the current game state for the session
-      const gameState = await GameStateManager.getGameState(sessionId);
+      const gameState = await gameStateManager.getGameState(sessionId);
 
       // Update the currentPhase
       gameState.currentPhase = partialUpdate.currentPhase;
@@ -195,7 +201,7 @@ module.exports = function (socket, io) {
   //Allocate Resources
   socket.on("allocateResources", async ({ sessionId, playerId }) => {
     try {
-      const allocateResources = await CardManager.allocateResources(
+      const allocateResources = await cardManager.allocateResources(
         playerId,
         sessionId
       );
@@ -209,7 +215,7 @@ module.exports = function (socket, io) {
   socket.on("drawEquipmentCard", async ({ sessionId, playerId }) => {
     try {
       // Call the drawPhaseCardDraw function and update the game state
-      const cardDrawn = await CardManager.drawPhaseCardDraw(
+      const cardDrawn = await cardManager.drawPhaseCardDraw(
         playerId,
         sessionId
       );
@@ -311,7 +317,7 @@ module.exports = function (socket, io) {
   socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
     try {
       // Retrieve the current trade state for the session
-      const currentTradeState = await TradeManager.getTradeState(
+      const currentTradeState = await tradeManager.getTradeState(
         sessionId
       );
 
@@ -322,7 +328,7 @@ module.exports = function (socket, io) {
       };
 
       // Persist this updated state
-      await TradeManager.addToTrade(sessionId, updatedTradeState);
+      await tradeManager.addToTrade(sessionId, updatedTradeState);
 
       // Emit back the updated trade state to all players in the session
       io.to(sessionId).emit("tradeAdded", updatedTradeState);
@@ -335,18 +341,18 @@ module.exports = function (socket, io) {
   socket.on(
     "tradeOfferAccepted",
     async ({ tradeSessionId, sessionId, playerId }) => {
-      const currentTradeState = await TradeManager.getTradeState(
+      const currentTradeState = await tradeManager.getTradeState(
         tradeSessionId
       );
       if (
-        await TradeManager.pendingTradeAcceptance(
+        await tradeManager.pendingTradeAcceptance(
           tradeSessionId,
           playerId
         )
       ) {
         // Finalize trade if both players have accepted
 
-        const updatedSessionData = await TradeManager.finalizeTrade(
+        const updatedSessionData = await tradeManager.finalizeTrade(
           tradeSessionId,
           sessionId
         );
@@ -370,14 +376,14 @@ module.exports = function (socket, io) {
     "tradeOfferDeclined",
     async ({ tradeSessionId, sessionId, playerId }) => {
       if (
-        await TradeManager.pendingTradeAcceptance(
+        await tradeManager.pendingTradeAcceptance(
           tradeSessionId,
           playerId
         )
       ) {
         // Finalize trade if both players have accepted
 
-        await TradeManager.finalizeTrade(tradeSessionId, sessionId);
+        await tradeManager.finalizeTrade(tradeSessionId, sessionId);
 
         // Emit event to notify players about trade finalization
         io.in(sessionId).emit("tradeFinalized", {

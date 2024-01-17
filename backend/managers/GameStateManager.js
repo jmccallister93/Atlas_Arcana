@@ -1,11 +1,13 @@
 class GameStateManager {
     constructor(sessionClient) {
       this.sessionClient = sessionClient;
+      this.updateGameState = this.updateGameState.bind(this);
+      this.getGameState = this.getGameState.bind(this);
     }
   
     async updateGameState(sessionId, newState) {
       try {
-        const sessionData = JSON.parse(await sessionClient.get(sessionId));
+        const sessionData = JSON.parse(await this.sessionClient.get(sessionId));
         if (!sessionData) {
           throw new Error("Session not found");
         }
@@ -16,7 +18,7 @@ class GameStateManager {
         console.log("Updated GameState after merge:", updatedGameState);
   
         sessionData.gameState = updatedGameState;
-        await sessionClient.set(sessionId, JSON.stringify(sessionData));
+        await this.sessionClient.set(sessionId, JSON.stringify(sessionData));
   
         console.log("Emitting updated game state to session:", sessionId);
         io.to(sessionId).emit("updateGameState", updatedGameState);
@@ -27,7 +29,7 @@ class GameStateManager {
   
     async getGameState(sessionId) {
       try {
-        const sessionData = await sessionClient.get(sessionId);
+        const sessionData = await this.sessionClient.get(sessionId);
         if (sessionData) {
           return JSON.parse(sessionData);
         } else {

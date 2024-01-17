@@ -49,7 +49,7 @@ class GameSessionManager {
     this.turnManager.determineTurnOrder(players);
     const turnOrder = this.turnManager.turnOrder;
     const currentPlayerTurn = this.turnManager.getCurrentPlayerTurn();
-    const currentPhase = "Map";
+    const currentPhase = "Setup";
     const startingCardData = this.cardManager.determineStartingCards(players);
     const tileGrid = this.gameBoardManager.createTileGrid();
     const titans = this.titanManager.determineStartingTitans(players.length);
