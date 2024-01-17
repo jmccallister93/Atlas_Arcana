@@ -1,107 +1,89 @@
-const CardManager = require('./CardManager');
-const MapManager = require('./MapManager'); // Assuming you have a MapManager
-const PlayerManager = require('./PlayerManager'); // Assuming you have a PlayerManager
-const TradeManager = require('./TradeManager'); // Assuming you have a TradeManager
-const TurnManager = require('./TurnManager')
-const { v4: uuidv4 } = require('uuid');
-const sessionClient = require("../yourPathTo/redisClient"); // Import your Redis client
+// Import necessary modules
+const redis = require("redis");
+const { v4: uuidv4 } = require("uuid");
+const io = require("../server/server");
+
+const CardManager = require("../managers/CardManager");
+const GameBoardManager = require("../managers/GameBoardManager")
+const GameStateManager = require("../managers/GameStateManager")
+const PlayerManager = require("../managers/PlayerManager");
+const PositionManager = require("../managers/PositionManager");
+const TitanManager = require("../managers/TitanManager");
+const TradeManager = require("../managers/TradeManager");
+const TurnManager = require("../managers/TurnManager");
+
+const equipmentCards = require("../gameCards/equipmentCards");
+const elementalCards = require("../gameCards/elementalCards");
+const questCards = require("../gameCards/questCards");
+const titanCards = require("../gameCards/titanCards");
+const treasureCards = require("../gameCards/treasureCards");
+const worldEventCards = require("../gameCards/worldEventCards");
+
+// Redis client for session management
+const sessionClient = redis.createClient();
+sessionClient.on("error", (err) =>
+  console.log("Redis Session Client Error", err)
+);
+sessionClient.connect();
 
 class GameSessionManager {
-    constructor() {
-        this.cardManager = new CardManager();
-        this.mapManager = new MapManager();
-        this.playerManager = new PlayerManager();
-        this.tradeManager = new TradeManager();
-        this.turnManager = new TurnManager()
-    }
+  constructor() {
+    const gridSize = 24; // Define gridSize before using it
+    this.sessionClient = sessionClient;
+    this.playerManager = new PlayerManager(sessionClient);
+    this.gameStateManager = new GameStateManager(sessionClient);
+    this.gameBoardManager = new GameBoardManager();
+    this.tradeManager = new TradeManager(sessionClient);
+    this.titanManager = new TitanManager(titanCards);
+    this.turnManager = new TurnManager();
+    this.cardManager = new CardManager(equipmentCards);
+    this.positionManager = new PositionManager(gridSize);
+  }
 
-    async createGameSession(playerOneData, playerTwoData) {
-        const sessionId = uuidv4();
-        // Initialize players with more detailed data
-        const players = this.playerManager.initializePlayers([playerOneData, playerTwoData]);
-        // Determine random turn order
-        const turnOrder = this.turnManager.determineTurnOrder(players.map(p => p.username));
-        // Set starting phase of the game
-        const currentPhase = "Map";
-        //Determine starting cards
-        const startingCardData = this.cardManager.determineStartingCards(players);
-        // GameBoard
-        // Create tile grid to be sent to the front end
-        this.mapManager.createTileGrid();
-        //Titans
-        const titans = determineStartingTitans(titanCards, players.length);
-        const titanPosition = placeTitansOnGrid(gridSize, titans);
-      
-        // NewSession to pass
-        const newSession = {
-          sessionId,
-          players,
-          turnOrder,
-          currentPlayerTurn,
-          tileGrid,
-          setupPhase: true,
-          currentPhase,
-          turnsCompleted: 1,
-          titans: titanPosition,
-          equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
-          questCardCount: [], // Counter for quest cards
-          treasureCardCount: [],
-          worldEventCardCount: [], // Counter for world event cards
-        };
-        console.log(
-          "createGameSession - New session created:",
-          JSON.stringify(newSession)
-        );
-        await sessionClient.set(sessionId, JSON.stringify(newSession));
-        return newSession;
-      }
-
-    //   Update game state
-    async  updateGameState(io, sessionId, newState){
-      try {
-        const sessionData = JSON.parse(await sessionClient.get(sessionId));
-        if (!sessionData) {
-          throw new Error("Session not found");
-        }
-        console.log("Existing GameState before merge:", sessionData.gameState);
-        console.log("NewState to merge:", JSON.stringify(newState));
-    
-        const updatedGameState = { ...sessionData.gameState, ...newState };
-        console.log("Updated GameState after merge:", updatedGameState);
-    
-        sessionData.gameState = updatedGameState;
-        await sessionClient.set(sessionId, JSON.stringify(sessionData));
-    
-        console.log("Emitting updated game state to session:", sessionId);
-        io.to(sessionId).emit("updateGameState", updatedGameState);
-      } catch (error) {
-        console.error("Error updating game state:", error);
-      }
+  async createGameSession(playerOneData, playerTwoData) {
+    this.sessionId = uuidv4();
+    const players = this.playerManager.initializePlayers([
+      playerOneData,
+      playerTwoData,
+    ]);
+    this.turnManager.determineTurnOrder(players);
+    const turnOrder = this.turnManager.turnOrder;
+    const currentPlayerTurn = this.turnManager.getCurrentPlayerTurn();
+    const currentPhase = "Map";
+    const startingCardData = this.cardManager.determineStartingCards(players);
+    const tileGrid = this.gameBoardManager.createTileGrid();
+    const titans = this.titanManager.determineStartingTitans(players.length);
+    const titanPositions = this.positionManager.placeTitansOnGrid(titans);
+    const newSession = {
+      sessionId: this.sessionId,
+      players,
+      turnOrder,
+      currentPlayerTurn,
+      tileGrid,
+      setupPhase: true,
+      currentPhase,
+      turnsCompleted: 1,
+      titans: titanPositions,
+      equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
+      questCardCount: [], // Counter for quest cards
+      treasureCardCount: [],
+      worldEventCardCount: [], // Counter for world event cards
     };
-    
-    async getGameState(sessionId) {
-        try {
-          const sessionData = await sessionClient.get(sessionId);
-          if (sessionData) {
-            return JSON.parse(sessionData);
-          } else {
-            // Handle case where session data is not found
-            throw new Error("Session data not found for sessionId: " + sessionId);
-          }
-        } catch (error) {
-          console.error("Error retrieving game state:", error);
-          throw error; 
-        }
-      }
+    await this.sessionClient.set(this.sessionId, JSON.stringify(newSession));
+    return newSession;
+  }
 
-    async endGameSession(sessionId) {
-        // Clean up the session data from Redis
-        await sessionClient.del(sessionId);
-        // Additional logic for saving the game result to database, if required
-    }
-
-    // ... other methods related to game session management ...
-
+  async endGameSession(sessionId) {
+    // Implementation for ending a game session
+  }
 }
 
-module.exports = GameSessionManager;
+// Export modules
+module.exports = {
+  GameSessionManager,
+  GameStateManager,
+  PlayerManager,
+  GameBoardManager,
+  TitanManager,
+  TradeManager,
+};
