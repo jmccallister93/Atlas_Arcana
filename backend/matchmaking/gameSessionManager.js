@@ -11,15 +11,19 @@ const sessionClient = redis.createClient(); // You can use a separate client for
 const { v4: uuidv4 } = require("uuid"); // For generating unique session IDs
 const io = require("../server/server");
 const Player = require("../database/PlayerModel"); // Import the Player model
+const CardManager = require("../managers/CardManager");
 
 // Connect to Redis client
+// XXX
 sessionClient.on("error", (err) =>
   console.log("Redis Session Client Error", err)
 );
 sessionClient.connect();
 
+
 // Create a game session
 async function createGameSession(playerOneData, playerTwoData) {
+  // XXX
   const sessionId = uuidv4();
   // Initialize players with more detailed data
   const players = initializePlayers([playerOneData, playerTwoData]);
@@ -36,19 +40,6 @@ async function createGameSession(playerOneData, playerTwoData) {
   const currentPhase = "Map";
   //Determine starting cards
   const startingCardData = determineStartingCards(players);
-
-  // Map object
-  const sessionMap = new SessionMap();
-    // Example to set initial positions
-    players.forEach(player => {
-      sessionMap.updatePlayerPosition(player.username, { x: 0, y: 0 });
-      // Initialize strongholds, buildings as needed
-    });
-  
-    // Set titan positions
-    titans.forEach(titan => {
-      sessionMap.updateTitanPosition(titan.titanName, { x: titan.row, y: titan.col });
-    });
 
   // GameBoard
   // Create tile grid to be sent to the front end

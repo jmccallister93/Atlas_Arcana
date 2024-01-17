@@ -3,6 +3,7 @@
 const redis = require("redis");
 const client = redis.createClient(); // Default: localhost and port 6379
 const gameSessionManager = require("./gameSessionManager");
+const  GameSessionManager  = require("../managers/GameSessionManager");
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
@@ -61,17 +62,14 @@ async function findMatch(connectedUsers, io) {
 
     // If playerOne and playerTwo are different, proceed with match creation
     if (playerOneData.token !== playerTwoData.token) {
+      const gameSessionManager = new GameSessionManager();
       const newSession = await gameSessionManager.createGameSession(
         playerOneData,
         playerTwoData
       );
-      // console.log(
-      //   "From matchmakingservice new gamesession: ",
-      //   JSON.stringify(newSession)
-      // );
-      // console.log(
-      //   "From matchmakingservice new playerOneData: ",
-      //   JSON.stringify(playerOneData)
+      // const newSession = await gameSessionManager.createGameSession(
+      //   playerOneData,
+      //   playerTwoData
       // );
       notifyPlayers(
         playerOneData,

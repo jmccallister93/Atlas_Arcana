@@ -11,7 +11,7 @@ class TurnManager {
     }
   
     getCurrentPlayerTurn() {
-      return this.turnOrder.length > 0 ? this.turnOrder[0] : null;
+      return this.turnOrder.length > 0 ? this.turnOrder[0].username : null;
     }
   }
 

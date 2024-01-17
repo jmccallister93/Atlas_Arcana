@@ -4,8 +4,8 @@ const { v4: uuidv4 } = require("uuid");
 const io = require("../server/server");
 
 const CardManager = require("../managers/CardManager");
-const GameBoardManager = require("../managers/GameBoardManager")
-const GameStateManager = require("../managers/GameStateManager")
+const GameBoardManager = require("../managers/GameBoardManager");
+const GameStateManager = require("../managers/GameStateManager");
 const PlayerManager = require("../managers/PlayerManager");
 const PositionManager = require("../managers/PositionManager");
 const TitanManager = require("../managers/TitanManager");
@@ -79,11 +79,4 @@ class GameSessionManager {
 }
 
 // Export modules
-module.exports = {
-  GameSessionManager,
-  GameStateManager,
-  PlayerManager,
-  GameBoardManager,
-  TitanManager,
-  TradeManager,
-};
+module.exports = GameSessionManager;
