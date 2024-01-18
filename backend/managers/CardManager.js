@@ -5,7 +5,7 @@ const treasureCards = require("../gameCards/treasureCards");
 const worldEventCards = require("../gameCards/worldEventCards");
 
 class CardManager {
-    constructor(equipmentCards, sessionClient) {
+    constructor( sessionClient) {
       this.sessionClient = sessionClient;
       this.chosenEquipmentCards = [];
       this.equipmentCards = equipmentCards;
@@ -27,7 +27,17 @@ class CardManager {
       return { chosenEquipmentCards: this.chosenEquipmentCards };
     }
     async allocateResources(player, sessionId, ) {
-      const sessionData = JSON.parse(await this.sessionClient.get(sessionId));
+      const sessionString = await this.sessionClient.get(sessionId);
+      console.log("Retrieved session data:", sessionString);
+
+      if (!sessionString) {
+          throw new Error("Session data not found");
+      }
+  
+      const sessionData = JSON.parse(sessionString);
+      if (!sessionData) {
+          throw new Error("Game state not found in session data");
+      }
   
       let farmCount = 0;
       let ranchCount = 0;
@@ -56,7 +66,7 @@ class CardManager {
       player.inventory.resources = totalResources;
   
       // Update the player in the session data and save the changes
-      sessionData.gameState.player = player;
+      sessionData.player = player;
       await this.sessionClient.set(sessionId, JSON.stringify(sessionData));
   
       return newResources, totalResources; // Return the new total resources
@@ -69,11 +79,11 @@ class CardManager {
         const randomIndex = Math.floor(Math.random() * equipmentCards.length);
         card = equipmentCards[randomIndex];
       } while (
-        sessionData.gameState.equipmentCardCount.includes(card.equipmentName)
+        sessionData.equipmentCardCount.includes(card.equipmentName)
       );
   
       player.inventory.equipment.push(card);
-      sessionData.gameState.equipmentCardCount.push(card.equipmentName);
+      sessionData.equipmentCardCount.push(card.equipmentName);
       await this.sessionClient.set(sessionId, JSON.stringify(sessionData));
   
       return card;

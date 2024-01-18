@@ -3,17 +3,17 @@ const { v4: uuidv4 } = require("uuid");
 const StateManager = require("../networking/sync/stateManager");
 const Player = require("../database/PlayerModel");
 const GameSessionManager = require("../managers/GameSessionManager");
-const GameStateManager = require("../managers/GameStateManager")
-const TradeManager = require("../managers/TradeManager")
+const GameStateManager = require("../managers/GameStateManager");
+const TradeManager = require("../managers/TradeManager");
 const CardManager = require("../managers/CardManager");
 
 // Initialize the state manager
 const stateManager = new StateManager();
 
-const gameSessionManager = new GameSessionManager()
-const gameStateManager = new GameStateManager(gameSessionManager.sessionClient)
-const tradeManager = new TradeManager(gameSessionManager.sessionClient)
-const cardManager = new CardManager(gameSessionManager.sessionClient)
+const gameSessionManager = new GameSessionManager();
+const gameStateManager = new GameStateManager(gameSessionManager.sessionClient);
+const tradeManager = new TradeManager(gameSessionManager.sessionClient);
+const cardManager = new CardManager(gameSessionManager.sessionClient);
 
 // This will store unique socket IDs of connected users
 const totalConnectedUsers = new Set();
@@ -133,7 +133,6 @@ module.exports = function (socket, io) {
   // Listen for game state updates from clients
   socket.on("updateGameState", async ({ sessionId, newState }) => {
     try {
-
       // Process the new state (e.g., validate, apply game logic)
       await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
@@ -192,11 +191,12 @@ module.exports = function (socket, io) {
   //Game Phases
   // Draw Phase
   //Allocate Resources
-  socket.on("allocateResources", async ({ sessionId, playerId }) => {
+  socket.on("allocateResources", async ({ sessionId, player }) => {
+    console.log("From allocateResources player:", player);
     try {
       const allocateResources = await cardManager.allocateResources(
-        playerId,
-        sessionId,
+        player,
+        sessionId
       );
       socket.emit("resourcesAllocated", allocateResources);
     } catch (error) {
@@ -307,12 +307,11 @@ module.exports = function (socket, io) {
       console.error("Error handling tradeWindowClosed event:", error);
     }
   });
+
   socket.on("addToTrade", async ({ sessionId, playerId, tradeState }) => {
     try {
       // Retrieve the current trade state for the session
-      const currentTradeState = await tradeManager.getTradeState(
-        sessionId
-      );
+      const currentTradeState = await tradeManager.getTradeState(sessionId);
 
       // Merge the incoming tradeState with the existing trade state
       const updatedTradeState = {
@@ -337,12 +336,7 @@ module.exports = function (socket, io) {
       const currentTradeState = await tradeManager.getTradeState(
         tradeSessionId
       );
-      if (
-        await tradeManager.pendingTradeAcceptance(
-          tradeSessionId,
-          playerId
-        )
-      ) {
+      if (await tradeManager.pendingTradeAcceptance(tradeSessionId, playerId)) {
         // Finalize trade if both players have accepted
 
         const updatedSessionData = await tradeManager.finalizeTrade(
@@ -352,8 +346,8 @@ module.exports = function (socket, io) {
 
         // Emit event to notify players about trade finalization
         io.in(sessionId).emit("tradeFinalized", {
-          sessionId: sessionId,
           tradeSessionId: tradeSessionId,
+          sessionId: sessionId,
           status: "accepted",
           currentTradeState: currentTradeState,
         });
@@ -368,32 +362,22 @@ module.exports = function (socket, io) {
   socket.on(
     "tradeOfferDeclined",
     async ({ tradeSessionId, sessionId, playerId }) => {
-      if (
-        await tradeManager.pendingTradeAcceptance(
-          tradeSessionId,
-          playerId
-        )
-      ) {
-        // Finalize trade if both players have accepted
-
-        await tradeManager.finalizeTrade(tradeSessionId, sessionId);
-
-        // Emit event to notify players about trade finalization
-        io.in(sessionId).emit("tradeFinalized", {
-          sessionId: sessionId,
+      try {
+        // Emit an event to close the trade window for all players in the session
+        io.in(sessionId).emit("closeTradeWindow", {
           tradeSessionId: tradeSessionId,
-          status: "declined",
-          currentTradeState: currentTradeState,
+          sessionId: sessionId,
+          message: "Trade declined. Closing trade window.",
         });
+      } catch (error) {
+        console.error("Error handling tradeOfferDeclined event:", error);
       }
     }
   );
-
-// socket.on("restAccepted", async({sessionId, playerId}) => {
-//  await gameSessionManager.restAccepted(sessionId, playerId)
-//  socket.emit("healthRestored", )
-// })
-
+  // socket.on("restAccepted", async({sessionId, playerId}) => {
+  //  await gameSessionManager.restAccepted(sessionId, playerId)
+  //  socket.emit("healthRestored", )
+  // })
 };
 
 // Call to check user online status

@@ -99,7 +99,7 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
     if (currentPlayer && gameState) {
       socket.emit("allocateResources", {
         sessionId: gameState.sessionId,
-        playerId: currentPlayer,
+        player: currentPlayer,
       });
     }
     setIsResourcesAllocated(true);

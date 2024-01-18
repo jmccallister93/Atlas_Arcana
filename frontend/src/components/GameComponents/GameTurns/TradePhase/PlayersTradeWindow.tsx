@@ -545,12 +545,12 @@ const PlayersTradeWindow: React.FC<PlayersTradewindowProps> = ({
         {isTradeOfferPending ? (
           <>
             <IonButton disabled>Pending {tradePartnerId?.username}</IonButton>
-            <IonButton onClick={declineTradeOffer}>Cancel Trade</IonButton>
+            <IonButton onClick={closeAndDecline}>Cancel Trade</IonButton>
           </>
         ) : (
           <>
             <IonButton onClick={acceptTradeOffer}>Accept Trade</IonButton>
-            <IonButton onClick={declineTradeOffer}>Decline Trade</IonButton>
+            <IonButton onClick={closeAndDecline}>Decline Trade</IonButton>
           </>
         )}
       </div>

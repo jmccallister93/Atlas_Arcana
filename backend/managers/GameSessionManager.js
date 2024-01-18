@@ -36,7 +36,7 @@ class GameSessionManager {
     this.tradeManager = new TradeManager(sessionClient);
     this.titanManager = new TitanManager(titanCards);
     this.turnManager = new TurnManager();
-    this.cardManager = new CardManager(equipmentCards, sessionClient);
+    this.cardManager = new CardManager( sessionClient);
     this.positionManager = new PositionManager(gridSize);
   }
 
@@ -49,7 +49,7 @@ class GameSessionManager {
     this.turnManager.determineTurnOrder(players);
     const turnOrder = this.turnManager.turnOrder;
     const currentPlayerTurn = this.turnManager.getCurrentPlayerTurn();
-    const currentPhase = "Setup";
+    const currentPhase = "Trade";
     const startingCardData = this.cardManager.determineStartingCards(players);
     const tileGrid = this.gameBoardManager.createTileGrid();
     const titans = this.titanManager.determineStartingTitans(players.length);
