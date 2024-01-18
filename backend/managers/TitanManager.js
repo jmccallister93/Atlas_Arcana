@@ -1,8 +1,8 @@
 const titanCards = require("../gameCards/titanCards");
 
 class TitanManager {
-    constructor(titanCards) {
-      this.titanCards = titanCards;
+    constructor() {
+      
     }
     determineStartingTitans(numberOfPlayers) {
       const selectedTitans = [];
@@ -10,9 +10,9 @@ class TitanManager {
         this.determineNumberOfTitans(numberOfPlayers);
   
       for (let i = 0; i < numberOfTitansToAllocate; i++) {
-        const randomIndex = Math.floor(Math.random() * this.titanCards.length);
-        selectedTitans.push(this.titanCards[randomIndex]);
-        this.titanCards.splice(randomIndex, 1);
+        const randomIndex = Math.floor(Math.random() * titanCards.length);
+        selectedTitans.push(titanCards[randomIndex]);
+        titanCards.splice(randomIndex, 1);
       }
   
       return selectedTitans;

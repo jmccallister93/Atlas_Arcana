@@ -1,4 +1,4 @@
-class PositionManager {
+class TitanPlacementManager {
     constructor(gridSize) {
       this.gridSize = gridSize;
     }
@@ -34,4 +34,4 @@ class PositionManager {
     }
   }
 
-  module.exports = PositionManager;
+  module.exports = TitanPlacementManager;
