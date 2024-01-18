@@ -7,11 +7,11 @@ class TurnManager {
         const j = Math.floor(Math.random() * (i + 1));
         [players[i], players[j]] = [players[j], players[i]];
       }
-      this.turnOrder = players;
+      this.turnOrder = players.map(player => player.username);
     }
   
     getCurrentPlayerTurn() {
-      return this.turnOrder.length > 0 ? this.turnOrder[0].username : null;
+      return this.turnOrder.length > 0 ? this.turnOrder[0] : null;
     }
   }
 

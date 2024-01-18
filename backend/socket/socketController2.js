@@ -13,7 +13,7 @@ const stateManager = new StateManager();
 const gameSessionManager = new GameSessionManager()
 const gameStateManager = new GameStateManager(gameSessionManager.sessionClient)
 const tradeManager = new TradeManager(gameSessionManager.sessionClient)
-const cardManager = new CardManager()
+const cardManager = new CardManager(gameSessionManager.sessionClient)
 
 // This will store unique socket IDs of connected users
 const totalConnectedUsers = new Set();
@@ -133,21 +133,12 @@ module.exports = function (socket, io) {
   // Listen for game state updates from clients
   socket.on("updateGameState", async ({ sessionId, newState }) => {
     try {
-        console.log("Received updateGameState event");
-    console.log("Session ID:", sessionId);
-    console.log("Type of Session ID:", typeof sessionId);
-    console.log("New state:", JSON.stringify(newState));
 
-    // Verify that sessionId is a string
-    if (typeof sessionId !== 'string') {
-      throw new Error("Invalid sessionId type");
-    }
       // Process the new state (e.g., validate, apply game logic)
       await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
       const updatedState = await gameStateManager.getGameState(sessionId);
       // Broadcast the updated state to all players in the session
-      console.log("Broadcasting updated state to session:", sessionId);
       io.to(sessionId).emit("updateGameState", updatedState.gameState); // Emit the gameState part
     } catch (error) {
       console.error("Error updating game state:", error);
@@ -205,7 +196,7 @@ module.exports = function (socket, io) {
     try {
       const allocateResources = await cardManager.allocateResources(
         playerId,
-        sessionId
+        sessionId,
       );
       socket.emit("resourcesAllocated", allocateResources);
     } catch (error) {

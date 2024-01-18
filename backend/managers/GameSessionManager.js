@@ -36,7 +36,7 @@ class GameSessionManager {
     this.tradeManager = new TradeManager(sessionClient);
     this.titanManager = new TitanManager(titanCards);
     this.turnManager = new TurnManager();
-    this.cardManager = new CardManager(equipmentCards);
+    this.cardManager = new CardManager(equipmentCards, sessionClient);
     this.positionManager = new PositionManager(gridSize);
   }
 

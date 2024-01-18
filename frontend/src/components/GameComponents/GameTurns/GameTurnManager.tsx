@@ -75,13 +75,17 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         setShowStrongholdAlert(true);
         return;
       }
-
+      console.log("From advance phase turnOrder:",turnOrder)
+      console.log("From advance phase currentPlayerTurn:", currentPlayerTurn)
       // Logic to handle Setup Phase
       const currentPlayerIndex = turnOrder.findIndex(
         (player) => player === currentPlayerTurn
       );
+      console.log("From advance phase currentPlayerIndex:", currentPlayerIndex)
       const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
+      console.log("From advance phase nextPlayerIndex:", nextPlayerIndex)
       const nextPlayerTurn = turnOrder[nextPlayerIndex];
+      console.log("From advance phase nextPlayerTurn:", nextPlayerTurn)
 
       if (nextPlayerIndex === 0) {
         // Check if all strongholds are placed

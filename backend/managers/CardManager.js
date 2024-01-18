@@ -5,7 +5,8 @@ const treasureCards = require("../gameCards/treasureCards");
 const worldEventCards = require("../gameCards/worldEventCards");
 
 class CardManager {
-    constructor(equipmentCards) {
+    constructor(equipmentCards, sessionClient) {
+      this.sessionClient = sessionClient;
       this.chosenEquipmentCards = [];
       this.equipmentCards = equipmentCards;
     }
@@ -25,8 +26,8 @@ class CardManager {
   
       return { chosenEquipmentCards: this.chosenEquipmentCards };
     }
-    async allocateResources(player, sessionId, sessionClient) {
-      const sessionData = JSON.parse(await sessionClient.get(sessionId));
+    async allocateResources(player, sessionId, ) {
+      const sessionData = JSON.parse(await this.sessionClient.get(sessionId));
   
       let farmCount = 0;
       let ranchCount = 0;
@@ -56,13 +57,13 @@ class CardManager {
   
       // Update the player in the session data and save the changes
       sessionData.gameState.player = player;
-      await sessionClient.set(sessionId, JSON.stringify(sessionData));
+      await this.sessionClient.set(sessionId, JSON.stringify(sessionData));
   
       return newResources, totalResources; // Return the new total resources
     }
   
     async drawPhaseCardDraw(player, sessionId) {
-      const sessionData = JSON.parse(await sessionClient.get(sessionId));
+      const sessionData = JSON.parse(await this.sessionClient.get(sessionId));
       let card;
       do {
         const randomIndex = Math.floor(Math.random() * equipmentCards.length);
@@ -73,7 +74,7 @@ class CardManager {
   
       player.inventory.equipment.push(card);
       sessionData.gameState.equipmentCardCount.push(card.equipmentName);
-      await sessionClient.set(sessionId, JSON.stringify(sessionData));
+      await this.sessionClient.set(sessionId, JSON.stringify(sessionData));
   
       return card;
     }
