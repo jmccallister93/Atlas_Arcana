@@ -31,7 +31,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
 
   const auth = useAuth();
 
-  console.log("STHLDP rendered");
+  // console.log("STHLDP rendered");
 
   const currentPlayer = useMemo(() => {
     return players.find((player) => player.username === auth.username);

@@ -208,22 +208,21 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       payload: updatedStrongholdPosition,
     });
   
-    if (gameState && gameState.strongholdPositions) {
+    
       const updatedPositions = gameState.strongholdPositions.map(
         (position: StrongholdPosition) => {
           console.log("Current position before update:", position);
           const updatedPosition = position.playerUsername === updatedStrongholdPosition.playerUsername
             ? updatedStrongholdPosition
-            : position;
+            : updatedStrongholdPosition;
           console.log("Position after potential update:", updatedPosition);
           return updatedPosition;
         }
       );
       
-  
     console.log("Emitting Updated Stronghold Positions:", updatedPositions);
     emitGameStateUpdate({ strongholdPositions: updatedPositions });
-      }
+      
   };
   
 

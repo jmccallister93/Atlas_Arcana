@@ -67,7 +67,7 @@ const usePlayerBoardData = (players: PlayerInfo[]) => {
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
-  console.log("GameBoard Rendered");
+  // console.log("GameBoard Rendered");
   // Get Game state componenets
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const playerBoardData = usePlayerBoardData(players);

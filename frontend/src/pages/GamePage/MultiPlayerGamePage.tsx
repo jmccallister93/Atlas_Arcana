@@ -22,7 +22,7 @@ const MultiPlayerGamePage = () => {
   const togglePlayerMenu = () => {
     setIsPlayerMenuOpen(!isPlayerMenuOpen);
   };
-  console.log("MPGP Rendered");
+  // console.log("MPGP Rendered");
   return (
     <IonPage>
       {/* Welcome Modal */}

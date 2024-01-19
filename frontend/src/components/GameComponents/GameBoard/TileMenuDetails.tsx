@@ -77,7 +77,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 
-  console.log("TMD rendered");
+  // console.log("TMD rendered");
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (setupPhase && currentPlayer?.username === currentPlayerTurn) {

@@ -38,7 +38,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const tileSize = 30;
   let game: Phaser.Game;
 
-  console.log("Canvas Rendered");
+  // console.log("Canvas Rendered");
 
   useEffect(() => {
     if (gameRef.current) {
