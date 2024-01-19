@@ -17,6 +17,8 @@ interface GameTurnManagerProps {}
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   // Get Game state
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
+  const strongholdPositions = gameState.strongholdPositions;
+
   const auth = useAuth();
   // Player info
   // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
@@ -55,8 +57,10 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   }, [currentPlayerTurn, gameState.players]);
 
   // Example function to check if all strongholds are placed
-  const areAllStrongholdsPlaced = (players: PlayerInfo[]) => {
-    return players.every((player) => player.strongHold !== undefined);
+  const areAllStrongholdsPlaced = () => {
+    return gameState.players.every(player => 
+      strongholdPositions.some(stronghold => stronghold.playerUsername === player.username)
+    );
   };
 
   // Function to advance to the next phase and/or player turn
@@ -71,7 +75,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
 
     if (isSetupPhase) {
       // Check if current player has not placed a stronghold
-      if (currentPlayer.strongHold === undefined) {
+      if (!areAllStrongholdsPlaced()) {
         setShowStrongholdAlert(true);
         return;
       }
@@ -89,7 +93,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
 
       if (nextPlayerIndex === 0) {
         // Check if all strongholds are placed
-        if (areAllStrongholdsPlaced(gameState.players)) {
+        if (areAllStrongholdsPlaced()) {
           gameState.setupPhase = false; // End setup phase
           gameState.currentPhase = phaseOrder[0]; // Start with the first phase
           gameState.currentPlayerTurn = turnOrder[0]; // Reset to the first player in turn order

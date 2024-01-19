@@ -73,6 +73,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
         };
 
         // Update the stronghold position
+        
         updateStrongholdPosition(updatedStrongholdPosition);
       } else {
         onShowStrongholdAlert(

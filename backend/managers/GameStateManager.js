@@ -5,26 +5,32 @@ class GameStateManager {
     this.getGameState = this.getGameState.bind(this);
   }
 
-
   async updateGameState(io, sessionId, newState) {
     try {
       const sessionData = await this.sessionClient.get(sessionId);
       if (!sessionData) {
         throw new Error("Session not found");
       }
-
+  
       const parsedSessionData = JSON.parse(sessionData);
-
-      const updatedGameState = { ...parsedSessionData.gameState, ...newState };
-
+      // console.log("Existing GameState before merge:", parsedSessionData.gameState);
+      // console.log("NewState to merge:", JSON.stringify(newState));
+  
+      // Merge newState into the gameState property of parsedSessionData
+      parsedSessionData.gameState = { ...parsedSessionData.gameState, ...newState };
+      // console.log("Updated GameState after merge:", parsedSessionData.gameState);
+  
       const serializedData = JSON.stringify(parsedSessionData);
       await this.sessionClient.set(sessionId, serializedData);
-
-      io.to(sessionId).emit("updateGameState", updatedGameState);
+  
+      // console.log("Emitting updated game state to session:", sessionId);
+      io.to(sessionId).emit("updateGameState", parsedSessionData.gameState);
     } catch (error) {
       console.error("Error updating game state:", error);
     }
   }
+  
+  
 
   async getGameState(sessionId) {
     try {

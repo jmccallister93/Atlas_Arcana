@@ -24,7 +24,9 @@ interface GameState {
   emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
   updatePlayerPosition: (updatedPlayerPosition: PlayerPosition) => void;
-  updateStrongholdPosition: (updatedStrongholdPosition: StrongholdPosition) => void;
+  updateStrongholdPosition: (
+    updatedStrongholdPosition: StrongholdPosition
+  ) => void;
   updateTitanPosition: (updatedTitanPosition: TitanPosition) => void;
   updateBuildingPosition: (updatedBuildingPosition: BuildingPosition) => void;
 }
@@ -79,13 +81,27 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
         );
         return { ...state, playerPositions: updatedPlayerPosisitions };
       case "UPDATE_STRONGHOLD_POSITION":
-        const updatedStrongholdPosisitions = state.strongholdPositions.map(
-          (position) =>
-            position.playerUsername === action.payload.playerUsername
-              ? action.payload
-              : position
+        let updatedStrongholdPositions = [...state.strongholdPositions];
+
+        const existingIndex = updatedStrongholdPositions.findIndex(
+          (pos) => pos.playerUsername === action.payload.playerUsername
         );
-        return { ...state, strongholdPositions: updatedStrongholdPosisitions };
+
+        if (existingIndex >= 0) {
+          // Update existing position
+          updatedStrongholdPositions[existingIndex] = action.payload;
+        } else {
+          // Add new position
+          updatedStrongholdPositions.push(action.payload);
+        }
+
+        const newState = {
+          ...state,
+          strongholdPositions: updatedStrongholdPositions,
+        };
+
+        return newState;
+
       case "UPDATE_TITAN_POSITION":
         const updatedTtianPosisitions = state.titanPositions.map((position) =>
           position.titanName === action.payload.titanName
@@ -142,6 +158,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }, []);
 
   const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    console.log("From emitGameState update updatedData:",updatedData)
     if (gameState) {
       const updatedState = {
         sessionId: gameState.sessionId,
@@ -184,24 +201,31 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
   };
 
-  const updateStrongholdPosition = (
-    updatedStrongholdPosition: StrongholdPosition
-  ) => {
+  const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition) => {
+    console.log("Dispatching Stronghold Position Update:", updatedStrongholdPosition);
     dispatch({
       type: "UPDATE_STRONGHOLD_POSITION",
       payload: updatedStrongholdPosition,
     });
+  
     if (gameState && gameState.strongholdPositions) {
-      emitGameStateUpdate({
-        strongholdPositions: gameState.strongholdPositions.map(
-          (position: StrongholdPosition) =>
-            position.playerUsername === updatedStrongholdPosition.playerUsername
-              ? updatedStrongholdPosition
-              : position
-        ),
-      });
-    }
+      const updatedPositions = gameState.strongholdPositions.map(
+        (position: StrongholdPosition) => {
+          console.log("Current position before update:", position);
+          const updatedPosition = position.playerUsername === updatedStrongholdPosition.playerUsername
+            ? updatedStrongholdPosition
+            : position;
+          console.log("Position after potential update:", updatedPosition);
+          return updatedPosition;
+        }
+      );
+      
+  
+    console.log("Emitting Updated Stronghold Positions:", updatedPositions);
+    emitGameStateUpdate({ strongholdPositions: updatedPositions });
+      }
   };
+  
 
   const updateTitanPosition = (updatedTitanPosition: TitanPosition) => {
     dispatch({ type: "UPDATE_TITAN_POSITION", payload: updatedTitanPosition });

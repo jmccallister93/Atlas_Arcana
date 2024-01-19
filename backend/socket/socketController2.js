@@ -133,6 +133,7 @@ module.exports = function (socket, io) {
   // Listen for game state updates from clients
   socket.on("updateGameState", async ({ sessionId, newState }) => {
     try {
+        console.log("New state from socketcontroller:",newState)
       // Process the new state (e.g., validate, apply game logic)
       await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
