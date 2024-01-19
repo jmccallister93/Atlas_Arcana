@@ -12,6 +12,7 @@ export interface GameSessionInfo {
   treasureCardCount: [];
   worldEventCardCount: [];
   players: PlayerInfo[];
+  playerPositions: PlayerPosition[]
 }
 
 export interface TitanInfo {
@@ -61,8 +62,6 @@ export interface BuildingInfo {
 export interface PlayerInfo {
   socketId: string;
   username: string;
-  col: number;
-  row: number;
   victoryPoints: number;
   rank: number;
   totalHealth: number;

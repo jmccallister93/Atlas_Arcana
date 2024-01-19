@@ -19,6 +19,7 @@ const titanCards = require("../gameCards/titanCards");
 const treasureCards = require("../gameCards/treasureCards");
 const worldEventCards = require("../gameCards/worldEventCards");
 const TitanPlacementManager = require("./TitanPlacementManager");
+const PlayerPositionManager = require("./PlayerPositionManager");
 
 // Redis client for session management
 const sessionClient = redis.createClient();
@@ -39,6 +40,7 @@ class GameSessionManager {
     this.turnManager = new TurnManager();
     this.cardManager = new CardManager( sessionClient);
     this.titanPlacementManager = new TitanPlacementManager(gridSize);
+    this.playerPositionManager = new PlayerPositionManager()
   }
 
   async createGameSession(playerOneData, playerTwoData) {
@@ -47,10 +49,11 @@ class GameSessionManager {
       playerOneData,
       playerTwoData,
     ]);
+    const playerPositions = this.playerPositionManager.initializePlayerPositions(players)
     this.turnManager.determineTurnOrder(players);
     const turnOrder = this.turnManager.turnOrder;
     const currentPlayerTurn = this.turnManager.getCurrentPlayerTurn();
-    const currentPhase = "Trade";
+    const currentPhase = "Map";
     const startingCardData = this.cardManager.determineStartingCards(players);
     const tileGrid = this.gameBoardManager.createTileGrid();
     const titans = this.titanManager.determineStartingTitans(players.length);
@@ -58,6 +61,7 @@ class GameSessionManager {
     const newSession = {
       sessionId: this.sessionId,
       players,
+      playerPosition: playerPositions,
       turnOrder,
       currentPlayerTurn,
       tileGrid,
@@ -65,10 +69,10 @@ class GameSessionManager {
       currentPhase,
       turnsCompleted: 1,
       titans: titanPositions,
-      equipmentCardCount: startingCardData.chosenEquipmentCards, // Counter for equipment cards
-      questCardCount: [], // Counter for quest cards
+      equipmentCardCount: startingCardData.chosenEquipmentCards, 
+      questCardCount: [], 
       treasureCardCount: [],
-      worldEventCardCount: [], // Counter for world event cards
+      worldEventCardCount: [], 
     };
     await this.sessionClient.set(this.sessionId, JSON.stringify(newSession));
     return newSession;
