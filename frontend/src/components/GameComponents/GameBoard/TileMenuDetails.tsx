@@ -1,7 +1,13 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { IonContent, IonIcon, IonModal, IonButton, IonAlert } from "@ionic/react";
+import {
+  IonContent,
+  IonIcon,
+  IonModal,
+  IonButton,
+  IonAlert,
+} from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import { BuildingInfo, PlayerInfo } from "../Interfaces";
+import { BuildingInfo, PlayerInfo, StrongholdPosition } from "../Interfaces";
 import {
   useGameContext,
   useGameStatePart,
@@ -20,11 +26,6 @@ interface Titan {
   col: number;
   image?: string;
 }
-export interface StrongholdInfo {
-  row: number;
-  col: number;
-  ownerUsername: string; // Add this to store the owner's username
-}
 
 export interface TileInfo {
   type: string;
@@ -35,7 +36,7 @@ export interface TileInfo {
   buildingBonuses: string;
   players: PlayerInfo | null;
   buildings: BuildingInfo[] | null;
-  stronghold: StrongholdInfo | null;
+  stronghold: StrongholdPosition | null;
   titan: Titan | null;
   titanImage?: string;
 }
@@ -44,22 +45,19 @@ interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
   showTileDetails: boolean;
   setShowTileDetails: (show: boolean) => void;
-  
 }
 
 const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   selectedTile,
   showTileDetails,
   setShowTileDetails,
- 
 }) => {
   // const { gameState } = useGameContext();
 
   const auth = useAuth();
-  const playerData = useGameStatePart(state => {
-    return state.players.map(({ username, strongHold, buildings }) => ({
+  const playerData = useGameStatePart((state) => {
+    return state.players.map(({ username, buildings }) => ({
       username,
-      strongHold,
       buildings,
     }));
   });
@@ -67,15 +65,19 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
     (state) => state.currentPlayerTurn as string
   );
   const setupPhase = useGameStatePart((state) => state.setupPhase as boolean);
+  const strongholdPositions = useGameStatePart(
+    (state) => state.strongholdPositions as StrongholdPosition[]
+  );
+
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
-    const currentPlayer = useMemo(() => {
-      return playerData.find(player => player.username === auth.username);
-    }, [playerData, auth.username]);
+  const currentPlayer = useMemo(() => {
+    return playerData.find((player) => player.username === auth.username);
+  }, [playerData, auth.username]);
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 
-  console.log("TMD rendered")
+  console.log("TMD rendered");
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
     if (setupPhase && currentPlayer?.username === currentPlayerTurn) {
@@ -176,10 +178,10 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             {selectedTile.stronghold && (
               <div>
                 <h3>Stronghold</h3>
-                <p>Owner: {selectedTile.stronghold.ownerUsername}</p>
+                <p>Owner: {selectedTile.stronghold.playerUsername}</p>
                 <p>
-                  Coordinates: (X: {selectedTile.stronghold.col}, Y:{" "}
-                  {selectedTile.stronghold.row})
+                  Coordinates: (X: {selectedTile.stronghold.x}, Y:{" "}
+                  {selectedTile.stronghold.y})
                 </p>
               </div>
             )}
@@ -208,11 +210,11 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
         )}
         <IonButton onClick={() => setShowTileDetails(false)}>Close</IonButton>
         <IonAlert
-        isOpen={showStrongholdAlert}
-        onDidDismiss={() => setShowStrongholdAlert(false)}
-        message={strongholdAlertMessage}
-        buttons={["OK"]}
-      />
+          isOpen={showStrongholdAlert}
+          onDidDismiss={() => setShowStrongholdAlert(false)}
+          message={strongholdAlertMessage}
+          buttons={["OK"]}
+        />
       </IonContent>
     </IonModal>
   );

@@ -1,33 +1,41 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { IonButton, IonAlert } from "@ionic/react";
-import { GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces"; // Adjust the import paths based on your project structure
-import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
+import {
+  GameSessionInfo,
+  PlayerInfo,
+  TitanInfo,
+  StrongholdPosition,
+} from "../Interfaces"; // Adjust the import paths based on your project structure
+import {
+  useGameContext,
+  useGameStatePart,
+} from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import { TileInfo } from "./TileMenuDetails";
 
 interface StrongholdPlacementProps {
   selectedTile: TileInfo | null;
-  onShowStrongholdAlert: (message: string) => void
+  onShowStrongholdAlert: (message: string) => void;
 }
 
 const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
-  onShowStrongholdAlert
+  onShowStrongholdAlert,
 }) => {
-  const {updatePlayerData} = useGameContext()
+  const { updateStrongholdPosition } = useGameContext();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  const strongholdPositions = useGameStatePart(
+    (state) => state.strongholdPositions as StrongholdPosition[]
+  );
+
   const auth = useAuth();
- 
-  
-  console.log("STHLDP rendered")
+
+  console.log("STHLDP rendered");
 
   const currentPlayer = useMemo(() => {
-    return players.find(player => player.username === auth.username);
+    return players.find((player) => player.username === auth.username);
   }, [players, auth.username]);
-
-  // Memoize the stronghold of the current player
-  const currentStrongHold = useMemo(() => currentPlayer?.strongHold, [currentPlayer]);
 
   const calculateDistance = (
     x1: number,
@@ -44,14 +52,9 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
       if (distance <= 6) return false;
     }
 
-    for (let player of players) {
-      if (player.strongHold && player.username !== currentPlayer?.username) {
-        const distance = calculateDistance(
-          x,
-          y,
-          player.strongHold.col,
-          player.strongHold.row
-        );
+    for (let stronghold of strongholdPositions) {
+      if (stronghold.playerUsername !== currentPlayer?.username) {
+        const distance = calculateDistance(x, y, stronghold.x, stronghold.y);
         if (distance <= 6) return false;
       }
     }
@@ -61,32 +64,20 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
 
   // Place stronghold
   const placeStronghold = () => {
-    if (selectedTile) {
-      if (
-        currentPlayer &&
-        isValidStrongholdPlacement(selectedTile.x, selectedTile.y)
-      ) {
-        const updatedPlayer = {
-          ...currentPlayer,
-          strongHold: {
-            col: selectedTile.x,
-            row: selectedTile.y,
-          },
+    if (selectedTile && currentPlayer) {
+      if (isValidStrongholdPlacement(selectedTile.x, selectedTile.y)) {
+        const updatedStrongholdPosition: StrongholdPosition = {
+          playerUsername: currentPlayer.username,
+          x: selectedTile.x,
+          y: selectedTile.y,
         };
-        const updatedGameState = {
-          players: players?.map((p) =>
-            p.username === updatedPlayer.username ? updatedPlayer : p
-          ),
-        };
-        // Emit the update to server
-        updatePlayerData(updatedPlayer);
-      
+
+        // Update the stronghold position
+        updateStrongholdPosition(updatedStrongholdPosition);
       } else {
         onShowStrongholdAlert(
           "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."
         );
-        
-        return;
       }
     }
   };
@@ -94,7 +85,6 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   return (
     <>
       <IonButton onClick={placeStronghold}>Place Stronghold</IonButton>
-
     </>
   );
 };

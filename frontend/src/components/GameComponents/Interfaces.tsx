@@ -75,10 +75,7 @@ export interface PlayerInfo {
   movement: number;
   build: number;
   strongHoldPlaced: boolean;
-  strongHold: {
-    col: number;
-    row: number;
-  };
+ 
   equippedItems: {
     weapon: any[];
     armor: any[];

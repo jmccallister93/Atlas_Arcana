@@ -10,9 +10,17 @@ import iceTitanToken from "../Titans/Tokens/ice_titan_token.png";
 import stoneTitanToken from "../Titans/Tokens/stone_titan_token.png";
 import stormTitanToken from "../Titans/Tokens/storm_titan_token.png";
 import "./GameBoard.scss";
-import { StrongholdInfo } from "./TileMenuDetails";
-import { BuildingInfo, GameSessionInfo, PlayerInfo, TitanInfo } from "../Interfaces";
-import { useGameContext, useGameStatePart } from "../../../context/GameContext/GameContext";
+import {
+  BuildingInfo,
+  GameSessionInfo,
+  PlayerInfo,
+  StrongholdPosition,
+  TitanInfo,
+} from "../Interfaces";
+import {
+  useGameContext,
+  useGameStatePart,
+} from "../../../context/GameContext/GameContext";
 import TileModal from "./TileModal";
 import TileAlerts from "./TileAlerts";
 import Canvas from "./Canvas";
@@ -26,7 +34,7 @@ export interface TileInfo {
   buildingBonuses: string;
   buildings: BuildingInfo[] | null;
   players: PlayerInfo | null;
-  stronghold: StrongholdInfo | null;
+  stronghold: StrongholdPosition | null;
   titan: {
     titanName: string;
     rank: number;
@@ -45,14 +53,13 @@ export interface TileCoordinate {
   y: number;
 }
 
-interface GameBoardProps{
-}
+interface GameBoardProps {}
 
 const usePlayerBoardData = (players: PlayerInfo[]) => {
   return useMemo(() => {
-    return players.map(player => ({
+    return players.map((player) => ({
       username: player.username,
-      strongHold: player.strongHold,
+      // strongHold: player.strongHold,
       buildings: player.buildings,
       // position: { row: player.row, col: player.col }, // Assuming these are directly on the player object
     }));
@@ -62,34 +69,34 @@ const usePlayerBoardData = (players: PlayerInfo[]) => {
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
   console.log("GameBoard Rendered");
   // Get Game state componenets
-  const players = useGameStatePart(state => state.players as PlayerInfo[]);
+  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const playerBoardData = usePlayerBoardData(players);
-  const titans = useGameStatePart(state => state.titans as TitanInfo[]);
-  const tileGrid = useGameStatePart(state => state.tileGrid as string[][]);
+  const strongholdPositions = useGameStatePart(
+    (state) => state.strongholdPositions as StrongholdPosition[]
+  );
+  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, ] = useState("");
- 
+  const [alertMessage] = useState("");
 
   // Handle Selected tile
-  const handleTileSelection = useCallback((x: number, y: number) => {
-    if (
-      x < 0 ||
-      x >= tileGrid.length ||
-      y < 0 ||
-      y >= tileGrid[x].length
-    ) {
-      console.error("Selected tile is out of bounds.");
-      return;
-    }
-    onTileSelect(tileGrid[x][y], x, y);
-  }, [tileGrid, titans, players, setSelectedTile, setShowTileDetails])
+  const handleTileSelection = useCallback(
+    (x: number, y: number) => {
+      if (x < 0 || x >= tileGrid.length || y < 0 || y >= tileGrid[x].length) {
+        console.error("Selected tile is out of bounds.");
+        return;
+      }
+      onTileSelect(tileGrid[x][y], x, y);
+    },
+    [tileGrid, titans, players, setSelectedTile, setShowTileDetails]
+  );
 
   // Updated function to check entities on a tile
   const checkEntitiesOnTile = (x: number, y: number) => {
     let playerOnTile = null;
-    let strongholdOnTile: StrongholdInfo | null = null;
+    let strongholdOnTile: StrongholdPosition | null = null;
     let buildingsOnTile: BuildingInfo[] = [];
     let titanOnTile = null;
     let titanImageUrl = "";
@@ -121,18 +128,6 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       // if (player.row === y && player.col === x) {
       //   playerOnTile = player;
       // }
-
-      if (
-        player.strongHold &&
-        player.strongHold.row === y &&
-        player.strongHold.col === x
-      ) {
-        strongholdOnTile = {
-          ...player.strongHold,
-          ownerUsername: player.username, // Include the owner's username
-        };
-      }
-
       // Check for buildings
       Object.values(player.buildings).forEach((buildingCategory) => {
         // Ensure buildingCategory is an array before calling forEach
@@ -147,7 +142,16 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         }
       });
     });
-
+    const foundStronghold = strongholdPositions.find(
+      (stronghold) => stronghold.x === x && stronghold.y === y
+    );
+    if (foundStronghold) {
+      strongholdOnTile = {
+        playerUsername: foundStronghold.playerUsername,
+        x: foundStronghold.x,
+        y: foundStronghold.y,
+      };
+    }
     return {
       playerOnTile,
       strongholdOnTile,
@@ -190,7 +194,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         monsterBonuses = "+1 Health";
         break;
       default:
-        imageSrc = ""; 
+        imageSrc = "";
         buildingBonuses = "";
         monsterBonuses = "";
         break;
@@ -227,9 +231,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   return (
     <>
-      <Canvas
-        handleTileSelection={handleTileSelection}
-      />
+      <Canvas handleTileSelection={handleTileSelection} />
       <TileModal
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}

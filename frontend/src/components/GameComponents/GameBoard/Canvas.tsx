@@ -16,7 +16,7 @@ import stronghold1 from "./GameTiles/stronghold1.png";
 import stronghold2 from "./GameTiles/stronghold2.png";
 import stronghold3 from "./GameTiles/stronghold3.png";
 import stronghold4 from "./GameTiles/stronghold4.png";
-import { PlayerInfo, TitanInfo } from "../Interfaces";
+import { PlayerInfo, StrongholdPosition, TitanInfo } from "../Interfaces";
 
 import "./GameBoard.scss";
 import {
@@ -31,6 +31,7 @@ interface CanvasProps {
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   // const { gameState } = useGameContext();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const strongholds = useGameStatePart((state) => state.strongholdPositions as StrongholdPosition[]);
   const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const gameRef = useRef<HTMLDivElement>(null);
@@ -127,18 +128,16 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           }
         });
         // Strongholds
-        players.forEach((player, index) => {
-          if (player.strongHold) {
-            const strongholdKey = `stronghold${(index % 4) + 1}`; // Cycle through stronghold images
-            this.add
-              .sprite(
-                player.strongHold.col * tileSize,
-                player.strongHold.row * tileSize,
-                strongholdKey
-              )
-              .setDisplaySize(tileSize, tileSize)
-              .setOrigin(0, 0); // Add the stronghold sprite
-          }
+        strongholds.forEach((stronghold, index) => {
+          const strongholdKey = `stronghold${(index % 4) + 1}`; // Cycle through stronghold images
+          this.add
+            .sprite(
+              stronghold.x * tileSize,
+              stronghold.y * tileSize,
+              strongholdKey
+            )
+            .setDisplaySize(tileSize, tileSize)
+            .setOrigin(0, 0); // Add the stronghold sprite
         });
 
         // Mouse events
