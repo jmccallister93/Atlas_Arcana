@@ -6,8 +6,12 @@ import React, {
   useMemo,
 } from "react";
 import {
+  BuildingPosition,
   GameSessionInfo,
   PlayerInfo,
+  PlayerPosition,
+  StrongholdPosition,
+  TitanPosition,
 } from "../../components/GameComponents/Interfaces";
 import socket, {
   onGameStateUpdate,
@@ -19,6 +23,10 @@ interface GameState {
   gameState: GameSessionInfo;
   emitGameStateUpdate: (updatedData: Partial<GameSessionInfo>) => void;
   updatePlayerData: (updatedPlayer: PlayerInfo) => void;
+  updatePlayerPosition: (updatedPlayerPosition: PlayerPosition) => void;
+  updateStrongholdPosition: (updatedStrongholdPosition: StrongholdPosition) => void;
+  updateTitanPosition: (updatedTitanPosition: TitanPosition) => void;
+  updateBuildingPosition: (updatedBuildingPosition: BuildingPosition) => void;
 }
 
 // Create the context
@@ -63,6 +71,36 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           ...state,
           gameState: { ...state, currentPlayerTurn: action.payload },
         };
+      case "UPDATE_PLAYER_POSITION":
+        const updatedPlayerPosisitions = state.playerPositions.map((position) =>
+          position.playerUsername === action.payload.playerUsername
+            ? action.payload
+            : position
+        );
+        return { ...state, playerPositions: updatedPlayerPosisitions };
+      case "UPDATE_STRONGHOLD_POSITION":
+        const updatedStrongholdPosisitions = state.strongholdPositions.map(
+          (position) =>
+            position.playerUsername === action.payload.playerUsername
+              ? action.payload
+              : position
+        );
+        return { ...state, strongholdPositions: updatedStrongholdPosisitions };
+      case "UPDATE_TITAN_POSITION":
+        const updatedTtianPosisitions = state.titanPositions.map((position) =>
+          position.titanName === action.payload.titanName
+            ? action.payload
+            : position
+        );
+        return { ...state, titanPositions: updatedTtianPosisitions };
+      case "UPDATE_BUILDING_POSITION":
+        const updatedBuildingPosisitions = state.buildingPositions.map(
+          (position) =>
+            position.buildingName === action.payload.buildingName
+              ? action.payload
+              : position
+        );
+        return { ...state, buildingPositions: updatedBuildingPosisitions };
       default:
         return state;
     }
@@ -117,7 +155,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
   // Function to update player data
   const updatePlayerData = (updatedPlayer: PlayerInfo) => {
-    // Assuming dispatch updates gameState correctly
     dispatch({ type: "UPDATE_PLAYER_DATA", payload: updatedPlayer });
 
     // Emit updated player data with correct typing
@@ -129,13 +166,90 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       });
     }
   };
+
+  const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
+    dispatch({
+      type: "UPDATE_PLAYER_POSITION",
+      payload: updatedPlayerPosition,
+    });
+    if (gameState && gameState.playerPositions) {
+      emitGameStateUpdate({
+        playerPositions: gameState.playerPositions.map(
+          (position: PlayerPosition) =>
+            position.playerUsername === updatedPlayerPosition.playerUsername
+              ? updatedPlayerPosition
+              : position
+        ),
+      });
+    }
+  };
+
+  const updateStrongholdPosition = (
+    updatedStrongholdPosition: StrongholdPosition
+  ) => {
+    dispatch({
+      type: "UPDATE_STRONGHOLD_POSITION",
+      payload: updatedStrongholdPosition,
+    });
+    if (gameState && gameState.strongholdPositions) {
+      emitGameStateUpdate({
+        strongholdPositions: gameState.strongholdPositions.map(
+          (position: StrongholdPosition) =>
+            position.playerUsername === updatedStrongholdPosition.playerUsername
+              ? updatedStrongholdPosition
+              : position
+        ),
+      });
+    }
+  };
+
+  const updateTitanPosition = (updatedTitanPosition: TitanPosition) => {
+    dispatch({ type: "UPDATE_TITAN_POSITION", payload: updatedTitanPosition });
+    if (gameState && gameState.titanPositions) {
+      emitGameStateUpdate({
+        titanPositions: gameState.titanPositions.map(
+          (position: TitanPosition) =>
+            position.titanName === updatedTitanPosition.titanName
+              ? updatedTitanPosition
+              : position
+        ),
+      });
+    }
+  };
+
+  const updateBuildingPosition = (
+    updatedBuildingPosition: BuildingPosition
+  ) => {
+    dispatch({
+      type: "UPDATE_BUUILDING_POSITION",
+      payload: updatedBuildingPosition,
+    });
+    if (gameState && gameState.buildingPositions) {
+      emitGameStateUpdate({
+        buildingPositions: gameState.buildingPositions.map(
+          (position: BuildingPosition) =>
+            position.ownerName === updatedBuildingPosition.ownerName
+              ? updatedBuildingPosition
+              : position
+        ),
+      });
+    }
+  };
   useEffect(() => {
     console.log("From Gamecontext gameState:", gameState);
   }, [gameState]);
 
   return (
     <GameContext.Provider
-      value={{ gameState, emitGameStateUpdate, updatePlayerData }}
+      value={{
+        gameState,
+        emitGameStateUpdate,
+        updatePlayerData,
+        updatePlayerPosition,
+        updateStrongholdPosition,
+        updateTitanPosition,
+        updateBuildingPosition,
+      }}
     >
       {children}
     </GameContext.Provider>

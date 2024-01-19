@@ -14,6 +14,8 @@ export interface GameSessionInfo {
   players: PlayerInfo[];
   playerPositions: PlayerPosition[]
   strongholdPositions: StrongholdPosition[]
+  titanPositions: TitanPosition[]
+  buildingPositions: BuildingPosition[]
 }
 
 export interface TitanInfo {
@@ -118,8 +120,8 @@ export interface TitanPosition {
   y: number;
 }
 export interface BuildingPosition {
-  buildingName: string;
   ownerName: string;
+  buildingName: string;
   x: number;
   y: number;
 }
