@@ -190,7 +190,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         monsterBonuses = "+1 Health";
         break;
       default:
-        imageSrc = ""; // Default image or leave blank
+        imageSrc = ""; 
         buildingBonuses = "";
         monsterBonuses = "";
         break;
@@ -230,22 +230,17 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       <Canvas
         handleTileSelection={handleTileSelection}
       />
-      
       <TileModal
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
         setShowTileDetails={setShowTileDetails}
-        
       />
-
       <TileAlerts
         showAlert={showAlert}
         setShowAlert={setShowAlert}
         alertMessage={alertMessage}
         selectedTile={selectedTile}
       />
-
-   
     </>
   );
 };

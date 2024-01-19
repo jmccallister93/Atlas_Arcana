@@ -9,6 +9,7 @@ class PlayerPositionManager {
       return { playerUsername: player.username, ...position };
     });
   }
+
   updatePlayerPosition(playerUsername, newPosition) {
     // Update player position
     this.playerPositions[playerUsername] = newPosition;

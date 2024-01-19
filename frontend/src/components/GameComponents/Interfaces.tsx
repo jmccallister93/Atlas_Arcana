@@ -13,6 +13,7 @@ export interface GameSessionInfo {
   worldEventCardCount: [];
   players: PlayerInfo[];
   playerPositions: PlayerPosition[]
+  strongholdPositions: StrongholdPosition[]
 }
 
 export interface TitanInfo {
@@ -123,7 +124,7 @@ export interface BuildingPosition {
   y: number;
 }
 export interface StrongholdPosition {
-  ownerName: string;
+  playerUsername: string;
   x: number;
   y: number;
 }

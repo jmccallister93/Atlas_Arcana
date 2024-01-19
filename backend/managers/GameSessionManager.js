@@ -20,6 +20,8 @@ const treasureCards = require("../gameCards/treasureCards");
 const worldEventCards = require("../gameCards/worldEventCards");
 const TitanPlacementManager = require("./TitanPlacementManager");
 const PlayerPositionManager = require("./PlayerPositionManager");
+const TitanPositionManager = require("./TitanPositionManager");
+const StrongholdPositionManager = require("./StrongholdPositionManager");
 
 // Redis client for session management
 const sessionClient = redis.createClient();
@@ -41,6 +43,9 @@ class GameSessionManager {
     this.cardManager = new CardManager( sessionClient);
     this.titanPlacementManager = new TitanPlacementManager(gridSize);
     this.playerPositionManager = new PlayerPositionManager()
+    this.titanPositionManager = new TitanPositionManager();
+    // this.buildingPositionManager = new BuildingPositionManager()
+    this.strongholdPositionManager = new StrongholdPositionManager()
   }
 
   async createGameSession(playerOneData, playerTwoData) {
@@ -53,15 +58,18 @@ class GameSessionManager {
     this.turnManager.determineTurnOrder(players);
     const turnOrder = this.turnManager.turnOrder;
     const currentPlayerTurn = this.turnManager.getCurrentPlayerTurn();
-    const currentPhase = "Map";
+    const currentPhase = "Setup";
     const startingCardData = this.cardManager.determineStartingCards(players);
     const tileGrid = this.gameBoardManager.createTileGrid();
     const titans = this.titanManager.determineStartingTitans(players.length);
     const titanPositions = this.titanPlacementManager.placeTitansOnGrid(titans);
+    this.titanPositionManager.initializeTitanPositions(titanPositions);
+    const mappedTitanPositions = this.titanPositionManager.getTitanPositions();
     const newSession = {
       sessionId: this.sessionId,
       players,
-      playerPosition: playerPositions,
+      playerPositions: playerPositions,
+      strongholdPositions: [{}],
       turnOrder,
       currentPlayerTurn,
       tileGrid,
