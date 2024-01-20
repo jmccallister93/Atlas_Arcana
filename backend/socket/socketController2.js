@@ -18,10 +18,18 @@ const gameSessionManager = new GameSessionManager();
 const gameStateManager = new GameStateManager(gameSessionManager.sessionClient);
 const tradeManager = new TradeManager(gameSessionManager.sessionClient);
 const cardManager = new CardManager(gameSessionManager.sessionClient);
-const playerPositionManager = new PlayerPositionManager(gameSessionManager.sessionClient)
-const strongholdPositionManager = new StrongholdPositionManager(gameSessionManager.sessionClient)
-const titanPositionManager = new TitanPositionManager(gameSessionManager.sessionClient)
-const buildingPositionManager = new BuildingPositionManager(gameSessionManager.sessionClient)
+const playerPositionManager = new PlayerPositionManager(
+  gameSessionManager.sessionClient
+);
+const strongholdPositionManager = new StrongholdPositionManager(
+  gameSessionManager.sessionClient
+);
+const titanPositionManager = new TitanPositionManager(
+  gameSessionManager.sessionClient
+);
+const buildingPositionManager = new BuildingPositionManager(
+  gameSessionManager.sessionClient
+);
 
 // This will store unique socket IDs of connected users
 const totalConnectedUsers = new Set();
@@ -141,7 +149,7 @@ module.exports = function (socket, io) {
   // Listen for game state updates from clients
   socket.on("updateGameState", async ({ sessionId, newState }) => {
     try {
-        console.log("New state from socketcontroller:",newState)
+      console.log("New state from socketcontroller:", newState);
       // Process the new state (e.g., validate, apply game logic)
       await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
@@ -157,14 +165,16 @@ module.exports = function (socket, io) {
     }
   });
 
-   // Listen for player position updates from clients
-   socket.on("updatePlayerPosition", async ({ sessionId, newState }) => {
+  // Listen for player position updates from clients
+  socket.on("updatePlayerPosition", async ({ sessionId, newState }) => {
     try {
-        console.log("New state from socketcontroller:",newState)
+      console.log("New state from socketcontroller:", newState);
       // Process the new state (e.g., validate, apply game logic)
       playerPositionManager.updatePlayerPosition(io, sessionId, newState);
       // Retrieve the updated state
-      const updatedPosition = await playerPositionManager.getPlayerPosition(sessionId);
+      const updatedPosition = await playerPositionManager.getPlayerPosition(
+        sessionId
+      );
       // Broadcast the updated state to all players in the session
       io.to(sessionId).emit("updatePlayerPosition", updatedPosition.gameState); // Emit the gameState part
     } catch (error) {
@@ -175,32 +185,35 @@ module.exports = function (socket, io) {
       });
     }
   });
-   // Listen for stronghold position updates from clients
-   socket.on("updateStrongholdPosition", async ({ sessionId, newState }) => {
+  // Listen for stronghold position updates from clients
+  socket.on("updateStrongholdPosition", async ({ sessionId, newState }) => {
     try {
-        console.log("New state from socketcontroller:",newState)
-      // Process the new state (e.g., validate, apply game logic)
-      strongholdPositionManager.updateStrongholdPosition(io, sessionId, newState);
-      // Retrieve the updated state
-      const updatedPosition = await strongholdPositionManager.getStrongholdPosition(sessionId);
-      // Broadcast the updated state to all players in the session
-      io.to(sessionId).emit("updateStrongholdPosition", updatedPosition.gameState); // Emit the gameState part
+      console.log("New state from socketcontroller:", newState);
+      strongholdPositionManager.updateStrongholdPosition(
+        io,
+        sessionId,
+        newState.strongholdPositions,
+        newState
+      );
+      // Since updateStrongholdPosition already emits the updated position, you may not need additional emission here
     } catch (error) {
       console.error("Error updating game state:", error);
-      // Optionally, emit  an error message back to the client
       socket.emit("positionUpdateError", {
         message: "Failed to update position.",
       });
     }
   });
-   // Listen for titan position updates from clients
-   socket.on("updateTitanPosition", async ({ sessionId, newState }) => {
+
+  // Listen for titan position updates from clients
+  socket.on("updateTitanPosition", async ({ sessionId, newState }) => {
     try {
-        console.log("New state from socketcontroller:",newState)
+      console.log("New state from socketcontroller:", newState);
       // Process the new state (e.g., validate, apply game logic)
       titanPositionManager.updateTitanPosition(io, sessionId, newState);
       // Retrieve the updated state
-      const updatedPosition = await titanPositionManager.getTitanPosition(sessionId);
+      const updatedPosition = await titanPositionManager.getTitanPosition(
+        sessionId
+      );
       // Broadcast the updated state to all players in the session
       io.to(sessionId).emit("updateTitanPosition", updatedPosition.gameState); // Emit the gameState part
     } catch (error) {
@@ -211,16 +224,21 @@ module.exports = function (socket, io) {
       });
     }
   });
-   // Listen for building position updates from clients
-   socket.on("updateBuildingPosition", async ({ sessionId, newState }) => {
+  // Listen for building position updates from clients
+  socket.on("updateBuildingPosition", async ({ sessionId, newState }) => {
     try {
-        console.log("New state from socketcontroller:",newState)
+      console.log("New state from socketcontroller:", newState);
       // Process the new state (e.g., validate, apply game logic)
       buildingPositionManager.updateBuildingPosition(io, sessionId, newState);
       // Retrieve the updated state
-      const updatedPosition = await buildingPositionManager.getBuildingPosition(sessionId);
+      const updatedPosition = await buildingPositionManager.getBuildingPosition(
+        sessionId
+      );
       // Broadcast the updated state to all players in the session
-      io.to(sessionId).emit("updateBuildingPosition", updatedPosition.gameState); // Emit the gameState part
+      io.to(sessionId).emit(
+        "updateBuildingPosition",
+        updatedPosition.gameState
+      ); // Emit the gameState part
     } catch (error) {
       console.error("Error updating game state:", error);
       // Optionally, emit  an error message back to the client

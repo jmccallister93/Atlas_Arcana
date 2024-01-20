@@ -16,7 +16,7 @@ const TileModal: React.FC<TileModalProps> = ({
   setShowTileDetails,
 }) => {
  
-  console.log("Tile Modal Rendered")
+  // console.log("Tile Modal Rendered")
   return (
     <>
       <IonModal

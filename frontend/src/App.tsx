@@ -46,36 +46,34 @@ setupIonicReact();
 import io from "socket.io-client";
 import { useState } from "react";
 import { GameProvider } from "./context/GameContext/GameContext";
-
-
+// import { GameboardProvider } from "./context/GameContext/GameboardContext";
 
 const App: React.FC = () => (
-  
   <AuthProvider>
-     <GameProvider>
-    <IonApp>
-      <IonReactRouter>
-        <Navbar />
-        <MatchFoundListener /> {/* Include the listener */}
-        <IonRouterOutlet id="mainMenu">
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-          <Route exact path="/home" component={HomePage} />
-          <Route exact path="/login" component={LoginPage} />
-          <Route exact path="/signup" component={SignupPage} />
-          <Route exact path="/resetPassword" component={ResetPasswordPage} />
-          <Route exact path="/settings" component={SettingsPage} />
-          <Route exact path="/multiGame" component={MultiPlayerGamePage} />
-          <Route exact path="/singleGame" component={SinglePlayerGamePage} />
-          <Route exact path="/lobby" component={LobbyPage} />
-          <Route exact path="/dashboard" component={DashBoardPage} />
-          <Route exact path="/account" component={AccountPage} />
-          <Route exact path="/friends" component={FriendsPage} />
-          <Route exact path="/matchHistory" component={MatchHistoryPage} />
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </IonApp>
+    <GameProvider>
+      <IonApp>
+        <IonReactRouter>
+          <Navbar />
+          <MatchFoundListener /> {/* Include the listener */}
+          <IonRouterOutlet id="mainMenu">
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+            <Route exact path="/home" component={HomePage} />
+            <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/signup" component={SignupPage} />
+            <Route exact path="/resetPassword" component={ResetPasswordPage} />
+            <Route exact path="/settings" component={SettingsPage} />
+            <Route exact path="/multiGame" component={MultiPlayerGamePage} />
+            <Route exact path="/singleGame" component={SinglePlayerGamePage} />
+            <Route exact path="/lobby" component={LobbyPage} />
+            <Route exact path="/dashboard" component={DashBoardPage} />
+            <Route exact path="/account" component={AccountPage} />
+            <Route exact path="/friends" component={FriendsPage} />
+            <Route exact path="/matchHistory" component={MatchHistoryPage} />
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </IonApp>
     </GameProvider>
   </AuthProvider>
 );

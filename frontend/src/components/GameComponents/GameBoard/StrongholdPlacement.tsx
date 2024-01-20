@@ -12,6 +12,7 @@ import {
 } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import { TileInfo } from "./TileMenuDetails";
+// import { useGameboardContext } from "../../../context/GameContext/GameboardContext";
 
 interface StrongholdPlacementProps {
   selectedTile: TileInfo | null;
@@ -73,7 +74,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
         };
 
         // Update the stronghold position
-        
+
         updateStrongholdPosition(updatedStrongholdPosition);
       } else {
         onShowStrongholdAlert(
