@@ -6,6 +6,10 @@ const GameSessionManager = require("../managers/GameSessionManager");
 const GameStateManager = require("../managers/GameStateManager");
 const TradeManager = require("../managers/TradeManager");
 const CardManager = require("../managers/CardManager");
+const PlayerPositionManager = require("../managers/PlayerPositionManager");
+const StrongholdPositionManager = require("../managers/StrongholdPositionManager");
+const TitanPositionManager = require("../managers/TitanPositionManager");
+const BuildingPositionManager = require("../managers/BuildingPositionManager");
 
 // Initialize the state manager
 const stateManager = new StateManager();
@@ -14,6 +18,10 @@ const gameSessionManager = new GameSessionManager();
 const gameStateManager = new GameStateManager(gameSessionManager.sessionClient);
 const tradeManager = new TradeManager(gameSessionManager.sessionClient);
 const cardManager = new CardManager(gameSessionManager.sessionClient);
+const playerPositionManager = new PlayerPositionManager(gameSessionManager.sessionClient)
+const strongholdPositionManager = new StrongholdPositionManager(gameSessionManager.sessionClient)
+const titanPositionManager = new TitanPositionManager(gameSessionManager.sessionClient)
+const buildingPositionManager = new BuildingPositionManager(gameSessionManager.sessionClient)
 
 // This will store unique socket IDs of connected users
 const totalConnectedUsers = new Set();
@@ -145,6 +153,79 @@ module.exports = function (socket, io) {
       // Optionally, emit  an error message back to the client
       socket.emit("gameStateUpdateError", {
         message: "Failed to update game state.",
+      });
+    }
+  });
+
+   // Listen for player position updates from clients
+   socket.on("updatePlayerPosition", async ({ sessionId, newState }) => {
+    try {
+        console.log("New state from socketcontroller:",newState)
+      // Process the new state (e.g., validate, apply game logic)
+      playerPositionManager.updatePlayerPosition(io, sessionId, newState);
+      // Retrieve the updated state
+      const updatedPosition = await playerPositionManager.getPlayerPosition(sessionId);
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updatePlayerPosition", updatedPosition.gameState); // Emit the gameState part
+    } catch (error) {
+      console.error("Error updating game state:", error);
+      // Optionally, emit  an error message back to the client
+      socket.emit("positionUpdateError", {
+        message: "Failed to update position.",
+      });
+    }
+  });
+   // Listen for stronghold position updates from clients
+   socket.on("updateStrongholdPosition", async ({ sessionId, newState }) => {
+    try {
+        console.log("New state from socketcontroller:",newState)
+      // Process the new state (e.g., validate, apply game logic)
+      strongholdPositionManager.updateStrongholdPosition(io, sessionId, newState);
+      // Retrieve the updated state
+      const updatedPosition = await strongholdPositionManager.getStrongholdPosition(sessionId);
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updateStrongholdPosition", updatedPosition.gameState); // Emit the gameState part
+    } catch (error) {
+      console.error("Error updating game state:", error);
+      // Optionally, emit  an error message back to the client
+      socket.emit("positionUpdateError", {
+        message: "Failed to update position.",
+      });
+    }
+  });
+   // Listen for titan position updates from clients
+   socket.on("updateTitanPosition", async ({ sessionId, newState }) => {
+    try {
+        console.log("New state from socketcontroller:",newState)
+      // Process the new state (e.g., validate, apply game logic)
+      titanPositionManager.updateTitanPosition(io, sessionId, newState);
+      // Retrieve the updated state
+      const updatedPosition = await titanPositionManager.getTitanPosition(sessionId);
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updateTitanPosition", updatedPosition.gameState); // Emit the gameState part
+    } catch (error) {
+      console.error("Error updating game state:", error);
+      // Optionally, emit  an error message back to the client
+      socket.emit("positionUpdateError", {
+        message: "Failed to update position.",
+      });
+    }
+  });
+   // Listen for building position updates from clients
+   socket.on("updateBuildingPosition", async ({ sessionId, newState }) => {
+    try {
+        console.log("New state from socketcontroller:",newState)
+      // Process the new state (e.g., validate, apply game logic)
+      buildingPositionManager.updateBuildingPosition(io, sessionId, newState);
+      // Retrieve the updated state
+      const updatedPosition = await buildingPositionManager.getBuildingPosition(sessionId);
+      // Broadcast the updated state to all players in the session
+      io.to(sessionId).emit("updateBuildingPosition", updatedPosition.gameState); // Emit the gameState part
+    } catch (error) {
+      console.error("Error updating game state:", error);
+      // Optionally, emit  an error message back to the client
+      socket.emit("positionUpdateError", {
+        message: "Failed to update position.",
       });
     }
   });

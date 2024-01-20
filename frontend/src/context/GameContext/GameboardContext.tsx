@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext, useEffect, useReducer } from "react";
 import {
     BuildingPosition,
     GameSessionInfo,
@@ -9,12 +9,39 @@ import {
   } from "../../components/GameComponents/Interfaces";
 import socket from "../SocketClient/socketClient";
 
+type GameboardAction =
+  | { type: "UPDATE_PLAYER_POSITION"; payload: PlayerPosition }
+  | { type: "UPDATE_STRONGHOLD_POSITION"; payload: StrongholdPosition }
+  | { type: "UPDATE_TITAN_POSITION"; payload: TitanPosition }
+  | { type: "UPDATE_BUILDING_POSITION"; payload: BuildingPosition };
+
 interface GameboardState {
   updatePlayerPosition: (updatedPlayerPosition: PlayerPosition) => void;
   updateStrongholdPosition: (updatedStrongholdPosition: StrongholdPosition) => void;
   updateTitanPosition: (updatedTitanPosition: TitanPosition) => void;
   updateBuildingPosition: (updatedBuildingPosition: BuildingPosition) => void;
 }
+
+const initialState: GameSessionInfo = {
+    sessionId: '', // Default value for string
+    setupPhase: false, // Default value for boolean
+    currentPhase: '', // Default value for string
+    currentPlayerTurn: '', // Default value for string
+    turnOrder: [], // Empty array for string array
+    tileGrid: [], // Assuming tileGrid is an array
+    turnsCompleted: 0, // Default value for number
+    titans: [], // Empty array for TitanInfo array
+    equipmentCardCount: [], // Assuming equipmentCardCount is an array
+    questCardCount: [], // Assuming questCardCount is an array
+    treasureCardCount: [], // Assuming treasureCardCount is an array
+    worldEventCardCount: [], // Assuming worldEventCardCount is an array
+    players: [], // Empty array for PlayerInfo array
+    playerPositions: [], // Empty array for PlayerPosition array
+    strongholdPositions: [], // Empty array for StrongholdPosition array
+    titanPositions: [], // Empty array for TitanPosition array
+    buildingPositions: [], // Empty array for BuildingPosition array
+  };
+  
 
 const GameboardContext = createContext<GameboardState | undefined>(undefined);
 
@@ -27,7 +54,7 @@ export const useGameboardContext = () => {
   return context;
 };
 
-const gameboardReducer = (state: GameSessionInfo, action: any) => {
+const gameboardReducer = (state: GameSessionInfo, action: GameboardAction) => {
   switch (action.type) {
     case "UPDATE_PLAYER_POSITION":
         const updatedPlayerPosisitions = state.playerPositions.map((position) =>
@@ -78,12 +105,43 @@ const gameboardReducer = (state: GameSessionInfo, action: any) => {
   }
 };
 
+
+
+
 interface GameboardProviderProps {
   children: React.ReactNode;
 }
 
 export const GameboardProvider: React.FC<GameboardProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(gameboardReducer, {});
+    
+  const [gameState, dispatch] = useReducer(gameboardReducer, initialState);
+
+//   Player Position
+  useEffect(() => {
+    // Handler for game state updates
+    const handlePlayerPositionUpdate = (updatedState: PlayerPosition) => {
+      dispatch({ type: "UPDATE_PLAYER_POSITION", payload: updatedState });
+    };
+    // Subscribe to game state updates from the server
+    socket.on("updatePlayerPosition", handlePlayerPositionUpdate);
+    return () => {
+      socket.off("updatePlayerPosition", handlePlayerPositionUpdate);
+    };
+  }, []);
+
+  const emitPlayerPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    console.log("From emitGameState update updatedData:",updatedData)
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updatePlayerPosition", updatedState);
+    }
+  };
 
   const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
     dispatch({
@@ -91,7 +149,7 @@ export const GameboardProvider: React.FC<GameboardProviderProps> = ({ children }
       payload: updatedPlayerPosition,
     });
     if (gameState && gameState.playerPositions) {
-      emitGameStateUpdate({
+        emitPlayerPositionUpdate({
         playerPositions: gameState.playerPositions.map(
           (position: PlayerPosition) =>
             position.playerUsername === updatedPlayerPosition.playerUsername
@@ -102,6 +160,32 @@ export const GameboardProvider: React.FC<GameboardProviderProps> = ({ children }
     }
   };
 
+//   Stronghold psoition
+useEffect(() => {
+    // Handler for game state updates
+    const handleStrongholdPositionUpdate = (updatedState: StrongholdPosition) => {
+      dispatch({ type: "UPDATE_STRONGHOLD_POSITION", payload: updatedState });
+    };
+    // Subscribe to game state updates from the server
+    socket.on("updateStrongholdPosition", handleStrongholdPositionUpdate);
+    return () => {
+      socket.off("updateStrongholdPosition", handleStrongholdPositionUpdate);
+    };
+  }, []);
+
+  const emitStrongholdPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    console.log("From emitGameState update updatedData:",updatedData)
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updateStrongholdPosition", updatedState);
+    }
+  };
   const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition) => {
     console.log("Dispatching Stronghold Position Update:", updatedStrongholdPosition);
     dispatch({
@@ -128,15 +212,41 @@ export const GameboardProvider: React.FC<GameboardProviderProps> = ({ children }
   }
       
     console.log("Emitting Updated Stronghold Positions:", updatedPositions);
-    emitGameStateUpdate({ strongholdPositions: updatedPositions });
+    emitStrongholdPositionUpdate({ strongholdPositions: updatedPositions });
       
   };
   
+//   Titan position
+useEffect(() => {
+    // Handler for game state updates
+    const handleTitanPositionUpdate = (updatedState: TitanPosition) => {
+      dispatch({ type: "UPDATE_TITAN_POSITION", payload: updatedState });
+    };
+    // Subscribe to game state updates from the server
+    socket.on("updateTitanPosition", handleTitanPositionUpdate);
+    return () => {
+      socket.off("updateTitanPosition", handleTitanPositionUpdate);
+    };
+  }, []);
+
+  const emitTitanPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    console.log("From emitGameState update updatedData:",updatedData)
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updateTitanPosition", updatedState);
+    }
+  };
 
   const updateTitanPosition = (updatedTitanPosition: TitanPosition) => {
     dispatch({ type: "UPDATE_TITAN_POSITION", payload: updatedTitanPosition });
     if (gameState && gameState.titanPositions) {
-      emitGameStateUpdate({
+        emitTitanPositionUpdate({
         titanPositions: gameState.titanPositions.map(
           (position: TitanPosition) =>
             position.titanName === updatedTitanPosition.titanName
@@ -147,15 +257,42 @@ export const GameboardProvider: React.FC<GameboardProviderProps> = ({ children }
     }
   };
 
+
+//   Building position
+useEffect(() => {
+    // Handler for game state updates
+    const handleBuildingPositionUpdate = (updatedState: BuildingPosition) => {
+      dispatch({ type: "UPDATE_BUILDING_POSITION", payload: updatedState });
+    };
+    // Subscribe to game state updates from the server
+    socket.on("updateBuildingPosition", handleBuildingPositionUpdate);
+    return () => {
+      socket.off("updateBuildingPosition", handleBuildingPositionUpdate);
+    };
+  }, []);
+
+  const emitBuildingPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
+    console.log("From emitGameState update updatedData:",updatedData)
+    if (gameState) {
+      const updatedState = {
+        sessionId: gameState.sessionId,
+        newState: {
+          ...gameState,
+          ...updatedData,
+        },
+      };
+      socket.emit("updateBuildingPosition", updatedState);
+    }
+  };
   const updateBuildingPosition = (
     updatedBuildingPosition: BuildingPosition
   ) => {
     dispatch({
-      type: "UPDATE_BUUILDING_POSITION",
+      type: "UPDATE_BUILDING_POSITION",
       payload: updatedBuildingPosition,
     });
     if (gameState && gameState.buildingPositions) {
-      emitGameStateUpdate({
+        emitBuildingPositionUpdate({
         buildingPositions: gameState.buildingPositions.map(
           (position: BuildingPosition) =>
             position.ownerName === updatedBuildingPosition.ownerName
