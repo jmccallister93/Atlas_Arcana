@@ -69,7 +69,7 @@ class GameSessionManager {
       sessionId: this.sessionId,
       players,
       playerPositions: playerPositions,
-      strongholdPositions: [{}],
+      strongholdPositions: [],
       turnOrder,
       currentPlayerTurn,
       tileGrid,

@@ -81,26 +81,7 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           );
           return { ...state, playerPositions: updatedPlayerPosisitions };
         case "UPDATE_STRONGHOLD_POSITION":
-          let updatedStrongholdPositions = [...state.strongholdPositions];
-    
-          const existingIndex = updatedStrongholdPositions.findIndex(
-            (pos) => pos.playerUsername === action.payload.playerUsername
-          );
-    
-          if (existingIndex >= 0) {
-            // Update existing position
-            updatedStrongholdPositions[existingIndex] = action.payload;
-          } else {
-            // Add new position
-            updatedStrongholdPositions.push(action.payload);
-          }
-    
-          const newState = {
-            ...state,
-            strongholdPositions: updatedStrongholdPositions,
-          };
-    
-          return newState;
+          return { ...state, ...action.payload };
     
         case "UPDATE_TITAN_POSITION":
           const updatedTtianPosisitions = state.titanPositions.map((position) =>
@@ -243,59 +224,33 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     };
   }, []);
 
-  const emitStrongholdPositionUpdate = (
-    updatedData: Partial<GameSessionInfo>
-  ) => {
-    console.log("From emitGameState update updatedData:", updatedData);
+  const emitStrongholdPositionUpdate = (strongholdPosition: StrongholdPosition) => {
     if (gameState) {
-      const updatedState = {
-        sessionId: gameState.sessionId,
-        newState: {
-          ...gameState,
-          ...updatedData,
-        },
-      };
-      socket.emit("updateStrongholdPosition", updatedState);
+        const updatePayload = {
+            sessionId: gameState.sessionId,
+            newStrongholdPosition: strongholdPosition,
+        };
+        socket.emit("updateStrongholdPosition", updatePayload);
     }
-  };
-  const updateStrongholdPosition = (
-    updatedStrongholdPosition: StrongholdPosition
-  ) => {
-    console.log(
-      "Dispatching Stronghold Position Update:",
-      updatedStrongholdPosition
-    );
-    dispatch({
-      type: "UPDATE_STRONGHOLD_POSITION",
-      payload: updatedStrongholdPosition,
-    });
-    // Check if the stronghold position already exists
-    const positionExists = gameState.strongholdPositions.some(
-      (position: StrongholdPosition) =>
-        position.playerUsername === updatedStrongholdPosition.playerUsername
-    );
+};
 
-    let updatedPositions;
 
-    if (positionExists) {
-      // Update the existing position
-      updatedPositions = gameState.strongholdPositions.map(
-        (position: StrongholdPosition) =>
-          position.playerUsername === updatedStrongholdPosition.playerUsername
-            ? updatedStrongholdPosition
-            : position
-      );
-    } else {
-      // Add the new position
-      updatedPositions = [
-        ...gameState.strongholdPositions,
-        updatedStrongholdPosition,
-      ];
-    }
 
-    console.log("Emitting Updated Stronghold Positions:", updatedPositions);
-    emitStrongholdPositionUpdate({ strongholdPositions: updatedPositions });
-  };
+const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition) => {
+  console.log(
+    "Dispatching Stronghold Position Update:",
+    updatedStrongholdPosition
+  );
+  dispatch({
+    type: "UPDATE_STRONGHOLD_POSITION",
+    payload: updatedStrongholdPosition,
+  });
+
+  // Directly emit the updated stronghold position to the backend
+  console.log("Emitting Stronghold Position Update:", updatedStrongholdPosition);
+  emitStrongholdPositionUpdate(updatedStrongholdPosition);
+};
+
 
   //   Titan position
   useEffect(() => {

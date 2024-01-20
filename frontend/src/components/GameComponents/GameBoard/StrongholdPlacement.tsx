@@ -52,11 +52,12 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
       const distance = calculateDistance(x, y, titan.col, titan.row);
       if (distance <= 6) return false;
     }
-
-    for (let stronghold of strongholdPositions) {
-      if (stronghold.playerUsername !== currentPlayer?.username) {
-        const distance = calculateDistance(x, y, stronghold.x, stronghold.y);
-        if (distance <= 6) return false;
+    if (strongholdPositions) {
+      for (let stronghold of strongholdPositions) {
+        if (stronghold.playerUsername !== currentPlayer?.username) {
+          const distance = calculateDistance(x, y, stronghold.x, stronghold.y);
+          if (distance <= 6) return false;
+        }
       }
     }
 

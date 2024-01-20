@@ -4,44 +4,45 @@ class StrongholdPositionManager {
     this.strongholdPositions = new Map(); // { playerId: { x: Number, y: Number }, ... }
   }
   // This method will handle both initialization and updating of stronghold positions
-  async updateStrongholdPosition(io, sessionId, playerUsername, newPosition) {
+  async updateStrongholdPosition(io, sessionId, newStrongholdPosition) {
     try {
-      const sessionData = await this.sessionClient.get(sessionId);
-      if (!sessionData) {
-        throw new Error("Session not found");
-      }
+        // Fetch the current session data
+        const sessionData = await this.sessionClient.get(sessionId);
+        if (!sessionData) {
+            throw new Error("Session not found");
+        }
 
-      const parsedSessionData = JSON.parse(sessionData);
+        // Parse the session data
+        const parsedSessionData = JSON.parse(sessionData);
+        console.log("Current stronghold positions before update:", parsedSessionData.strongholdPositions);
 
-      // Ensure gameState and strongholdPositions array exist
-      if (!parsedSessionData.gameState) {
-        parsedSessionData.gameState = {};
-      }
-      if (!Array.isArray(parsedSessionData.gameState.strongholdPositions)) {
-        parsedSessionData.gameState.strongholdPositions = [];
-      }
+        // Check if the stronghold position for the user already exists
+        const existingIndex = parsedSessionData.strongholdPositions.findIndex(
+            position => position.playerUsername === newStrongholdPosition.playerUsername
+        );
 
-      // Find the index of the stronghold position for the specific player
-      const index = parsedSessionData.gameState.strongholdPositions.findIndex(position => position.playerUsername === playerUsername);
+        if (existingIndex !== -1) {
+            // Update existing position
+            parsedSessionData.strongholdPositions[existingIndex] = newStrongholdPosition;
+        } else {
+            // Add new position
+            parsedSessionData.strongholdPositions.push(newStrongholdPosition);
+        }
 
-      if (index !== -1) {
-        // Update the existing position
-        parsedSessionData.gameState.strongholdPositions[index] = { playerUsername, ...newPosition };
-      } else {
-        // Add a new position
-        parsedSessionData.gameState.strongholdPositions.push({ playerUsername, ...newPosition });
-      }
-
-      const serializedData = JSON.stringify(parsedSessionData);
-      await this.sessionClient.set(sessionId, serializedData);
-
-      io.to(sessionId).emit("updateStrongholdPosition", {
-        strongholdPositions: parsedSessionData.gameState.strongholdPositions,
-      });
+        // Serialize and save the updated session data
+        const serializedData = JSON.stringify(parsedSessionData);
+        await this.sessionClient.set(sessionId, serializedData);
+        console.log("Updated stronghold positions:", parsedSessionData.strongholdPositions);
+        // Emit the update to all clients in the session
+        io.to(sessionId).emit("updateStrongholdPosition", {
+            strongholdPositions: parsedSessionData.strongholdPositions,
+        });
     } catch (error) {
-      console.error("Error updating stronghold position:", error);
+        console.error("Error updating stronghold position:", error);
+        // Handle any errors that might occur
     }
-  }
+}
+  
   getStrongholdPosition(playerUsername) {
     return this.strongholdPositions.get(playerUsername) || null;
   }

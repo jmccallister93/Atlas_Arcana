@@ -149,7 +149,7 @@ module.exports = function (socket, io) {
   // Listen for game state updates from clients
   socket.on("updateGameState", async ({ sessionId, newState }) => {
     try {
-      console.log("New state from socketcontroller:", newState);
+    //   console.log("New state from socketcontroller:", newState);
       // Process the new state (e.g., validate, apply game logic)
       await gameStateManager.updateGameState(io, sessionId, newState);
       // Retrieve the updated state
@@ -186,23 +186,20 @@ module.exports = function (socket, io) {
     }
   });
   // Listen for stronghold position updates from clients
-  socket.on("updateStrongholdPosition", async ({ sessionId, newState }) => {
+  socket.on("updateStrongholdPosition", async ({ sessionId, newStrongholdPosition }) => {
+    console.log("Received new stronghold position:", newStrongholdPosition);
     try {
-      console.log("New state from socketcontroller:", newState);
-      strongholdPositionManager.updateStrongholdPosition(
-        io,
-        sessionId,
-        newState.strongholdPositions,
-        newState
-      );
-      // Since updateStrongholdPosition already emits the updated position, you may not need additional emission here
+        await strongholdPositionManager.updateStrongholdPosition(
+            io, sessionId, newStrongholdPosition
+        );
     } catch (error) {
-      console.error("Error updating game state:", error);
-      socket.emit("positionUpdateError", {
-        message: "Failed to update position.",
-      });
+        console.error("Error updating game state:", error);
+        socket.emit("positionUpdateError", {
+            message: "Failed to update position.",
+        });
     }
-  });
+});
+
 
   // Listen for titan position updates from clients
   socket.on("updateTitanPosition", async ({ sessionId, newState }) => {

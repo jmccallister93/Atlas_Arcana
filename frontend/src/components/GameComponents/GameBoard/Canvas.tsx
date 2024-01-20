@@ -128,17 +128,20 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           }
         });
         // Strongholds
-        strongholds.forEach((stronghold, index) => {
-          const strongholdKey = `stronghold${(index % 4) + 1}`; // Cycle through stronghold images
-          this.add
-            .sprite(
-              stronghold.x * tileSize,
-              stronghold.y * tileSize,
-              strongholdKey
-            )
-            .setDisplaySize(tileSize, tileSize)
-            .setOrigin(0, 0); // Add the stronghold sprite
-        });
+        if(strongholds){
+          strongholds.forEach((stronghold, index) => {
+            const strongholdKey = `stronghold${(index % 4) + 1}`; // Cycle through stronghold images
+            this.add
+              .sprite(
+                stronghold.x * tileSize,
+                stronghold.y * tileSize,
+                strongholdKey
+              )
+              .setDisplaySize(tileSize, tileSize)
+              .setOrigin(0, 0); // Add the stronghold sprite
+          });
+        }
+       
 
         // Mouse events
         let isDragging = false;

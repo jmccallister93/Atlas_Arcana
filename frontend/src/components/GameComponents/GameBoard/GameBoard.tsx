@@ -142,16 +142,19 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         }
       });
     });
-    const foundStronghold = strongholdPositions.find(
-      (stronghold) => stronghold.x === x && stronghold.y === y
-    );
-    if (foundStronghold) {
-      strongholdOnTile = {
-        playerUsername: foundStronghold.playerUsername,
-        x: foundStronghold.x,
-        y: foundStronghold.y,
-      };
+    if (strongholdPositions) {
+      const foundStronghold = strongholdPositions.find(
+        (stronghold) => stronghold.x === x && stronghold.y === y
+      );
+      if (foundStronghold) {
+        strongholdOnTile = {
+          playerUsername: foundStronghold.playerUsername,
+          x: foundStronghold.x,
+          y: foundStronghold.y,
+        };
+      }
     }
+
     return {
       playerOnTile,
       strongholdOnTile,
