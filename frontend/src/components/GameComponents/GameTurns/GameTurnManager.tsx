@@ -58,8 +58,10 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
 
   // Example function to check if all strongholds are placed
   const areAllStrongholdsPlaced = () => {
-    return gameState.players.every(player => 
-      strongholdPositions.some(stronghold => stronghold.playerUsername === player.username)
+    return gameState.players.every((player) =>
+      gameState.strongholdPositions.some(
+        (stronghold) => stronghold.playerUsername === currentPlayer?.username
+      )
     );
   };
 
@@ -79,17 +81,16 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
         setShowStrongholdAlert(true);
         return;
       }
-      console.log("From advance phase turnOrder:",turnOrder)
-      console.log("From advance phase currentPlayerTurn:", currentPlayerTurn)
+
       // Logic to handle Setup Phase
       const currentPlayerIndex = turnOrder.findIndex(
         (player) => player === currentPlayerTurn
       );
-      console.log("From advance phase currentPlayerIndex:", currentPlayerIndex)
+      console.log("From advance phase currentPlayerIndex:", currentPlayerIndex);
       const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
-      console.log("From advance phase nextPlayerIndex:", nextPlayerIndex)
+      console.log("From advance phase nextPlayerIndex:", nextPlayerIndex);
       const nextPlayerTurn = turnOrder[nextPlayerIndex];
-      console.log("From advance phase nextPlayerTurn:", nextPlayerTurn)
+      console.log("From advance phase nextPlayerTurn:", nextPlayerTurn);
 
       if (nextPlayerIndex === 0) {
         // Check if all strongholds are placed
@@ -142,24 +143,16 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
           setPhaseAction(<DrawPhase />);
           break;
         case "Trade":
-          setPhaseAction(
-            <TradePhase/>
-          );
+          setPhaseAction(<TradePhase />);
           break;
         case "Map":
-          setPhaseAction(
-            <MapPhase/>
-          );
+          setPhaseAction(<MapPhase />);
           break;
         case "Combat":
-          setPhaseAction(
-            <CombatPhase/>
-          );
+          setPhaseAction(<CombatPhase />);
           break;
         case "Titan":
-          setPhaseAction(
-            <TitanPhase/>
-          );
+          setPhaseAction(<TitanPhase />);
           break;
         default:
           // Optional: handle any case where currentPhase doesn't match any of the cases

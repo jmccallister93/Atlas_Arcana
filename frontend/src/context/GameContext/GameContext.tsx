@@ -207,18 +207,24 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       type: "UPDATE_STRONGHOLD_POSITION",
       payload: updatedStrongholdPosition,
     });
+  // Check if the stronghold position already exists
+  const positionExists = gameState.strongholdPositions.some((position: StrongholdPosition) => 
+    position.playerUsername === updatedStrongholdPosition.playerUsername
+  );
+
+  let updatedPositions;
   
-    
-      const updatedPositions = gameState.strongholdPositions.map(
-        (position: StrongholdPosition) => {
-          console.log("Current position before update:", position);
-          const updatedPosition = position.playerUsername === updatedStrongholdPosition.playerUsername
-            ? updatedStrongholdPosition
-            : updatedStrongholdPosition;
-          console.log("Position after potential update:", updatedPosition);
-          return updatedPosition;
-        }
-      );
+  if (positionExists) {
+    // Update the existing position
+    updatedPositions = gameState.strongholdPositions.map((position: StrongholdPosition) => 
+      position.playerUsername === updatedStrongholdPosition.playerUsername
+        ? updatedStrongholdPosition
+        : position
+    );
+  } else {
+    // Add the new position
+    updatedPositions = [...gameState.strongholdPositions, updatedStrongholdPosition];
+  }
       
     console.log("Emitting Updated Stronghold Positions:", updatedPositions);
     emitGameStateUpdate({ strongholdPositions: updatedPositions });
