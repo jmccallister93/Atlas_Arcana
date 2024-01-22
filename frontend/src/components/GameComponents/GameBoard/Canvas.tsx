@@ -84,14 +84,20 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   useEffect(() => {
     if (phaserGameRef) {
       if (strongholds) {
-        strongholds.forEach((stronghold) => {
-          (strongholdSpritesRef.current as StrongholdSprites).addStronghold(
-            stronghold, stronghold1
-          );
+        strongholds.forEach((stronghold, index) => {
+          // Define the array of keys
+          let strongholdKeys = ["stronghold1", "stronghold2", "stronghold3", "stronghold4"];
+  
+          // Use the index to cycle through the keys
+          let keyIndex = index % strongholdKeys.length;
+          let strongholdKey = strongholdKeys[keyIndex];
+  
+          (strongholdSpritesRef.current as StrongholdSprites).addStronghold(stronghold, strongholdKey);
         });
       }
     }
   }, [strongholds]);
+  
 
   function preload(this: Phaser.Scene) {
     this.load.image("desert", desert);

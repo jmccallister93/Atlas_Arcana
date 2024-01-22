@@ -38,9 +38,8 @@ class StrongholdSprites {
       sprite.setScale(scaleX, scaleY);
 
       this.strongholds.set(stronghold.playerUsername, sprite);
+    }
   }
-  }
-  
 }
 
 export default StrongholdSprites;
