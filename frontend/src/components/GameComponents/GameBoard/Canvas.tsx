@@ -28,7 +28,7 @@ import {
   useGameContext,
   useGameStatePart,
 } from "../../../context/GameContext/GameContext";
-import StrongholdSprites from "./Sprites/StorngholdSprites";
+import StrongholdSprites from "./Sprites/StrongholdSprites";
 import PlayerSprites from "./Sprites/PlayerSprites";
 import TitanSprites from "./Sprites/TitanSprites";
 import BuildingSprites from "./Sprites/BuildingSprites";
@@ -51,14 +51,14 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
 
   const tileSize = 30;
   const phaserGameRef = useRef<Phaser.Game | null>(null);
-  let strongholdSprites: StrongholdSprites;
+
   let playerSprites: PlayerSprites;
   let titanSprites: TitanSprites;
   let buildingSprites: BuildingSprites;
-
+  const strongholdSpritesRef = useRef<StrongholdSprites | null>(null);
   // Initialize phaser game
   useEffect(() => {
-    if (gameRef.current && !phaserGameRef.current)  {
+    if (gameRef.current && !phaserGameRef.current) {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
         width: 720,
@@ -68,9 +68,8 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           preload: preload,
           create: create,
         },
-        
       };
-  
+
       phaserGameRef.current = new Phaser.Game(config);
     }
     return () => {
@@ -81,35 +80,18 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     };
   }, []);
 
+  // Updates
   useEffect(() => {
-    console.log("phasergame useeffect called")
     if (phaserGameRef) {
-      // const scene = phaserGameRef.scene.getAt(0) as Phaser.Scene;
-
-      // Update strongholds
-      // if (strongholds) {
-      //   strongholds.forEach((stronghold) => {
-      //     strongholdSprites.updateStronghold(stronghold);
-      //   });
-      // }
-
-      // // Update titans
-      // if (titans) {
-      //   titans.forEach((titan) => {
-      //     titanSprites.updateTitan(titan);
-      //   });
-      // }
-
-      // // Update players
-      // players.forEach(player => {
-      //   playerSprites.updatePlayer(player);
-      // });
-      // // Update buildings
-      // buildings.forEach(building => {
-      //   buildingSprites.updateBuilding(building);
-      // });
+      if (strongholds) {
+        strongholds.forEach((stronghold) => {
+          (strongholdSpritesRef.current as StrongholdSprites).addStronghold(
+            stronghold, stronghold1
+          );
+        });
+      }
     }
-  }, [strongholds]); // Add other dependencies as needed
+  }, [strongholds]);
 
   function preload(this: Phaser.Scene) {
     this.load.image("desert", desert);
@@ -128,12 +110,8 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   }
 
   function create(this: Phaser.Scene) {
-    console.log("Create function called")
     const graphics = this.add.graphics(); // Create a new Graphics object
-    strongholdSprites = new StrongholdSprites(this);
-    titanSprites = new TitanSprites(this);
-    playerSprites = new PlayerSprites(this);
-    buildingSprites = new BuildingSprites(this);
+    strongholdSpritesRef.current = new StrongholdSprites(this);
 
     const tileTypeToColor: { [key: string]: string } = {
       forest: "#095300", // Dark Green
@@ -178,19 +156,23 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       });
     });
 
-    // Initialize titans
-    if (titans) {
-      titans.forEach((titan) => {
-        const titanImageKey = titanNameToImageKey[titan.titanName];
-        titanSprites.addTitan(titan, titanImageKey);
-      });
-    }
+    // // Initialize titans
+    // if (titans) {
+    //   titans.forEach((titan) => {
+    //     const titanImageKey = titanNameToImageKey[titan.titanName];
+    //     titanSprites.addTitan(titan, titanImageKey);
+    //   });
+    // }
 
     // Initialize strongholds (and other dynamic elements)
+
     if (strongholds) {
       strongholds.forEach((stronghold, index) => {
         const strongholdKey = `stronghold${(index % 4) + 1}`;
-        strongholdSprites.addStronghold(stronghold, strongholdKey);
+        (strongholdSpritesRef.current as StrongholdSprites).addStronghold(
+          stronghold,
+          strongholdKey
+        );
       });
     }
 

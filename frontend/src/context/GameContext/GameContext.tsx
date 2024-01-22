@@ -237,17 +237,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
 
 const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition) => {
-  console.log(
-    "Dispatching Stronghold Position Update:",
-    updatedStrongholdPosition
-  );
   dispatch({
     type: "UPDATE_STRONGHOLD_POSITION",
     payload: updatedStrongholdPosition,
   });
 
-  // Directly emit the updated stronghold position to the backend
-  console.log("Emitting Stronghold Position Update:", updatedStrongholdPosition);
   emitStrongholdPositionUpdate(updatedStrongholdPosition);
 };
 
