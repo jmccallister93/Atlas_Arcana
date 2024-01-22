@@ -37,7 +37,7 @@ export interface TileInfo {
   players: PlayerInfo | null;
   buildings: BuildingInfo[] | null;
   stronghold: StrongholdPosition | null;
-  titan: Titan | null;
+  // titan: Titan | null;
   titanImage?: string;
 }
 
@@ -118,7 +118,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             ) : null}
 
             {/* titan details */}
-            {selectedTile.titan && (
+            {/* {selectedTile.titan && (
               <div>
                 <h3>{selectedTile.titan.titanName} Details</h3>
                 <img
@@ -142,7 +142,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                   <b>Stamina:</b> {selectedTile.titan.stamina}
                 </p>
               </div>
-            )}
+            )} */}
 
             {/* Render Player Details */}
             {selectedTile.players && (

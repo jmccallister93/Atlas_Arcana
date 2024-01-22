@@ -25,8 +25,6 @@ export interface TitanInfo {
   offense: number;
   defense: number;
   stamina: number;
-  row: number;
-  col: number;
 }
 
 export interface LocationState {

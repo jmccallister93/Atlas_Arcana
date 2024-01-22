@@ -5,6 +5,7 @@ import {
   PlayerInfo,
   TitanInfo,
   StrongholdPosition,
+  TitanPosition,
 } from "../Interfaces"; // Adjust the import paths based on your project structure
 import {
   useGameContext,
@@ -25,7 +26,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
 }) => {
   const { updateStrongholdPosition } = useGameContext();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
-  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  const titans = useGameStatePart((state) => state.titanPositions as TitanPosition[]);
   const strongholdPositions = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
@@ -49,7 +50,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
 
   const isValidStrongholdPlacement = (x: number, y: number): boolean => {
     for (let titan of titans) {
-      const distance = calculateDistance(x, y, titan.col, titan.row);
+      const distance = calculateDistance(x, y, titan.x, titan.y);
       if (distance <= 6) return false;
     }
     if (strongholdPositions) {

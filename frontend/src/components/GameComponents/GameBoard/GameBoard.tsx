@@ -16,6 +16,7 @@ import {
   PlayerInfo,
   StrongholdPosition,
   TitanInfo,
+  TitanPosition,
 } from "../Interfaces";
 import {
   useGameContext,
@@ -35,16 +36,16 @@ export interface TileInfo {
   buildings: BuildingInfo[] | null;
   players: PlayerInfo | null;
   stronghold: StrongholdPosition | null;
-  titan: {
-    titanName: string;
-    rank: number;
-    health: number;
-    offense: number;
-    defense: number;
-    stamina: number;
-    row: number;
-    col: number;
-  } | null;
+  // titan: {
+  //   titanName: string;
+  //   rank: number;
+  //   health: number;
+  //   offense: number;
+  //   defense: number;
+  //   stamina: number;
+  //   row: number;
+  //   col: number;
+  // } | null;
   titanImage: string;
 }
 
@@ -67,14 +68,14 @@ const usePlayerBoardData = (players: PlayerInfo[]) => {
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
-  // console.log("GameBoard Rendered");
+  console.log("GameBoard Rendered");
   // Get Game state componenets
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const playerBoardData = usePlayerBoardData(players);
   const strongholdPositions = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
-  const titans = useGameStatePart((state) => state.titans as TitanInfo[]);
+  const titans = useGameStatePart((state) => state.titanPositions as TitanPosition[]);
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
@@ -102,7 +103,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     let titanImageUrl = "";
     // Check for titans
     const foundTitan = titans?.find(
-      (titan) => titan.row === y && titan.col === x
+      (titan) => titan.x === y && titan.y === x
     );
     if (foundTitan) {
       titanOnTile = foundTitan;
@@ -223,7 +224,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       image: imageSrc,
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
-      titan: titanOnTile,
+      // titan: titanOnTile,
       titanImage: titanImageUrl,
       players: playerOnTile,
       stronghold: strongholdOnTile,
@@ -234,7 +235,9 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   return (
     <>
-      <Canvas handleTileSelection={handleTileSelection} />
+      <Canvas 
+      handleTileSelection={handleTileSelection} 
+      />
       <TileModal
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
