@@ -56,6 +56,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   let titanSprites: TitanSprites;
   let buildingSprites: BuildingSprites;
   const strongholdSpritesRef = useRef<StrongholdSprites | null>(null);
+  const titanSpritesRef = useRef<TitanSprites | null>(null);
   // Initialize phaser game
   useEffect(() => {
     if (gameRef.current && !phaserGameRef.current) {
@@ -86,18 +87,27 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       if (strongholds) {
         strongholds.forEach((stronghold, index) => {
           // Define the array of keys
-          let strongholdKeys = ["stronghold1", "stronghold2", "stronghold3", "stronghold4"];
-  
+          let strongholdKeys = [
+            "stronghold1",
+            "stronghold2",
+            "stronghold3",
+            "stronghold4",
+          ];
+
           // Use the index to cycle through the keys
           let keyIndex = index % strongholdKeys.length;
           let strongholdKey = strongholdKeys[keyIndex];
-  
-          (strongholdSpritesRef.current as StrongholdSprites).addStronghold(stronghold, strongholdKey);
+
+          (strongholdSpritesRef.current as StrongholdSprites).addStronghold(
+            stronghold,
+            strongholdKey
+          );
         });
+      }
+      if (titans) {
       }
     }
   }, [strongholds]);
-  
 
   function preload(this: Phaser.Scene) {
     this.load.image("desert", desert);
@@ -118,6 +128,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   function create(this: Phaser.Scene) {
     const graphics = this.add.graphics(); // Create a new Graphics object
     strongholdSpritesRef.current = new StrongholdSprites(this);
+    titanSpritesRef.current = new TitanSprites(this);
 
     const tileTypeToColor: { [key: string]: string } = {
       forest: "#095300", // Dark Green
@@ -125,17 +136,6 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       oasis: "#005fcc", // Dark Turquoise
       tundra: "#D9D9D9", // Silver
       grassland: "#00BC53", // Lime Green
-    };
-
-    interface TitanImageKeys {
-      [key: string]: string;
-    }
-
-    const titanNameToImageKey: { [key: string]: string } = {
-      "Fire Titan": "fireTitan",
-      "Ice Titan": "iceTitan",
-      "Stone Titan": "stoneTitan",
-      "Storm Titan": "stormTitan",
     };
 
     // Tile Grid
@@ -162,13 +162,24 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       });
     });
 
-    // // Initialize titans
-    // if (titans) {
-    //   titans.forEach((titan) => {
-    //     const titanImageKey = titanNameToImageKey[titan.titanName];
-    //     titanSprites.addTitan(titan, titanImageKey);
-    //   });
-    // }
+    interface TitanImageKeys {
+      [key: string]: string;
+    }
+
+    const titanNameToImageKey: { [key: string]: string } = {
+      "Fire Titan": "fireTitan",
+      "Ice Titan": "iceTitan",
+      "Stone Titan": "stoneTitan",
+      "Storm Titan": "stormTitan",
+    };
+
+    // Initialize titans
+    if (titans) {
+      titans.forEach((titan) => {
+        const titanImageKey = titanNameToImageKey[titan.titanName];
+        titanSpritesRef.current?.addTitan(titan, titanImageKey);
+      });
+    }
 
     // Initialize strongholds (and other dynamic elements)
 
@@ -260,8 +271,8 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           // Adjust the camera position to zoom towards the pointer position
           const offsetX = (pointer.x - this.cameras.main.width / 2) / oldZoom;
           const offsetY = (pointer.y - this.cameras.main.height / 2) / oldZoom;
-          this.cameras.main.scrollX -= offsetX * (1 - 1 / zoomLevel);
-          this.cameras.main.scrollY -= offsetY * (1 - 1 / zoomLevel);
+          this.cameras.main.scrollX += offsetX * (1 - 1 / zoomLevel);
+          this.cameras.main.scrollY += offsetY * (1 - 1 / zoomLevel);
         }
       }
     );

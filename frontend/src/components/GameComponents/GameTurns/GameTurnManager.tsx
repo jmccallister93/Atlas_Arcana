@@ -17,7 +17,6 @@ interface GameTurnManagerProps {}
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   // Get Game state
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
-console.log("From GTM gamestate:",gameState)
   const auth = useAuth();
   // Player info
   // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
@@ -53,7 +52,7 @@ console.log("From GTM gamestate:",gameState)
     } else {
       setGamePhaseButton(null);
     }
-  }, [currentPlayerTurn, gameState.players, gameState.strongholdPositions]);
+  }, [currentPlayerTurn, gameState]);
 
   // Example function to check if all strongholds are placed
   const areAllStrongholdsPlaced = () => {
@@ -91,11 +90,11 @@ console.log("From GTM gamestate:",gameState)
       const currentPlayerIndex = turnOrder.findIndex(
         (player) => player === currentPlayerTurn
       );
-      console.log("From advance phase currentPlayerIndex:", currentPlayerIndex);
+
       const nextPlayerIndex = (currentPlayerIndex + 1) % turnOrder.length;
-      console.log("From advance phase nextPlayerIndex:", nextPlayerIndex);
+
       const nextPlayerTurn = turnOrder[nextPlayerIndex];
-      console.log("From advance phase nextPlayerTurn:", nextPlayerTurn);
+  
 
       if (nextPlayerIndex === 0) {
         // Check if all strongholds are placed
