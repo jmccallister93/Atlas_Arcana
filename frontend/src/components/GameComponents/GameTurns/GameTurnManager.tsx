@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IonIcon, ReactComponentOrElement, IonAlert } from "@ionic/react";
 import { arrowForwardCircleOutline } from "ionicons/icons";
-import { GameSessionInfo, PlayerInfo } from "../Interfaces";
+import { GameSessionInfo, PlayerInfo, StrongholdPosition } from "../Interfaces";
 import DrawPhase from "./DrawPhase/DrawPhase";
 import TradePhase from "./TradePhase/TradePhase";
 import RestPhase from "./RestPhase/RestPhase";
@@ -17,8 +17,7 @@ interface GameTurnManagerProps {}
 const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
   // Get Game state
   const { gameState, emitGameStateUpdate, updatePlayerData } = useGameContext();
-  const strongholdPositions = gameState.strongholdPositions;
-
+console.log("From GTM gamestate:",gameState)
   const auth = useAuth();
   // Player info
   // const [players, setPlayers] = useState<PlayerInfo[]>(gameState.players);
@@ -54,14 +53,21 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     } else {
       setGamePhaseButton(null);
     }
-  }, [currentPlayerTurn, gameState.players]);
+  }, [currentPlayerTurn, gameState.players, gameState.strongholdPositions]);
 
   // Example function to check if all strongholds are placed
   const areAllStrongholdsPlaced = () => {
     return gameState.players.every((player) =>
       gameState.strongholdPositions.some(
-        (stronghold) => stronghold.playerUsername === currentPlayer?.username
+        (stronghold) => stronghold.playerUsername === player.username
       )
+    );
+  };
+
+
+  const hasCurrentPlayerPlacedStronghold = () => {
+    return gameState.strongholdPositions.some(
+      (stronghold) => stronghold.playerUsername === currentPlayer?.username
     );
   };
 
@@ -76,8 +82,7 @@ const GameTurnManager: React.FC<GameTurnManagerProps> = ({}) => {
     const isSetupPhase = gameState.setupPhase;
 
     if (isSetupPhase) {
-      // Check if current player has not placed a stronghold
-      if (!areAllStrongholdsPlaced()) {
+      if (!hasCurrentPlayerPlacedStronghold()) {
         setShowStrongholdAlert(true);
         return;
       }
