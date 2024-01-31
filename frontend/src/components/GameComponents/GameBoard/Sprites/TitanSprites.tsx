@@ -12,8 +12,6 @@ class TitanSprites {
   }
 
   addTitan(titan: TitanPosition, spriteKey: string) {
-    console.log("From addtitan titan:", titan)
-    console.log("From addtitan spriteKey:", spriteKey)
     // Calculate position based on tileSize
     const spriteX = titan.x * this.tileSize;
     const spriteY = titan.y * this.tileSize;

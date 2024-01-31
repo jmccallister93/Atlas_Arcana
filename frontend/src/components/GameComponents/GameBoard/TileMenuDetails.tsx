@@ -7,13 +7,14 @@ import {
   IonAlert,
 } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import { BuildingInfo, PlayerInfo, StrongholdPosition } from "../Interfaces";
+import { BuildingInfo, PlayerInfo, StrongholdPosition, TitanPosition } from "../Interfaces";
 import {
   useGameContext,
   useGameStatePart,
 } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import StrongholdPlacement from "./StrongholdPlacement";
+import { TileInfo } from "./GameBoard";
 
 interface Titan {
   titanName: string;
@@ -27,19 +28,6 @@ interface Titan {
   image?: string;
 }
 
-export interface TileInfo {
-  type: string;
-  x: number;
-  y: number;
-  image: string;
-  monsterBonuses: string;
-  buildingBonuses: string;
-  players: PlayerInfo | null;
-  buildings: BuildingInfo[] | null;
-  stronghold: StrongholdPosition | null;
-  // titan: Titan | null;
-  titanImage?: string;
-}
 
 interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
@@ -118,7 +106,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             ) : null}
 
             {/* titan details */}
-            {/* {selectedTile.titan && (
+            {selectedTile.titan && (
               <div>
                 <h3>{selectedTile.titan.titanName} Details</h3>
                 <img
@@ -126,7 +114,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                   alt={selectedTile.titan.titanName}
                   style={{ maxWidth: "100%" }}
                 />
-                <p>
+                {/* <p>
                   <b>Rank:</b> {selectedTile.titan.rank}
                 </p>
                 <p>
@@ -140,9 +128,9 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                 </p>
                 <p>
                   <b>Stamina:</b> {selectedTile.titan.stamina}
-                </p>
+                </p> */}
               </div>
-            )} */}
+            )}
 
             {/* Render Player Details */}
             {selectedTile.players && (

@@ -36,16 +36,7 @@ export interface TileInfo {
   buildings: BuildingInfo[] | null;
   players: PlayerInfo | null;
   stronghold: StrongholdPosition | null;
-  // titan: {
-  //   titanName: string;
-  //   rank: number;
-  //   health: number;
-  //   offense: number;
-  //   defense: number;
-  //   stamina: number;
-  //   row: number;
-  //   col: number;
-  // } | null;
+  titan: TitanPosition | null
   titanImage: string;
 }
 
@@ -68,7 +59,7 @@ const usePlayerBoardData = (players: PlayerInfo[]) => {
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({}) => {
-  console.log("GameBoard Rendered");
+  // console.log("GameBoard Rendered");
   // Get Game state componenets
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const playerBoardData = usePlayerBoardData(players);
@@ -81,6 +72,8 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage] = useState("");
+  const state = useGameStatePart((state) => state)
+  console.log(state)
 
   // Handle Selected tile
   const handleTileSelection = useCallback(
@@ -96,15 +89,14 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   // Updated function to check entities on a tile
   const checkEntitiesOnTile = (x: number, y: number) => {
+   
     let playerOnTile = null;
     let strongholdOnTile: StrongholdPosition | null = null;
     let buildingsOnTile: BuildingInfo[] = [];
     let titanOnTile = null;
     let titanImageUrl = "";
     // Check for titans
-    const foundTitan = titans?.find(
-      (titan) => titan.x === y && titan.y === x
-    );
+    const foundTitan = titans?.find(titan => titan.x === x && titan.y === y);
     if (foundTitan) {
       titanOnTile = foundTitan;
       // Determine the image URL based on the titan's name
@@ -144,6 +136,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       });
     });
     if (strongholdPositions) {
+      console.log("Stronghold psotions:", strongholdPositions)
       const foundStronghold = strongholdPositions.find(
         (stronghold) => stronghold.x === x && stronghold.y === y
       );
@@ -203,7 +196,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         monsterBonuses = "";
         break;
     }
-    // Handle unknown or undefined tile types
+   
     if (!imageSrc) {
       console.error("Unknown tile type selected:", tileType);
       return;
@@ -224,7 +217,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       image: imageSrc,
       monsterBonuses: monsterBonuses,
       buildingBonuses: buildingBonuses,
-      // titan: titanOnTile,
+      titan: titanOnTile,
       titanImage: titanImageUrl,
       players: playerOnTile,
       stronghold: strongholdOnTile,

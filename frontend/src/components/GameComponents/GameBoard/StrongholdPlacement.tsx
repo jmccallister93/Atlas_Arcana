@@ -12,7 +12,8 @@ import {
   useGameStatePart,
 } from "../../../context/GameContext/GameContext";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
-import { TileInfo } from "./TileMenuDetails";
+import { TileInfo } from "./GameBoard";
+// import { TileInfo } from "./TileMenuDetails";
 // import { useGameboardContext } from "../../../context/GameContext/GameboardContext";
 
 interface StrongholdPlacementProps {
