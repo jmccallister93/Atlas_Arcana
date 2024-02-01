@@ -79,7 +79,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
     setStrongholdAlertMessage(message);
     setShowStrongholdAlert(true);
   };
-console.log(selectedTile)
+
   return (
     <IonModal
       isOpen={showTileDetails}

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import desert from "./GameTiles/desertTile.png";
 import forest from "./GameTiles/forestTile.png";
@@ -36,7 +36,7 @@ export interface TileInfo {
   buildings: BuildingInfo[] | null;
   players: PlayerInfo | null;
   stronghold: StrongholdPosition | null;
-  titan: TitanPosition | null
+  titan: TitanPosition | null;
   titanImage: string;
 }
 
@@ -66,40 +66,41 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const strongholdPositions = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
-  const titans = useGameStatePart((state) => state.titanPositions as TitanPosition[]);
+  const strongholdPositionsRef = useRef(strongholdPositions);
+  strongholdPositionsRef.current = strongholdPositions;
+  const titans = useGameStatePart(
+    (state) => state.titanPositions as TitanPosition[]
+  );
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage] = useState("");
-  const state = useGameStatePart((state) => state)
-  // console.log(state)
+  const state = useGameStatePart((state) => state);
+
 
   // Handle Selected tile
-  const handleTileSelection = useCallback(
+  const handleTileSelection = 
     (x: number, y: number) => {
       if (x < 0 || x >= tileGrid.length || y < 0 || y >= tileGrid[x].length) {
         console.error("Selected tile is out of bounds.");
         return;
       }
       onTileSelect(tileGrid[x][y], x, y);
-    },
-    [tileGrid, titans, players, setSelectedTile, setShowTileDetails]
-  );
+    }
 
   // Updated function to check entities on a tile
   const checkEntitiesOnTile = (x: number, y: number) => {
-   
     let playerOnTile = null;
-    let strongholdOnTile: StrongholdPosition | null = null;
+    
     let buildingsOnTile: BuildingInfo[] = [];
+    
+    // Check for titans
     let titanOnTile = null;
     let titanImageUrl = "";
-    // Check for titans
-    const foundTitan = titans?.find(titan => titan.x === x && titan.y === y);
+    const foundTitan = titans?.find((titan) => titan.x === x && titan.y === y);
     if (foundTitan) {
       titanOnTile = foundTitan;
-      // Determine the image URL based on the titan's name
       switch (titanOnTile.titanName) {
         case "Fire Titan":
           titanImageUrl = fireTitanToken;
@@ -135,18 +136,19 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         }
       });
     });
-    if (strongholdPositions) {
-      console.log("Stronghold psotions:", strongholdPositions)
-      const foundStronghold = strongholdPositions.find(
-        (stronghold) => stronghold.x === x && stronghold.y === y
-      );
-      if (foundStronghold) {
-        strongholdOnTile = {
-          playerUsername: foundStronghold.playerUsername,
-          x: foundStronghold.x,
-          y: foundStronghold.y,
-        };
-      }
+    
+    // Stronghold
+    let strongholdOnTile = null;
+    const foundStronghold =  strongholdPositionsRef.current.find(
+      (stronghold) => stronghold.x === x && stronghold.y === y
+    );
+
+    if (foundStronghold) {
+      strongholdOnTile = {
+        playerUsername: foundStronghold.playerUsername,
+        x: foundStronghold.x,
+        y: foundStronghold.y,
+      };
     }
 
     return {
@@ -196,7 +198,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         monsterBonuses = "";
         break;
     }
-   
+
     if (!imageSrc) {
       console.error("Unknown tile type selected:", tileType);
       return;
@@ -228,9 +230,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   return (
     <>
-      <Canvas 
-      handleTileSelection={handleTileSelection} 
-      />
+      <Canvas handleTileSelection={handleTileSelection} />
       <TileModal
         selectedTile={selectedTile}
         showTileDetails={showTileDetails}
