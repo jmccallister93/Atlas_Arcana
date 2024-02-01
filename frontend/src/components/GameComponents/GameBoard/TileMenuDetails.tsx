@@ -166,6 +166,11 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
             {selectedTile.stronghold && (
               <div>
                 <h3>Stronghold</h3>
+                <img
+                  src={selectedTile.strongholdImage}
+                  alt={selectedTile.stronghold.playerUsername}
+                  style={{ maxWidth: "100%" }}
+                />
                 <p>Owner: {selectedTile.stronghold.playerUsername}</p>
                 <p>
                   Coordinates: (X: {selectedTile.stronghold.x}, Y:{" "}
