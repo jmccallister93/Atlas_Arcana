@@ -7,7 +7,6 @@ const CardManager = require("../managers/CardManager");
 const GameBoardManager = require("../managers/GameBoardManager");
 const GameStateManager = require("../managers/GameStateManager");
 const PlayerManager = require("../managers/PlayerManager");
-const PositionManager = require("./TitanPlacementManager");
 const TitanManager = require("../managers/TitanManager");
 const TradeManager = require("../managers/TradeManager");
 const TurnManager = require("../managers/TurnManager");
@@ -18,7 +17,7 @@ const questCards = require("../gameCards/questCards");
 const titanCards = require("../gameCards/titanCards");
 const treasureCards = require("../gameCards/treasureCards");
 const worldEventCards = require("../gameCards/worldEventCards");
-const TitanPlacementManager = require("./TitanPlacementManager");
+
 const PlayerPositionManager = require("./PlayerPositionManager");
 const TitanPositionManager = require("./TitanPositionManager");
 const StrongholdPositionManager = require("./StrongholdPositionManager");
@@ -38,10 +37,9 @@ class GameSessionManager {
     this.gameStateManager = new GameStateManager(sessionClient);
     this.gameBoardManager = new GameBoardManager();
     this.tradeManager = new TradeManager(sessionClient);
-    this.titanManager = new TitanManager(titanCards);
+    this.titanManager = new TitanManager(gridSize);
     this.turnManager = new TurnManager();
     this.cardManager = new CardManager( sessionClient);
-    this.titanPlacementManager = new TitanPlacementManager(gridSize);
     this.playerPositionManager = new PlayerPositionManager()
     this.titanPositionManager = new TitanPositionManager();
     // this.buildingPositionManager = new BuildingPositionManager()
@@ -62,7 +60,7 @@ class GameSessionManager {
     const startingCardData = this.cardManager.determineStartingCards(players);
     const tileGrid = this.gameBoardManager.createTileGrid();
     const titans = this.titanManager.determineStartingTitans(players.length);
-    const titanPositions = this.titanPlacementManager.placeTitansOnGrid(titans);
+    const titanPositions = this.titanManager.placeTitansOnGrid(titans);
     this.titanPositionManager.initializeTitanPositions(titanPositions);
     const mappedTitanPositions = this.titanPositionManager.getTitanPositions();
     const newSession = {

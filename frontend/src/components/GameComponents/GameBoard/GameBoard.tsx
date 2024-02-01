@@ -73,7 +73,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage] = useState("");
   const state = useGameStatePart((state) => state)
-  console.log(state)
+  // console.log(state)
 
   // Handle Selected tile
   const handleTileSelection = useCallback(
