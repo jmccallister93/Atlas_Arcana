@@ -147,11 +147,12 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     let strongholdOnTile = null;
     let strongholdImageUrl = "";
     // Mapping object
-    const strongholdImages: StrongholdImages = {
-      playerUsername1: stronghold1,
-      playerUsername2: stronghold2,
-      // Add more mappings as needed
-    };
+    const strongholdImages = [
+      stronghold1,
+      stronghold2,
+      stronghold3,
+      stronghold4,
+    ];
     const foundStronghold = strongholdPositionsRef.current.find(
       (stronghold) => stronghold.x === x && stronghold.y === y
     );
@@ -162,8 +163,12 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
         x: foundStronghold.x,
         y: foundStronghold.y,
       };
-      strongholdImageUrl =
-        strongholdImages[foundStronghold.playerUsername] || "";
+      const playerIndex = players.findIndex(
+        (player) => player.username === foundStronghold.playerUsername
+      );
+      if (playerIndex !== -1 && playerIndex < strongholdImages.length) {
+        strongholdImageUrl = strongholdImages[playerIndex];
+      }
     }
 
     return {
