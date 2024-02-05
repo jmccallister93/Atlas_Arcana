@@ -74,12 +74,8 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           gameState: { ...state, currentPlayerTurn: action.payload },
         };
         case "UPDATE_PLAYER_POSITION":
-          const updatedPlayerPosisitions = state.playerPositions.map((position) =>
-            position.playerUsername === action.payload.playerUsername
-              ? action.payload
-              : position
-          );
-          return { ...state, playerPositions: updatedPlayerPosisitions };
+          return { ...state, ...action.payload };
+      
         case "UPDATE_STRONGHOLD_POSITION":
           return { ...state, ...action.payload };
     
@@ -178,38 +174,27 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     };
   }, []);
 
-  const emitPlayerPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
-    console.log("From emitGameState update updatedData:", updatedData);
+  const emitPlayerPositionUpdate = (playerPosition: PlayerPosition) => {
     if (gameState) {
-      const updatedState = {
-        sessionId: gameState.sessionId,
-        newState: {
-          ...gameState,
-          ...updatedData,
-        },
-      };
-      socket.emit("updatePlayerPosition", updatedState);
+        const updatePayload = {
+            sessionId: gameState.sessionId,
+            newPlayerPosition: playerPosition,
+        };
+        socket.emit("updatePlayerPosition", updatePayload);
     }
-  };
+};
 
-  const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
-    dispatch({
-      type: "UPDATE_PLAYER_POSITION",
-      payload: updatedPlayerPosition,
-    });
-    if (gameState && gameState.playerPositions) {
-      emitPlayerPositionUpdate({
-        playerPositions: gameState.playerPositions.map(
-          (position: PlayerPosition) =>
-            position.playerUsername === updatedPlayerPosition.playerUsername
-              ? updatedPlayerPosition
-              : position
-        ),
-      });
-    }
-  };
+const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
+  dispatch({
+    type: "UPDATE_PLAYER_POSITION",
+    payload: updatedPlayerPosition,
+  });
 
-  //   Stronghold psoition
+  emitPlayerPositionUpdate(updatedPlayerPosition);
+};
+
+
+  //   Stronghold position
   useEffect(() => {
     // Handler for game state updates
     const handleStrongholdPositionUpdate = (

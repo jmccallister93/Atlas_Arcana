@@ -166,25 +166,19 @@ module.exports = function (socket, io) {
   });
 
   // Listen for player position updates from clients
-  socket.on("updatePlayerPosition", async ({ sessionId, newState }) => {
+  socket.on("updatePlayerPosition", async ({ sessionId, newPlayerPosition }) => {
+    console.log("Received new player position:", newPlayerPosition);
     try {
-      console.log("New state from socketcontroller:", newState);
-      // Process the new state (e.g., validate, apply game logic)
-      playerPositionManager.updatePlayerPosition(io, sessionId, newState);
-      // Retrieve the updated state
-      const updatedPosition = await playerPositionManager.getPlayerPosition(
-        sessionId
-      );
-      // Broadcast the updated state to all players in the session
-      io.to(sessionId).emit("updatePlayerPosition", updatedPosition.gameState); // Emit the gameState part
+        await playerPositionManager.updatePlayerPosition(
+            io, sessionId, newPlayerPosition
+        );
     } catch (error) {
-      console.error("Error updating game state:", error);
-      // Optionally, emit  an error message back to the client
-      socket.emit("positionUpdateError", {
-        message: "Failed to update position.",
-      });
+        console.error("Error updating game state:", error);
+        socket.emit("positionUpdateError", {
+            message: "Failed to update position.",
+        });
     }
-  });
+});
   // Listen for stronghold position updates from clients
   socket.on("updateStrongholdPosition", async ({ sessionId, newStrongholdPosition }) => {
     console.log("Received new stronghold position:", newStrongholdPosition);

@@ -15,6 +15,10 @@ import {
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import StrongholdPlacement from "./StrongholdPlacement";
 import { TileInfo } from "./GameBoard";
+import stronghold1 from "./GameTiles/stronghold1.png";
+import stronghold2 from "./GameTiles/stronghold2.png";
+import stronghold3 from "./GameTiles/stronghold3.png";
+import stronghold4 from "./GameTiles/stronghold4.png";
 
 interface Titan {
   titanName: string;
@@ -53,10 +57,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
     (state) => state.currentPlayerTurn as string
   );
   const setupPhase = useGameStatePart((state) => state.setupPhase as boolean);
-  const strongholdPositions = useGameStatePart(
-    (state) => state.strongholdPositions as StrongholdPosition[]
-  );
-
   const [isStrongholdPlacementMode, setIsStrongholdPlacementMode] =
     useState(false);
   const currentPlayer = useMemo(() => {
@@ -64,6 +64,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   }, [playerData, auth.username]);
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
+
 
   // console.log("TMD rendered");
   // Check if stronghold is placed and if cuurrent player turn
@@ -79,6 +80,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
     setStrongholdAlertMessage(message);
     setShowStrongholdAlert(true);
   };
+
 
   return (
     <IonModal

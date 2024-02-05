@@ -16,8 +16,15 @@ import stronghold1 from "./GameTiles/stronghold1.png";
 import stronghold2 from "./GameTiles/stronghold2.png";
 import stronghold3 from "./GameTiles/stronghold3.png";
 import stronghold4 from "./GameTiles/stronghold4.png";
+
+import playerToken1 from "./GameTiles/token1.png"
+import playerToken2 from "./GameTiles/token2.png"
+import playerToken3 from "./GameTiles/token3.png"
+import playerToken4 from "./GameTiles/token4.png"
+
 import {
   PlayerInfo,
+  PlayerPosition,
   StrongholdPosition,
   TitanInfo,
   TitanPosition,
@@ -39,7 +46,7 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   // const { gameState } = useGameContext();
-  const players = useGameStatePart((state) => state.players as PlayerInfo[]);
+  const players = useGameStatePart((state) => state.playerPositions as PlayerPosition[]);
   const strongholds = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
@@ -57,6 +64,9 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   let buildingSprites: BuildingSprites;
   const strongholdSpritesRef = useRef<StrongholdSprites | null>(null);
   const titanSpritesRef = useRef<TitanSprites | null>(null);
+  const playerSpritesRef = useRef<PlayerSprites | null>(null);
+
+
   // Initialize phaser game
   useEffect(() => {
     if (gameRef.current && !phaserGameRef.current) {
@@ -103,11 +113,30 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
             strongholdKey
           );
         });
-      }
-      if (titans) {
+       
+        if (players) {
+          players.forEach((player, index) => {
+            // Define the array of keys
+            let playerKeys = [
+              "stronghold1",
+              "stronghold2",
+              "stronghold3",
+              "stronghold4",
+            ];
+  
+            // Use the index to cycle through the keys
+            let keyIndex = index % playerKeys.length;
+            let playerKey = playerKeys[keyIndex];
+  
+            // (playerSpritesRef.current as PlayerSprites).addPlayer(
+            //   player,
+            //   playerKey
+            // );
+          });
+        }
       }
     }
-  }, [strongholds]);
+  }, [strongholds, players]);
 
   function preload(this: Phaser.Scene) {
     this.load.image("desert", desert);
@@ -129,6 +158,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     const graphics = this.add.graphics(); // Create a new Graphics object
     strongholdSpritesRef.current = new StrongholdSprites(this);
     titanSpritesRef.current = new TitanSprites(this);
+    playerSpritesRef.current = new PlayerSprites(this)
 
     const tileTypeToColor: { [key: string]: string } = {
       forest: "#095300", // Dark Green
@@ -162,10 +192,6 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       });
     });
 
-    interface TitanImageKeys {
-      [key: string]: string;
-    }
-
     const titanNameToImageKey: { [key: string]: string } = {
       "Fire Titan": "fireTitan",
       "Ice Titan": "iceTitan",
@@ -192,6 +218,18 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
         );
       });
     }
+
+    // if (players){
+    //   players.forEach((player, index)=> {
+    //     const playerKey = `player${(index % 4) + 1}`;
+    //     (playerSpritesRef.current as PlayerSprites).addPlayer(
+    //       player,
+    //       playerKey
+    //     )
+    //   })
+    // }
+    
+    
 
     // Mouse events
     let isDragging = false;

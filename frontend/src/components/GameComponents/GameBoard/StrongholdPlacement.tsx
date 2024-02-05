@@ -6,6 +6,7 @@ import {
   TitanInfo,
   StrongholdPosition,
   TitanPosition,
+  PlayerPosition,
 } from "../Interfaces"; // Adjust the import paths based on your project structure
 import {
   useGameContext,
@@ -25,7 +26,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
   selectedTile,
   onShowStrongholdAlert,
 }) => {
-  const { updateStrongholdPosition } = useGameContext();
+  const { updateStrongholdPosition, updatePlayerPosition } = useGameContext();
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
   const titans = useGameStatePart((state) => state.titanPositions as TitanPosition[]);
   const strongholdPositions = useGameStatePart(
@@ -76,9 +77,15 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
           y: selectedTile.y,
         };
 
-        // Update the stronghold position
+       const updatedPlayerPosition: PlayerPosition = {
+        playerUsername: currentPlayer.username,
+        x: selectedTile.x,
+        y: selectedTile.y
+       }
+       console.log("from stronghold placement players:" , updatedPlayerPosition)
 
         updateStrongholdPosition(updatedStrongholdPosition);
+        updatePlayerPosition(updatedPlayerPosition)
       } else {
         onShowStrongholdAlert(
           "Invalid stronghold placement. Must be at least 6 tiles away from Player Stronghold and Titan."

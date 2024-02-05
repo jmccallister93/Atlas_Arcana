@@ -76,7 +76,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   );
   const strongholdPositionsRef = useRef(strongholdPositions);
   strongholdPositionsRef.current = strongholdPositions;
-  const titans = useGameStatePart(
+  const titanPositions = useGameStatePart(
     (state) => state.titanPositions as TitanPosition[]
   );
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
@@ -84,7 +84,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [showTileDetails, setShowTileDetails] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage] = useState("");
-  const state = useGameStatePart((state) => state);
+
 
   // Handle Selected tile
   const handleTileSelection = (x: number, y: number) => {
@@ -102,7 +102,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
     // Check for titans
     let titanOnTile = null;
     let titanImageUrl = "";
-    const foundTitan = titans?.find((titan) => titan.x === x && titan.y === y);
+    const foundTitan = titanPositions?.find((titan) => titan.x === x && titan.y === y);
     if (foundTitan) {
       titanOnTile = foundTitan;
       switch (titanOnTile.titanName) {
