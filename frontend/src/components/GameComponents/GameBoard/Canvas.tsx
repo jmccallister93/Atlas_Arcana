@@ -23,6 +23,7 @@ import playerToken3 from "./GameTiles/token3.png"
 import playerToken4 from "./GameTiles/token4.png"
 
 import {
+  BuildingPosition,
   PlayerInfo,
   PlayerPosition,
   StrongholdPosition,
@@ -53,6 +54,9 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const titans = useGameStatePart(
     (state) => state.titanPositions as TitanPosition[]
   );
+  const buildings = useGameStatePart(
+    (state) => state.buildingPositions as BuildingPosition[]
+  );
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const gameRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +69,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const strongholdSpritesRef = useRef<StrongholdSprites | null>(null);
   const titanSpritesRef = useRef<TitanSprites | null>(null);
   const playerSpritesRef = useRef<PlayerSprites | null>(null);
-
+  const buildingSpritesRef = useRef<BuildingSprites | null>(null);
 
   // Initialize phaser game
   useEffect(() => {
@@ -134,6 +138,26 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
             );
           });
         }
+        // if (buildings) {
+        //   buildings.forEach((building, index) => {
+        //     // Define the array of keys
+        //     let buildingKeys = [
+        //       // "playerToken1",
+        //       // "playerToken2",
+        //       // "playerToken3",
+        //       // "playerToken4",
+        //     ];
+  
+        //     // Use the index to cycle through the keys
+        //     let keyIndex = index % buildingKeys.length;
+        //     let buildingKey = buildingKeys[keyIndex];
+  
+        //     (buildingSpritesRef.current as BuildingSprites).addBuilding(
+        //       building,
+        //       buildingKey
+        //     );
+        //   });
+        // }
       }
     }
   }, [strongholds, players]);
@@ -152,6 +176,10 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     this.load.image("stronghold2", stronghold2);
     this.load.image("stronghold3", stronghold3);
     this.load.image("stronghold4", stronghold4);
+    this.load.image("playerToken1", playerToken1);
+    this.load.image("playerToken2", playerToken2);
+    this.load.image("playerToken3", playerToken3)
+    this.load.image("playerToken4", playerToken4);
   }
 
   function create(this: Phaser.Scene) {
@@ -207,8 +235,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       });
     }
 
-    // Initialize strongholds (and other dynamic elements)
-
+    // Initialize strongholds
     if (strongholds) {
       strongholds.forEach((stronghold, index) => {
         const strongholdKey = `stronghold${(index % 4) + 1}`;
@@ -219,16 +246,28 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
       });
     }
 
-    // if (players){
-    //   players.forEach((player, index)=> {
-    //     const playerKey = `player${(index % 4) + 1}`;
-    //     (playerSpritesRef.current as PlayerSprites).addPlayer(
-    //       player,
-    //       playerKey
+    // Initialize players
+    if (players){
+      players.forEach((player, index)=> {
+        const playerKey = `player${(index % 4) + 1}`;
+        (playerSpritesRef.current as PlayerSprites).addPlayer(
+          player,
+          playerKey
+        )
+      })
+    }
+
+    
+    // Initialize buuildings
+    // if (buildings){
+    //   buildings.forEach((building, index)=> {
+    //     const buildingKey = `building${(index % 4) + 1}`;
+    //     (buildingSpritesRef.current as BuildingSprites).addBuilding(
+    //       building,
+    //       buildingKey
     //     )
     //   })
     // }
-    
     
 
     // Mouse events

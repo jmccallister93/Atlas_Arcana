@@ -194,50 +194,35 @@ module.exports = function (socket, io) {
     }
 });
 
-
-  // Listen for titan position updates from clients
-  socket.on("updateTitanPosition", async ({ sessionId, newState }) => {
-    try {
-      console.log("New state from socketcontroller:", newState);
-      // Process the new state (e.g., validate, apply game logic)
-      titanPositionManager.updateTitanPosition(io, sessionId, newState);
-      // Retrieve the updated state
-      const updatedPosition = await titanPositionManager.getTitanPosition(
-        sessionId
-      );
-      // Broadcast the updated state to all players in the session
-      io.to(sessionId).emit("updateTitanPosition", updatedPosition.gameState); // Emit the gameState part
-    } catch (error) {
-      console.error("Error updating game state:", error);
-      // Optionally, emit  an error message back to the client
-      socket.emit("positionUpdateError", {
-        message: "Failed to update position.",
-      });
-    }
-  });
   // Listen for building position updates from clients
-  socket.on("updateBuildingPosition", async ({ sessionId, newState }) => {
+  socket.on("updateBuildingPosition", async ({ sessionId, newBuildingPosition }) => {
+    console.log("Received new building position:", newBuildingPosition);
     try {
-      console.log("New state from socketcontroller:", newState);
-      // Process the new state (e.g., validate, apply game logic)
-      buildingPositionManager.updateBuildingPosition(io, sessionId, newState);
-      // Retrieve the updated state
-      const updatedPosition = await buildingPositionManager.getBuildingPosition(
-        sessionId
-      );
-      // Broadcast the updated state to all players in the session
-      io.to(sessionId).emit(
-        "updateBuildingPosition",
-        updatedPosition.gameState
-      ); // Emit the gameState part
+        await buildingPositionManager.updateBuildingPosition(
+            io, sessionId, newBuildingPosition
+        );
     } catch (error) {
-      console.error("Error updating game state:", error);
-      // Optionally, emit  an error message back to the client
-      socket.emit("positionUpdateError", {
-        message: "Failed to update position.",
-      });
+        console.error("Error updating game state:", error);
+        socket.emit("positionUpdateError", {
+            message: "Failed to update position.",
+        });
     }
+});
+    // Listen for titan position updates from clients
+    socket.on("updateTitanPosition", async ({ sessionId, newTitanPosition }) => {
+      console.log("Received new titan position:", newTitanPosition);
+      try {
+          await titanPositionManager.updateTitanPosition(
+              io, sessionId, newTitanPosition
+          );
+      } catch (error) {
+          console.error("Error updating game state:", error);
+          socket.emit("positionUpdateError", {
+              message: "Failed to update position.",
+          });
+      }
   });
+
 
   // Current Player Turn
   socket.on("updateCurrentPlayerTurn", async ({ sessionId, partialUpdate }) => {

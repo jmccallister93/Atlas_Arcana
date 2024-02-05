@@ -73,27 +73,16 @@ const gameReducer = (state: GameSessionInfo, action: any) => {
           ...state,
           gameState: { ...state, currentPlayerTurn: action.payload },
         };
-        case "UPDATE_PLAYER_POSITION":
-          return { ...state, ...action.payload };
-      
-        case "UPDATE_STRONGHOLD_POSITION":
-          return { ...state, ...action.payload };
-    
-        case "UPDATE_TITAN_POSITION":
-          const updatedTtianPosisitions = state.titanPositions.map((position) =>
-            position.titanName === action.payload.titanName
-              ? action.payload
-              : position
-          );
-          return { ...state, titanPositions: updatedTtianPosisitions };
-        case "UPDATE_BUILDING_POSITION":
-          const updatedBuildingPosisitions = state.buildingPositions.map(
-            (position) =>
-              position.buildingName === action.payload.buildingName
-                ? action.payload
-                : position
-          );
-          return { ...state, buildingPositions: updatedBuildingPosisitions };
+      case "UPDATE_PLAYER_POSITION":
+        return { ...state, ...action.payload };
+
+      case "UPDATE_STRONGHOLD_POSITION":
+        return { ...state, ...action.payload };
+
+      case "UPDATE_TITAN_POSITION":
+        return { ...state, ...action.payload };
+      case "UPDATE_BUILDING_POSITION":
+        return { ...state, ...action.payload };
       default:
         return state;
     }
@@ -135,7 +124,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }, []);
 
   const emitGameStateUpdate = (updatedData: Partial<GameSessionInfo>) => {
-    console.log("From emitGameState update updatedData:",updatedData)
+    console.log("From emitGameState update updatedData:", updatedData);
     if (gameState) {
       const updatedState = {
         sessionId: gameState.sessionId,
@@ -176,23 +165,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const emitPlayerPositionUpdate = (playerPosition: PlayerPosition) => {
     if (gameState) {
-        const updatePayload = {
-            sessionId: gameState.sessionId,
-            newPlayerPosition: playerPosition,
-        };
-        socket.emit("updatePlayerPosition", updatePayload);
+      const updatePayload = {
+        sessionId: gameState.sessionId,
+        newPlayerPosition: playerPosition,
+      };
+      socket.emit("updatePlayerPosition", updatePayload);
     }
-};
+  };
 
-const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
-  dispatch({
-    type: "UPDATE_PLAYER_POSITION",
-    payload: updatedPlayerPosition,
-  });
+  const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
+    dispatch({
+      type: "UPDATE_PLAYER_POSITION",
+      payload: updatedPlayerPosition,
+    });
 
-  emitPlayerPositionUpdate(updatedPlayerPosition);
-};
-
+    emitPlayerPositionUpdate(updatedPlayerPosition);
+  };
 
   //   Stronghold position
   useEffect(() => {
@@ -209,27 +197,28 @@ const updatePlayerPosition = (updatedPlayerPosition: PlayerPosition) => {
     };
   }, []);
 
-  const emitStrongholdPositionUpdate = (strongholdPosition: StrongholdPosition) => {
+  const emitStrongholdPositionUpdate = (
+    strongholdPosition: StrongholdPosition
+  ) => {
     if (gameState) {
-        const updatePayload = {
-            sessionId: gameState.sessionId,
-            newStrongholdPosition: strongholdPosition,
-        };
-        socket.emit("updateStrongholdPosition", updatePayload);
+      const updatePayload = {
+        sessionId: gameState.sessionId,
+        newStrongholdPosition: strongholdPosition,
+      };
+      socket.emit("updateStrongholdPosition", updatePayload);
     }
-};
+  };
 
+  const updateStrongholdPosition = (
+    updatedStrongholdPosition: StrongholdPosition
+  ) => {
+    dispatch({
+      type: "UPDATE_STRONGHOLD_POSITION",
+      payload: updatedStrongholdPosition,
+    });
 
-
-const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition) => {
-  dispatch({
-    type: "UPDATE_STRONGHOLD_POSITION",
-    payload: updatedStrongholdPosition,
-  });
-
-  emitStrongholdPositionUpdate(updatedStrongholdPosition);
-};
-
+    emitStrongholdPositionUpdate(updatedStrongholdPosition);
+  };
 
   //   Titan position
   useEffect(() => {
@@ -244,32 +233,26 @@ const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition)
     };
   }, []);
 
-  const emitTitanPositionUpdate = (updatedData: Partial<GameSessionInfo>) => {
-    console.log("From emitGameState update updatedData:", updatedData);
+  const emitTitanPositionUpdate = (
+    titanPosition: TitanPosition
+  ) => {
     if (gameState) {
-      const updatedState = {
+      const updatePayload = {
         sessionId: gameState.sessionId,
-        newState: {
-          ...gameState,
-          ...updatedData,
-        },
+        newTitanPosition: titanPosition,
       };
-      socket.emit("updateTitanPosition", updatedState);
+      socket.emit("updateTitanPosition", updatePayload);
     }
   };
+  const updateTitanPosition = (
+    updatedTitanPosition: TitanPosition
+  ) => {
+    dispatch({
+      type: "UPDATE_TITAN_POSITION",
+      payload: updatedTitanPosition,
+    });
 
-  const updateTitanPosition = (updatedTitanPosition: TitanPosition) => {
-    dispatch({ type: "UPDATE_TITAN_POSITION", payload: updatedTitanPosition });
-    if (gameState && gameState.titanPositions) {
-      emitTitanPositionUpdate({
-        titanPositions: gameState.titanPositions.map(
-          (position: TitanPosition) =>
-            position.titanName === updatedTitanPosition.titanName
-              ? updatedTitanPosition
-              : position
-        ),
-      });
-    }
+    emitTitanPositionUpdate(updatedTitanPosition);
   };
 
   //   Building position
@@ -286,39 +269,26 @@ const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition)
   }, []);
 
   const emitBuildingPositionUpdate = (
-    updatedData: Partial<GameSessionInfo>
+    buildingPosition: BuildingPosition
   ) => {
-    console.log("From emitGameState update updatedData:", updatedData);
     if (gameState) {
-      const updatedState = {
+      const updatePayload = {
         sessionId: gameState.sessionId,
-        newState: {
-          ...gameState,
-          ...updatedData,
-        },
+        newBuildingPosition: buildingPosition,
       };
-      socket.emit("updateBuildingPosition", updatedState);
+      socket.emit("updateBuildingPosition", updatePayload);
     }
   };
   const updateBuildingPosition = (
     updatedBuildingPosition: BuildingPosition
   ) => {
     dispatch({
-      type: "UPDATE_BUILDING_POSITION",
+      type: "UPDATE_BUUILDING_POSITION",
       payload: updatedBuildingPosition,
     });
-    if (gameState && gameState.buildingPositions) {
-      emitBuildingPositionUpdate({
-        buildingPositions: gameState.buildingPositions.map(
-          (position: BuildingPosition) =>
-            position.ownerName === updatedBuildingPosition.ownerName
-              ? updatedBuildingPosition
-              : position
-        ),
-      });
-    }
-  };
 
+    emitBuildingPositionUpdate(updatedBuildingPosition);
+  };
 
   useEffect(() => {
     console.log("From Gamecontext gameState:", gameState);
@@ -333,7 +303,7 @@ const updateStrongholdPosition = (updatedStrongholdPosition: StrongholdPosition)
         updateBuildingPosition,
         updatePlayerPosition,
         updateTitanPosition,
-        updateStrongholdPosition
+        updateStrongholdPosition,
       }}
     >
       {children}

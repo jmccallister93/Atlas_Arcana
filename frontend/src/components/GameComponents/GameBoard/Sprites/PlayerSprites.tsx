@@ -1,5 +1,5 @@
 import { PlayerPosition } from "../../Interfaces";
-
+ 
 class PlayerSprites {
     scene: Phaser.Scene;
     players: Map<string, Phaser.GameObjects.Sprite>;
@@ -38,17 +38,6 @@ class PlayerSprites {
     
           this.players.set(player.playerUsername, sprite);
         }
-      }
-
-      drawX(graphics: Phaser.GameObjects.Graphics, x: number, y: number) {
-        graphics.lineStyle(5, 0xFF0000); // Red color
-        graphics.beginPath();
-        graphics.moveTo(x, y);
-        graphics.lineTo(x + this.tileSize, y + this.tileSize);
-        graphics.moveTo(x + this.tileSize, y);
-        graphics.lineTo(x, y + this.tileSize);
-        graphics.closePath();
-        graphics.strokePath();
       }
 }
 

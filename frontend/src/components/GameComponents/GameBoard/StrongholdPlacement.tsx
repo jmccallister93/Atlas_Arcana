@@ -82,7 +82,7 @@ const StrongholdPlacement: React.FC<StrongholdPlacementProps> = ({
         x: selectedTile.x,
         y: selectedTile.y
        }
-       console.log("from stronghold placement players:" , updatedPlayerPosition)
+
 
         updateStrongholdPosition(updatedStrongholdPosition);
         updatePlayerPosition(updatedPlayerPosition)

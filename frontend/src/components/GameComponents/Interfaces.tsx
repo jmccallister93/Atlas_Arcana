@@ -115,7 +115,7 @@ export interface TitanPosition {
   y: number;
 }
 export interface BuildingPosition {
-  ownerName: string;
+  playerUsername: string;
   buildingName: string;
   x: number;
   y: number;

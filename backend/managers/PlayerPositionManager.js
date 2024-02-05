@@ -26,11 +26,6 @@ class PlayerPositionManager {
         parsedSessionData.playerPositions
       );
 
-      // Initialize playerPositions as an array if it doesn't exist
-      if (!Array.isArray(parsedSessionData.playerPositions)) {
-        parsedSessionData.playerPositions = [];
-      }
-
       // Check if the player position for the user already exists
       const existingIndex = parsedSessionData.playerPositions?.findIndex(
         (position) =>

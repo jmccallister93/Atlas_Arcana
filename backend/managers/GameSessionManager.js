@@ -21,6 +21,7 @@ const worldEventCards = require("../gameCards/worldEventCards");
 const PlayerPositionManager = require("./PlayerPositionManager");
 const TitanPositionManager = require("./TitanPositionManager");
 const StrongholdPositionManager = require("./StrongholdPositionManager");
+const BuildingPositionManager = require("./BuildingPositionManager");
 
 // Redis client for session management
 const sessionClient = redis.createClient();
@@ -42,7 +43,7 @@ class GameSessionManager {
     this.cardManager = new CardManager( sessionClient);
     this.playerPositionManager = new PlayerPositionManager()
     this.titanPositionManager = new TitanPositionManager();
-    // this.buildingPositionManager = new BuildingPositionManager()
+    this.buildingPositionManager = new BuildingPositionManager()
     this.strongholdPositionManager = new StrongholdPositionManager()
   }
 
@@ -66,8 +67,9 @@ class GameSessionManager {
     const newSession = {
       sessionId: this.sessionId,
       players,
-      // playerPositions: playerPositions,
+      playerPositions: [],
       strongholdPositions: [],
+      buildingPositions: [],
       turnOrder,
       currentPlayerTurn,
       tileGrid,
