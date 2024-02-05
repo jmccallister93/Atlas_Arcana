@@ -14,6 +14,12 @@ const MapPhase: React.FC<MapPhaseProps> = ({}) => {
     (player) => player.username === auth.username
   );
   const [showMapDetails, setShowMapDetails] = useState(true);
+  const [moveState, setMoveState] = useState(false);
+
+  const handleMoveClick = () => {
+    setShowMapDetails(false);
+    setMoveState(true);
+  };
 
   return (
     <>
@@ -34,14 +40,24 @@ const MapPhase: React.FC<MapPhaseProps> = ({}) => {
               <IonIcon icon={closeOutline} />
             </button>
           </div>
-          <IonButton>Move Character</IonButton>
+          {moveState ? (
+            <>
+              <IonButton onClick={() => setMoveState(false)} color="danger">Cancel Move</IonButton>
+            </>
+          ) : (
+            <>
+              <IonButton onClick={handleMoveClick}>Move Character</IonButton>
+            </>
+          )}
+
           <IonButton>Build Structure</IonButton>
           <p>
             <b>WARNING:</b> If Rest is taken Map Phase will be skipped.
           </p>
-          <IonButton>Rest</IonButton>
+          <IonButton color='warning'>Rest</IonButton>
         </IonModal>
       </div>
+      {moveState ? <>Move Charcter</> : <></>}
     </>
   );
 };

@@ -70,8 +70,8 @@ const EquipGear: React.FC<EquipGearProps> = ({
   ) => {
     if (
       currentPlayer &&
-      currentPlayer.username !== gameState.currentPlayerTurn &&
-      gameState.currentPhase !== "Rest"
+      currentPlayer.username !== gameState.currentPlayerTurn 
+      // && gameState.currentPhase !== "Rest"
     ) {
       return;
     }
@@ -127,8 +127,9 @@ const EquipGear: React.FC<EquipGearProps> = ({
   ) => {
     if (
       currentPlayer &&
-      currentPlayer.username !== gameState.currentPlayerTurn &&
-      gameState.currentPhase !== "Rest"
+      currentPlayer.username !== gameState.currentPlayerTurn 
+      
+      //&& gameState.currentPhase !== "Rest"
     ) {
       return;
     }
@@ -178,11 +179,11 @@ const EquipGear: React.FC<EquipGearProps> = ({
       return;
     }
 
-    if (gameState.currentPhase !== "Rest") {
-      setAlertMessage("It's not the Rest phase!");
-      setShowAlert(true);
-      return;
-    }
+    // if (gameState.currentPhase !== "Rest") {
+    //   setAlertMessage("It's not the Rest phase!");
+    //   setShowAlert(true);
+    //   return;
+    // }
 
     equipItem(itemToEquip, player, updatePlayerData);
   };
@@ -194,11 +195,11 @@ const EquipGear: React.FC<EquipGearProps> = ({
       return;
     }
 
-    if (gameState.currentPhase !== "Rest") {
-      setAlertMessage("It's not the Rest phase!");
-      setShowAlert(true);
-      return;
-    }
+    // if (gameState.currentPhase !== "Rest") {
+    //   setAlertMessage("It's not the Rest phase!");
+    //   setShowAlert(true);
+    //   return;
+    // }
 
     unequipItem(itemToUnequip, player, updatePlayerData);
   };

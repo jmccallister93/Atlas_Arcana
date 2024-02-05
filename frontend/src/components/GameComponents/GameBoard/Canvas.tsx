@@ -17,10 +17,10 @@ import stronghold2 from "./GameTiles/stronghold2.png";
 import stronghold3 from "./GameTiles/stronghold3.png";
 import stronghold4 from "./GameTiles/stronghold4.png";
 
-import playerToken1 from "./GameTiles/token1.png"
-import playerToken2 from "./GameTiles/token2.png"
-import playerToken3 from "./GameTiles/token3.png"
-import playerToken4 from "./GameTiles/token4.png"
+import playerToken1 from "./GameTiles/token1.png";
+import playerToken2 from "./GameTiles/token2.png";
+import playerToken3 from "./GameTiles/token3.png";
+import playerToken4 from "./GameTiles/token4.png";
 
 import {
   BuildingPosition,
@@ -47,7 +47,13 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   // const { gameState } = useGameContext();
-  const players = useGameStatePart((state) => state.playerPositions as PlayerPosition[]);
+
+  const playerStats = useGameStatePart(
+    (state) => state.players as PlayerInfo[]
+  );
+  const players = useGameStatePart(
+    (state) => state.playerPositions as PlayerPosition[]
+  );
   const strongholds = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
@@ -70,6 +76,11 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
   const titanSpritesRef = useRef<TitanSprites | null>(null);
   const playerSpritesRef = useRef<PlayerSprites | null>(null);
   const buildingSpritesRef = useRef<BuildingSprites | null>(null);
+
+  const currentPlayer = useGameStatePart((state) => state.currentPlayerTurn);
+  const gamePhase = useGameStatePart((state) => state.currentPhase);
+
+  useEffect(() => {}, [gamePhase]);
 
   // Initialize phaser game
   useEffect(() => {
@@ -117,7 +128,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
             strongholdKey
           );
         });
-       
+
         if (players) {
           players.forEach((player, index) => {
             // Define the array of keys
@@ -127,11 +138,11 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
               "playerToken3",
               "playerToken4",
             ];
-  
+
             // Use the index to cycle through the keys
             let keyIndex = index % playerKeys.length;
             let playerKey = playerKeys[keyIndex];
-  
+
             (playerSpritesRef.current as PlayerSprites).addPlayer(
               player,
               playerKey
@@ -147,11 +158,11 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
         //       // "playerToken3",
         //       // "playerToken4",
         //     ];
-  
+
         //     // Use the index to cycle through the keys
         //     let keyIndex = index % buildingKeys.length;
         //     let buildingKey = buildingKeys[keyIndex];
-  
+
         //     (buildingSpritesRef.current as BuildingSprites).addBuilding(
         //       building,
         //       buildingKey
@@ -162,6 +173,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     }
   }, [strongholds, players]);
 
+  //Preload
   function preload(this: Phaser.Scene) {
     this.load.image("desert", desert);
     this.load.image("forest", forest);
@@ -178,15 +190,16 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     this.load.image("stronghold4", stronghold4);
     this.load.image("playerToken1", playerToken1);
     this.load.image("playerToken2", playerToken2);
-    this.load.image("playerToken3", playerToken3)
+    this.load.image("playerToken3", playerToken3);
     this.load.image("playerToken4", playerToken4);
   }
 
+  //Create
   function create(this: Phaser.Scene) {
     const graphics = this.add.graphics(); // Create a new Graphics object
     strongholdSpritesRef.current = new StrongholdSprites(this);
     titanSpritesRef.current = new TitanSprites(this);
-    playerSpritesRef.current = new PlayerSprites(this)
+    playerSpritesRef.current = new PlayerSprites(this);
 
     const tileTypeToColor: { [key: string]: string } = {
       forest: "#095300", // Dark Green
@@ -247,18 +260,17 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     }
 
     // Initialize players
-    if (players){
-      players.forEach((player, index)=> {
+    if (players) {
+      players.forEach((player, index) => {
         const playerKey = `player${(index % 4) + 1}`;
         (playerSpritesRef.current as PlayerSprites).addPlayer(
           player,
           playerKey
-        )
-      })
+        );
+      });
     }
 
-    
-    // Initialize buuildings
+    // Initialize buildings
     // if (buildings){
     //   buildings.forEach((building, index)=> {
     //     const buildingKey = `building${(index % 4) + 1}`;
@@ -268,7 +280,7 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
     //     )
     //   })
     // }
-    
+
 
     // Mouse events
     let isDragging = false;
