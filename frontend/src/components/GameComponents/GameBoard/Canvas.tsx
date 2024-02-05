@@ -118,20 +118,20 @@ const Canvas: React.FC<CanvasProps> = ({ handleTileSelection }) => {
           players.forEach((player, index) => {
             // Define the array of keys
             let playerKeys = [
-              "stronghold1",
-              "stronghold2",
-              "stronghold3",
-              "stronghold4",
+              "playerToken1",
+              "playerToken2",
+              "playerToken3",
+              "playerToken4",
             ];
   
             // Use the index to cycle through the keys
             let keyIndex = index % playerKeys.length;
             let playerKey = playerKeys[keyIndex];
   
-            // (playerSpritesRef.current as PlayerSprites).addPlayer(
-            //   player,
-            //   playerKey
-            // );
+            (playerSpritesRef.current as PlayerSprites).addPlayer(
+              player,
+              playerKey
+            );
           });
         }
       }

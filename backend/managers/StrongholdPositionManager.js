@@ -1,7 +1,7 @@
 class StrongholdPositionManager {
   constructor(sessionClient) {
     this.sessionClient = sessionClient
-    this.strongholdPositions = new Map(); // { playerId: { x: Number, y: Number }, ... }
+    this.strongholdPositions = new Map();
   }
   // This method will handle both initialization and updating of stronghold positions
   async updateStrongholdPosition(io, sessionId, newStrongholdPosition) {

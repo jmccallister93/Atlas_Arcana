@@ -66,7 +66,7 @@ class GameSessionManager {
     const newSession = {
       sessionId: this.sessionId,
       players,
-      playerPositions: playerPositions,
+      // playerPositions: playerPositions,
       strongholdPositions: [],
       turnOrder,
       currentPlayerTurn,
