@@ -7,7 +7,12 @@ import {
   IonAlert,
 } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
-import { BuildingInfo, PlayerInfo, StrongholdPosition, TitanPosition } from "../Interfaces";
+import {
+  BuildingInfo,
+  PlayerInfo,
+  StrongholdPosition,
+  TitanPosition,
+} from "../Interfaces";
 import {
   useGameContext,
   useGameStatePart,
@@ -31,7 +36,6 @@ interface Titan {
   col: number;
   image?: string;
 }
-
 
 interface TileMenuDetailsProps {
   selectedTile: TileInfo | null;
@@ -65,7 +69,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
   const [showStrongholdAlert, setShowStrongholdAlert] = useState(false);
   const [strongholdAlertMessage, setStrongholdAlertMessage] = useState("");
 
-
   // console.log("TMD rendered");
   // Check if stronghold is placed and if cuurrent player turn
   useEffect(() => {
@@ -80,7 +83,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
     setStrongholdAlertMessage(message);
     setShowStrongholdAlert(true);
   };
-
 
   return (
     <IonModal
@@ -99,6 +101,9 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
         </div>
         {selectedTile && (
           <>
+            <p>
+              <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
+            </p>
             {/* Stronghold Palcement */}
             {isStrongholdPlacementMode ? (
               <StrongholdPlacement
@@ -140,14 +145,14 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                 <h3>Player Details</h3>
                 {/* Add more player details as needed */}
                 <p>
-                  <b>Username:</b> {selectedTile.players.username}
+                  <b>Username:</b> {selectedTile.players.playerUsername}
                 </p>
                 {/* ...other player details */}
               </div>
             )}
 
             {/* Render Building Details */}
-            {selectedTile.buildings && selectedTile.buildings.length > 0 && (
+            {/* {selectedTile.buildings && selectedTile.buildings.length > 0 && (
               <div>
                 <h3>Buildings</h3>
                 {selectedTile.buildings.map((building, index) => (
@@ -158,11 +163,11 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                     <p>
                       <b>Count:</b> {building.count}
                     </p>
-                    {/* ...other building details */}
+                    
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
 
             {/* Render Stronghold Details */}
             {selectedTile.stronghold && (
@@ -174,10 +179,6 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
                   style={{ maxWidth: "100%" }}
                 />
                 <p>Owner: {selectedTile.stronghold.playerUsername}</p>
-                <p>
-                  Coordinates: (X: {selectedTile.stronghold.x}, Y:{" "}
-                  {selectedTile.stronghold.y})
-                </p>
               </div>
             )}
 
@@ -191,9 +192,7 @@ const TileMenuDetails: React.FC<TileMenuDetailsProps> = ({
               <p>
                 <b>Type:</b> {selectedTile.type}
               </p>
-              <p>
-                <b>Coordinates:</b> (X: {selectedTile.x}, Y: {selectedTile.y})
-              </p>
+
               <p>
                 <b>Building Bonuses:</b> {selectedTile.buildingBonuses}
               </p>

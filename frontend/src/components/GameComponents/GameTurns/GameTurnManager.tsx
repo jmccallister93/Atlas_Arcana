@@ -5,7 +5,7 @@ import { GameSessionInfo, PlayerInfo, StrongholdPosition } from "../Interfaces";
 import DrawPhase from "./DrawPhase/DrawPhase";
 import TradePhase from "./TradePhase/TradePhase";
 import RestPhase from "./RestPhase/RestPhase";
-import MapPhase from "./MapPhase";
+import MapPhase from "./MapPhase/MapPhase";
 import CombatPhase from "./CombatPhase";
 import TitanPhase from "./TitanPhase";
 import socket from "../../../context/SocketClient/socketClient";

@@ -69,7 +69,9 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
   useEffect(() => {
     socket.on("resourcesAllocated", (resourcesAllocated) => {
       console.log("resourcesAllocated", resourcesAllocated);
-      setResourcesAllocatedDetails(resourcesAllocated - currentPlayer?.inventory.resources);
+      setResourcesAllocatedDetails(
+        resourcesAllocated - currentPlayer?.inventory.resources
+      );
       if (currentPlayer) {
         const newPlayer = {
           ...currentPlayer,
@@ -110,17 +112,20 @@ const DrawPhase: React.FC<DrawPhaseProps> = ({}) => {
       <IonButton onClick={() => setShowCardDrawDetails(true)}>
         Draw Options
       </IonButton>
+
       <IonModal
         isOpen={showCardDrawDetails}
         onDidDismiss={() => setShowCardDrawDetails(false)}
       >
-        <button
-          className="closeButton"
-          onClick={() => setShowCardDrawDetails(false)}
-        >
-          <IonIcon icon={closeOutline} />
-        </button>
-        <h1>Draw Phase</h1>
+        <div className="modalHeader">
+          <h3>Draw Phase</h3>
+          <button
+            className="closeButton"
+            onClick={() => setShowCardDrawDetails(false)}
+          >
+            <IonIcon icon={closeOutline} />
+          </button>
+        </div>
         {isResourcesAllocated ? (
           <>
             <h2>Resources Allocated! {resourcesAllocatedDetails}</h2>

@@ -16,8 +16,10 @@ import stronghold4 from "./GameTiles/stronghold4.png";
 import "./GameBoard.scss";
 import {
   BuildingInfo,
+  BuildingPosition,
   GameSessionInfo,
   PlayerInfo,
+  PlayerPosition,
   StrongholdPosition,
   TitanInfo,
   TitanPosition,
@@ -37,8 +39,8 @@ export interface TileInfo {
   image: string;
   monsterBonuses: string;
   buildingBonuses: string;
-  buildings: BuildingInfo[] | null;
-  players: PlayerInfo | null;
+  // buildings: BuildingPosition | null;
+  players: PlayerPosition | null;
   stronghold: StrongholdPosition | null;
   strongholdImage: string;
   titan: TitanPosition | null;
@@ -70,7 +72,11 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   // console.log("GameBoard Rendered");
   // Get Game state componenets
   const players = useGameStatePart((state) => state.players as PlayerInfo[]);
-  const playerBoardData = usePlayerBoardData(players);
+  const playerPositions = useGameStatePart((state) => state.playerPositions as PlayerPosition[]);
+  const playerPositionsRef = useRef(playerPositions);
+  playerPositionsRef.current = playerPositions;
+  
+  // const playerBoardData = usePlayerBoardData(players);
   const strongholdPositions = useGameStatePart(
     (state) => state.strongholdPositions as StrongholdPosition[]
   );
@@ -79,6 +85,11 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const titanPositions = useGameStatePart(
     (state) => state.titanPositions as TitanPosition[]
   );
+
+  const buildingPositions = useGameStatePart((state) => state.buildingPositions as BuildingPosition[]);
+  const buildingPositionsRef = useRef(buildingPositions);
+  buildingPositionsRef.current = buildingPositions;
+
   const tileGrid = useGameStatePart((state) => state.tileGrid as string[][]);
   const [selectedTile, setSelectedTile] = useState<TileInfo | null>(null);
   const [showTileDetails, setShowTileDetails] = useState(false);
@@ -123,25 +134,42 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
     // Determine the image URL based on the player's name
     let playerOnTile = null;
-    playerBoardData?.forEach((player) => {
-      // Check for player
-      // if (player.row === y && player.col === x) {
-      //   playerOnTile = player;
+    const foundPlayer = playerPositionsRef.current.find(
+      (player) => player.x === x && player.y === y
+    );
+
+    if (foundPlayer) {
+      playerOnTile = {
+        playerUsername: foundPlayer.playerUsername,
+        x: foundPlayer.x,
+        y: foundPlayer.y,
+      };
+      const playerIndex = players.findIndex(
+        (player) => player.username === foundPlayer.playerUsername
+      );
+      // if (playerIndex !== -1 && playerIndex < foundPlayer.length) {
+      //   strongholdImageUrl = strongholdImages[playerIndex];
       // }
-      // Check for buildings
-      Object.values(player.buildings).forEach((buildingCategory) => {
-        // Ensure buildingCategory is an array before calling forEach
-        if (Array.isArray(buildingCategory)) {
-          buildingCategory.forEach((building) => {
-            building.location.forEach((loc) => {
-              if (loc.row === y && loc.col === x) {
-                buildingsOnTile.push(building);
-              }
-            });
-          });
-        }
-      });
-    });
+    }
+    // playerBoardData?.forEach((player) => {
+    //   // Check for player
+    //   // if (player.row === y && player.col === x) {
+    //   //   playerOnTile = player;
+    //   // }
+    //   // Check for buildings
+    //   Object.values(player.buildings).forEach((buildingCategory) => {
+    //     // Ensure buildingCategory is an array before calling forEach
+    //     if (Array.isArray(buildingCategory)) {
+    //       buildingCategory.forEach((building) => {
+    //         building.location.forEach((loc) => {
+    //           if (loc.row === y && loc.col === x) {
+    //             buildingsOnTile.push(building);
+    //           }
+    //         });
+    //       });
+    //     }
+    //   });
+    // });
 
     // Stronghold
     let strongholdOnTile = null;
@@ -169,6 +197,35 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       if (playerIndex !== -1 && playerIndex < strongholdImages.length) {
         strongholdImageUrl = strongholdImages[playerIndex];
       }
+    }
+
+    
+    // Stronghold
+    let buildingOnTile = null;
+    // let buildingImageUrl = "";
+    // Mapping object
+    const buildingImages = [
+      // stronghold1,
+      // stronghold2,
+      // stronghold3,
+      // stronghold4,
+    ];
+    const foundBuilding = buildingPositionsRef.current.find(
+      (building) => building.x === x && building.y === y
+    );
+
+    if (foundBuilding) {
+      buildingOnTile = {
+        playerUsername: foundBuilding.playerUsername,
+        x: foundBuilding.x,
+        y: foundBuilding.y,
+      };
+      // const playerIndex = players.findIndex(
+      //   (player) => player.username === foundBuilding.playerUsername
+      // );
+      // if (playerIndex !== -1 && playerIndex < strongholdImages.length) {
+      // buildingImageUrl = strongholdImages[playerIndex];
+      // }
     }
 
     return {
@@ -246,7 +303,7 @@ const GameBoard: React.FC<GameBoardProps> = ({}) => {
       players: playerOnTile,
       stronghold: strongholdOnTile,
       strongholdImage: strongholdImageUrl,
-      buildings: buildingsOnTile,
+      // buildings: buildingsOnTile,
     });
     setShowTileDetails(true);
   };
